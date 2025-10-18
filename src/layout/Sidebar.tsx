@@ -40,7 +40,7 @@ import {
 const InventoryItems = [
   {
     title: "Product",
-    url: "#",
+    url: "/products",
     icon: Box,
   },
   {
