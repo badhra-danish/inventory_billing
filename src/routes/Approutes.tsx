@@ -5,7 +5,8 @@ import AppSidebar from "@/layout/Sidebar";
 import Navbar from "@/layout/Navbar";
 import CreateProduct from "@/pages/inventory/CreateProduct";
 import OutletLayout from "@/layout/outlet";
-import Products from "@/pages/inventory/Product";
+import ProductDataTablepage from "@/pages/inventory/Product";
+import ProductDetails from "@/components/inventory/ProductDetail";
 
 function Approutes() {
   return (
@@ -14,7 +15,11 @@ function Approutes() {
         <Routes>
           <Route path="/" element={<OutletLayout />}>
             <Route path="/create-product" element={<CreateProduct />} />
-            <Route path="/products" element={<Products />} />
+            <Route path="/products" element={<ProductDataTablepage />} />
+            <Route
+              path="/product-detail/:product_id"
+              element={<ProductDetails />}
+            />
           </Route>
         </Routes>
       </main>

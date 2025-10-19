@@ -26,7 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 function CreateProduct() {
+  const navigate = useNavigate();
   const [productType, setProductType] = React.useState<
     "single" | "variable" | ""
   >("");
@@ -73,7 +75,10 @@ function CreateProduct() {
             <p>Create Product</p>
           </div>
           <div>
-            <Button className="bg-gray border-2 border-blue-400 text-blue-400 hover:text-white">
+            <Button
+              className="bg-gray border-2 border-blue-400 text-blue-400 hover:text-white"
+              onClick={() => navigate("/products")}
+            >
               <ArrowLeft />
               Back To Product
             </Button>
