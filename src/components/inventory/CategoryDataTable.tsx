@@ -53,192 +53,96 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Product[] = [
+const data: Category[] = [
   {
-    id: "P001",
-    name: "Plywood Sheet 12mm",
-    category: "Wood & Boards",
-    brand: "GreenPly",
-    unit: "pc",
-    qty: 300,
-    price: 1200,
-    status: "In Stock",
+    name: "wood",
+    slugName: "wood",
+    status: "active",
   },
   {
-    id: "P002",
-    name: "Laminated Sheet 18mm",
-    category: "Wood & Boards",
-    brand: "Century",
-    unit: "pc",
-    qty: 300,
-    price: 1800,
-
-    status: "Low Stock",
+    name: "Plywood",
+    slugName: "plywood",
+    status: "active",
   },
   {
-    id: "P003",
-    name: "Hinges 3-inch",
-    category: "Hardware",
-    brand: "Godrej",
-    unit: "pc",
-    qty: 300,
-    price: 50,
-
-    status: "Out of Stock",
+    name: "Laminates",
+    slugName: "laminates",
+    status: "active",
   },
   {
-    id: "P004",
-    name: "Wood Glue 1L",
-    category: "Adhesives",
-    brand: "Fevicol",
-    unit: "pc",
-    qty: 300,
-    price: 250,
-
-    status: "In Stock",
+    name: "Hardware",
+    slugName: "hardware",
+    status: "active",
   },
   {
-    id: "P005",
-    name: "Drawer Slide Set",
-    category: "Hardware",
-    brand: "Hettich",
-    unit: "pc",
-    qty: 300,
-    price: 300,
-
-    status: "In Stock",
+    name: "Glass",
+    slugName: "glass",
+    status: "inactive",
   },
   {
-    id: "P006",
-    name: "Veneer Sheet 4x8ft",
-    category: "Finishing",
-    brand: "Kitply",
-    unit: "pc",
-    qty: 300,
-    price: 950,
-
-    status: "Low Stock",
+    name: "Paints",
+    slugName: "paints",
+    status: "active",
   },
   {
-    id: "P007",
-    name: "Screw Pack (100pcs)",
-    category: "Fasteners",
-    brand: "Taparia",
-    unit: "pc",
-    qty: 300,
-    price: 120,
-
-    status: "Out of Stock",
+    name: "Doors",
+    slugName: "doors",
+    status: "inactive",
   },
   {
-    id: "P008",
-    name: "Edge Band Roll",
-    category: "Finishing",
-    brand: "Rehau",
-    unit: "pc",
-    qty: 300,
-    price: 200,
-
-    status: "In Stock",
+    name: "Flooring",
+    slugName: "flooring",
+    status: "active",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    name: "Handles & Locks",
+    slugName: "handles-locks",
+    status: "active",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    name: "Cement Sheets",
+    slugName: "cement-sheets",
+    status: "inactive",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    name: "Doors",
+    slugName: "doors",
+    status: "inactive",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    name: "Doors",
+    slugName: "doors",
+    status: "inactive",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    name: "Flooring",
+    slugName: "flooring",
+    status: "active",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    name: "Handles & Locks",
+    slugName: "handles-locks",
+    status: "active",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    name: "Flooring",
+    slugName: "flooring",
+    status: "active",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    name: "Handles & Locks",
+    slugName: "handles-locks",
+    status: "active",
   },
 ];
 
-export type Product = {
-  id: string;
+export type Category = {
   name: string;
-  category: string;
-  brand: string;
-  unit: string;
-  qty: number;
-  price: number;
-  status: "In Stock" | "Low Stock" | "Out of Stock" | "failed";
+  slugName: string;
+  status: "active" | "inactive";
 };
 
-export default function Products() {
+export default function Category() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -246,12 +150,12 @@ export default function Products() {
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
-  const [selectedBrand, setSelectedBrand] = React.useState<string>("All");
+  const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<Category>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -275,15 +179,6 @@ export default function Products() {
       enableHiding: false,
     },
     {
-      accessorKey: "id",
-      header: () => <div className="text-left">SKU</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">{row.getValue("id")}</div>
-        );
-      },
-    },
-    {
       accessorKey: "name",
       header: ({ column }) => {
         return (
@@ -291,7 +186,7 @@ export default function Products() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Product Name
+            Category
             <ArrowUpDown />
           </Button>
         );
@@ -300,65 +195,59 @@ export default function Products() {
         <div className="capitalize font-bold">{row.getValue("name")}</div>
       ),
     },
+
     {
-      accessorKey: "category",
-      header: () => <div className="text-left">Category</div>,
+      accessorKey: "slugName",
+      header: () => <div className="text-left">Category Slug</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("category")}
+            {row.getValue("slugName")}
           </div>
         );
       },
     },
     {
-      accessorKey: "brand",
-      header: () => <div className="text-left">Brand</div>,
+      accessorKey: "slugName",
+      header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("brand")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("slugName")}
+          </div>
         );
       },
     },
     {
-      accessorKey: "qty",
-      header: () => <div className="text-left">Quantity</div>,
+      accessorKey: "status",
+      header: () => <div className="text-left">Status</div>,
       cell: ({ row }) => {
-        return <div className="lowercase text-left">{row.getValue("qty")}</div>;
-      },
-    },
-    {
-      accessorKey: "price",
-      header: () => <div className="text-left">Price</div>,
-      cell: ({ row }) => {
+        const status: string = row.getValue("status");
+
+        const colorClass =
+          status === "active"
+            ? "bg-green-400 text-white"
+            : "bg-red-400 text-white";
+
         return (
-          <div className="lowercase text-left">{row.getValue("price")}</div>
+          <div className="text-left">
+            <span
+              className={`capitalize px-1.5 py-1 rounded-sm text-xs font-normal ${colorClass}`}
+            >
+              {status}
+            </span>
+          </div>
         );
       },
     },
-    {
-      accessorKey: "unit",
-      header: () => <div className="text-right">Unit</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="lowercase text-left">{row.getValue("unit")}</div>
-        );
-      },
-    },
+
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        const product = row.original;
+        // const product = row.original;
         return (
           <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/product-detail/${product.id}`)}
-            >
-              <Eye />
-            </Button>
             <Button variant="outline" size="sm">
               <Edit />
             </Button>
@@ -479,17 +368,42 @@ export default function Products() {
 
               {[
                 "All",
-                "Wood & Boards",
+                "Wood",
+                "Plywood",
+                "Laminates",
+                "Veneers",
                 "Hardware",
+                "Handles & Locks",
+                "Hinges & Channels",
+                "Screws & Fasteners",
+                "Glass",
+                "Paints & Coatings",
                 "Finishing",
-                "Plastic Boards",
                 "Adhesives",
+                "Plastic Boards",
+                "MDF Boards",
+                "Particle Boards",
+                "Acrylic Sheets",
+                "Cement Sheets",
+                "Doors",
+                "Flooring",
+                "Ceiling Panels",
+                "Edge Banding",
+                "Tools & Accessories",
+                "Electrical Fittings",
+                "Kitchen Fittings",
+                "Bathroom Fittings",
+                "Construction Material",
+                "Safety Equipment",
+                "Decorative Panels",
+                "Sealers & Polishes",
+                "Others",
               ].map((cat) => (
                 <DropdownMenuItem
                   key={cat}
                   onClick={() => {
                     setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("category");
+                    const categoryColumn = table.getColumn("name");
                     if (categoryColumn) {
                       categoryColumn.setFilterValue(cat === "All" ? "" : cat);
                     }
@@ -507,35 +421,26 @@ export default function Products() {
               className="hover:bg-blue-500 hover:text-white"
             >
               <Button variant="outline" className="ml-auto">
-                Brand: {selectedBrand} <ChevronDown className="ml-2 h-4 w-4" />
+                Status: {selectedStatus}{" "}
+                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
-                Filter By Brand
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              {[
-                "All",
-                "GreenPly",
-                "Century",
-                "Taparia",
-                "Alstone",
-                "Pidilite",
-              ].map((brand) => (
+              {["All", "active", "inactive"].map((status) => (
                 <DropdownMenuItem
-                  key={brand}
+                  //key={status}
                   onClick={() => {
-                    setSelectedBrand(brand);
-                    const brandColumn = table.getColumn("brand");
-                    if (brandColumn) {
-                      brandColumn.setFilterValue(brand === "All" ? "" : brand);
+                    setSelectedStatus(status);
+                    const statusColumn = table.getColumn("status");
+                    if (statusColumn) {
+                      statusColumn.setFilterValue(
+                        status === "All" ? "" : status
+                      );
                     }
                   }}
                 >
-                  {brand}
+                  {status}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -543,15 +448,15 @@ export default function Products() {
         </div>
       </div>
 
-      {/* 🧾 Data Table */}
+      {/*  Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.depth}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
-                    key={header.id}
+                    key={header.index}
                     className="text-sm font-semibold text-gray-800  tracking-wide px-4 py-3"
                   >
                     {header.isPlaceholder
@@ -570,13 +475,13 @@ export default function Products() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={row.index}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:bg-gray-50 transition-colors capitalize"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      key={cell.id}
+                      key={cell.column.id}
                       className="px-4 py-3 text-sm text-gray-700 capitalize"
                     >
                       {flexRender(

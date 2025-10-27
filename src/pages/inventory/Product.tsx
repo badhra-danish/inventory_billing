@@ -5,7 +5,7 @@ import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { useNavigate } from "react-router-dom";
-
+import { RefreshCcw } from "lucide-react";
 function ProductDataTablepage() {
   const navigate = useNavigate();
   return (
@@ -21,6 +21,9 @@ function ProductDataTablepage() {
           </Button>
           <Button className="bg-white border-1 border-gray p-2 hover:bg-gray-100">
             <img src={xslImg} className="w-5 h-6" />
+          </Button>
+          <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
+            <RefreshCcw />
           </Button>
           <Button onClick={() => navigate("/create-product")}>
             <CirclePlus />

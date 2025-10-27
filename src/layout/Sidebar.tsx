@@ -60,7 +60,7 @@ const InventoryItems = [
   },
   {
     title: "Category",
-    url: "#",
+    url: "/category",
     icon: Shapes,
   },
   {
