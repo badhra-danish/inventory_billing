@@ -9,6 +9,8 @@ import ProductDataTablepage from "@/pages/inventory/Product";
 import ProductDetails from "@/components/inventory/ProductDetail";
 import CategoryPage from "@/pages/inventory/Category";
 import SubCategorypage from "@/pages/inventory/SubCategory";
+import BrandPage from "@/pages/inventory/Brand";
+import UnitsPage from "@/pages/inventory/Units";
 
 function Approutes() {
   return (
@@ -24,6 +26,8 @@ function Approutes() {
             />
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/sub-category" element={<SubCategorypage />} />
+            <Route path="/brand" element={<BrandPage />} />
+            <Route path="/units" element={<UnitsPage />} />
           </Route>
         </Routes>
       </main>

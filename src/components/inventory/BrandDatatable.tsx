@@ -1,5 +1,4 @@
 import * as React from "react";
-import Img from "../../assets/images/xls.png";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -54,205 +53,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: SubCategory[] = [
-  {
-    image: Img,
-    subCategory: "PlyWood",
-    category: "Wood",
-    categoryCode: "CT005",
-    description: "Wood Description",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description:
-      "Durable  hsdasjd shavdsvd sajvdjs javdasj jasvdand rust-resistant fittings for all types of doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description: "Durable and rust-resistant fittings for all types of doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description: "Durable and rust-resistant fittings for all types of doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
-  },
+const data: Brand[] = [
+  { brand: "greenply", status: "active" },
+  { brand: "Century", status: "inactive" },
+  { brand: "Kitply", status: "active" },
+  { brand: "Archidply", status: "active" },
+  { brand: "Austin", status: "inactive" },
+  { brand: "RoyalTouch", status: "active" },
+  { brand: "Merino", status: "active" },
+  { brand: "Alishan", status: "inactive" },
+  { brand: "ActionTesa", status: "active" },
+  { brand: "Durian", status: "active" },
 ];
 
-export type SubCategory = {
-  image: String;
-  subCategory: String;
-  category: String;
-  categoryCode: String;
-  description: String;
+export type Brand = {
+  brand: string;
   status: "active" | "inactive";
 };
 
-export default function SubCategoryDatatable() {
+export default function BrandDataTable() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -265,7 +84,7 @@ export default function SubCategoryDatatable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<SubCategory>[] = [
+  const columns: ColumnDef<Brand>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -289,71 +108,29 @@ export default function SubCategoryDatatable() {
       enableHiding: false,
     },
     {
-      accessorKey: "image",
-      header: () => <div className="text-left">Image</div>,
-      cell: ({ row }) => {
-        const imageUrl = row.getValue("image") as string;
-        return (
-          <div className="flex justify-left">
-            <img
-              src={imageUrl}
-              alt="category"
-              className="w-6 h-6 rounded-md object-cover border"
-            />
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "subCategory",
+      accessorKey: "brand",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Sub Category
+            Brand
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">
-          {row.getValue("subCategory")}
-        </div>
+        <div className="capitalize font-bold">{row.getValue("brand")}</div>
       ),
     },
 
     {
-      accessorKey: "category",
-      header: () => <div className="text-left">Category</div>,
+      accessorKey: "brand",
+      header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("category")}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "categoryCode",
-      header: () => <div className="text-left">Category Code</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("categoryCode")}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "description",
-      header: () => <div className="text-left"> Description</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("description")}
-          </div>
+          <div className="capitalize text-left ">{row.getValue("brand")}</div>
         );
       },
     },
@@ -450,7 +227,7 @@ export default function SubCategoryDatatable() {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4 custom-scrollbar">
+    <div className="w-full bg-white rounded-md shadow-md p-4">
       {/* 🔍 Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
@@ -489,7 +266,7 @@ export default function SubCategoryDatatable() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger
               asChild
               className="hover:bg-blue-500 hover:text-white"
@@ -543,7 +320,7 @@ export default function SubCategoryDatatable() {
                   key={cat}
                   onClick={() => {
                     setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("category");
+                    const categoryColumn = table.getColumn("name");
                     if (categoryColumn) {
                       categoryColumn.setFilterValue(cat === "All" ? "" : cat);
                     }
@@ -553,7 +330,7 @@ export default function SubCategoryDatatable() {
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -589,7 +366,7 @@ export default function SubCategoryDatatable() {
       </div>
 
       {/*  Data Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200 custom-scrollbar">
+      <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (

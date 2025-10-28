@@ -1,5 +1,4 @@
 import * as React from "react";
-import Img from "../../assets/images/xls.png";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -54,205 +53,77 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: SubCategory[] = [
+const data: Units[] = [
   {
-    image: Img,
-    subCategory: "PlyWood",
-    category: "Wood",
-    categoryCode: "CT005",
-    description: "Wood Description",
+    unit: "ton",
+    shortName: "tn",
+    noOfProduct: 20,
     status: "active",
   },
   {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
+    unit: "Liters",
+    shortName: "L",
+    noOfProduct: 18,
+    status: "active",
+  },
+  {
+    unit: "Kilograms",
+    shortName: "kg",
+    noOfProduct: 25,
+    status: "active",
+  },
+  {
+    unit: "Dozen",
+    shortName: "dz",
+    noOfProduct: 30,
+    status: "active",
+  },
+  {
+    unit: "Pieces",
+    shortName: "pcs",
+    noOfProduct: 42,
+    status: "active",
+  },
+  {
+    unit: "Meters",
+    shortName: "m",
+    noOfProduct: 15,
     status: "inactive",
   },
   {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description:
-      "Durable  hsdasjd shavdsvd sajvdjs javdasj jasvdand rust-resistant fittings for all types of doors.",
+    unit: "Feet",
+    shortName: "ft",
+    noOfProduct: 22,
     status: "active",
   },
   {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
+    unit: "Inches",
+    shortName: "in",
+    noOfProduct: 28,
     status: "active",
   },
   {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
+    unit: "Packets",
+    shortName: "pkt",
+    noOfProduct: 12,
     status: "inactive",
   },
   {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
+    unit: "Boxes",
+    shortName: "bx",
+    noOfProduct: 35,
     status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description: "Durable and rust-resistant fittings for all types of doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Laminates",
-    category: "Wood",
-    categoryCode: "CT002",
-    description:
-      "Decorative laminates for modern interior finishes and furniture.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Door Fittings",
-    category: "Hardware",
-    categoryCode: "CT003",
-    description: "Durable and rust-resistant fittings for all types of doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Screws & Nails",
-    category: "Hardware",
-    categoryCode: "CT004",
-    description: "Premium-grade screws, nails, and fasteners for construction.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Paints & Polish",
-    category: "Finishing",
-    categoryCode: "CT005",
-    description:
-      "Range of wood paints, varnish, and polish for smooth finishing.",
-    status: "inactive",
-  },
-  {
-    image: Img,
-    subCategory: "Handles & Knobs",
-    category: "Hardware",
-    categoryCode: "CT006",
-    description: "Designer handles and knobs for cabinets and doors.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "MDF Boards",
-    category: "Wood",
-    categoryCode: "CT007",
-    description: "Medium-density fiberboards ideal for furniture and panels.",
-    status: "active",
-  },
-  {
-    image: Img,
-    subCategory: "Adhesives",
-    category: "Hardware",
-    categoryCode: "CT008",
-    description:
-      "Strong bonding adhesives for woodworking and construction use.",
-    status: "inactive",
   },
 ];
 
-export type SubCategory = {
-  image: String;
-  subCategory: String;
-  category: String;
-  categoryCode: String;
-  description: String;
+export type Units = {
+  unit: string;
+  shortName: string;
+  noOfProduct: number;
   status: "active" | "inactive";
 };
 
-export default function SubCategoryDatatable() {
+export default function UnitsDataTable() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -265,7 +136,7 @@ export default function SubCategoryDatatable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<SubCategory>[] = [
+  const columns: ColumnDef<Units>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -289,75 +160,45 @@ export default function SubCategoryDatatable() {
       enableHiding: false,
     },
     {
-      accessorKey: "image",
-      header: () => <div className="text-left">Image</div>,
-      cell: ({ row }) => {
-        const imageUrl = row.getValue("image") as string;
-        return (
-          <div className="flex justify-left">
-            <img
-              src={imageUrl}
-              alt="category"
-              className="w-6 h-6 rounded-md object-cover border"
-            />
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "subCategory",
+      accessorKey: "unit",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Sub Category
+            Units
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">
-          {row.getValue("subCategory")}
-        </div>
+        <div className="capitalize font-bold">{row.getValue("unit")}</div>
       ),
     },
 
     {
-      accessorKey: "category",
-      header: () => <div className="text-left">Category</div>,
+      accessorKey: "shortName",
+      header: () => <div className="text-left">Short Name</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("category")}
+            {row.getValue("shortName")}
           </div>
         );
       },
     },
     {
-      accessorKey: "categoryCode",
-      header: () => <div className="text-left">Category Code</div>,
+      accessorKey: "noOfProduct",
+      header: () => <div className="text-left">No Of Products</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("categoryCode")}
+            {row.getValue("noOfProduct")}
           </div>
         );
       },
     },
-    {
-      accessorKey: "description",
-      header: () => <div className="text-left"> Description</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("description")}
-          </div>
-        );
-      },
-    },
-
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
@@ -450,7 +291,7 @@ export default function SubCategoryDatatable() {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4 custom-scrollbar">
+    <div className="w-full bg-white rounded-md shadow-md p-4">
       {/* 🔍 Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
@@ -495,72 +336,6 @@ export default function SubCategoryDatatable() {
               className="hover:bg-blue-500 hover:text-white"
             >
               <Button variant="outline" className="ml-auto">
-                Category: {selectedCategory}{" "}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
-                Filter by Category
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              {[
-                "All",
-                "Wood",
-                "Plywood",
-                "Laminates",
-                "Veneers",
-                "Hardware",
-                "Handles & Locks",
-                "Hinges & Channels",
-                "Screws & Fasteners",
-                "Glass",
-                "Paints & Coatings",
-                "Finishing",
-                "Adhesives",
-                "Plastic Boards",
-                "MDF Boards",
-                "Particle Boards",
-                "Acrylic Sheets",
-                "Cement Sheets",
-                "Doors",
-                "Flooring",
-                "Ceiling Panels",
-                "Edge Banding",
-                "Tools & Accessories",
-                "Electrical Fittings",
-                "Kitchen Fittings",
-                "Bathroom Fittings",
-                "Construction Material",
-                "Safety Equipment",
-                "Decorative Panels",
-                "Sealers & Polishes",
-                "Others",
-              ].map((cat) => (
-                <DropdownMenuItem
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("category");
-                    if (categoryColumn) {
-                      categoryColumn.setFilterValue(cat === "All" ? "" : cat);
-                    }
-                  }}
-                >
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="hover:bg-blue-500 hover:text-white"
-            >
-              <Button variant="outline" className="ml-auto">
                 Status: {selectedStatus}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -589,7 +364,7 @@ export default function SubCategoryDatatable() {
       </div>
 
       {/*  Data Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200 custom-scrollbar">
+      <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (

@@ -70,12 +70,12 @@ const InventoryItems = [
   },
   {
     title: "Brands",
-    url: "#",
+    url: "/brand",
     icon: Cone,
   },
   {
     title: "Units",
-    url: "#",
+    url: "/units",
     icon: Boxes,
   },
   {
