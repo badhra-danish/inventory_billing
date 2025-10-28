@@ -65,7 +65,7 @@ const InventoryItems = [
   },
   {
     title: "Sub Category",
-    url: "#",
+    url: "/sub-category",
     icon: ChartBarStacked,
   },
   {

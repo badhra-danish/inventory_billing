@@ -7,7 +7,8 @@ import CreateProduct from "@/pages/inventory/CreateProduct";
 import OutletLayout from "@/layout/outlet";
 import ProductDataTablepage from "@/pages/inventory/Product";
 import ProductDetails from "@/components/inventory/ProductDetail";
-import CategoryDataTablepage from "@/pages/inventory/Category";
+import CategoryPage from "@/pages/inventory/Category";
+import SubCategorypage from "@/pages/inventory/SubCategory";
 
 function Approutes() {
   return (
@@ -21,7 +22,8 @@ function Approutes() {
               path="/product-detail/:product_id"
               element={<ProductDetails />}
             />
-            <Route path="/category" element={<CategoryDataTablepage />} />
+            <Route path="/category" element={<CategoryPage />} />
+            <Route path="/sub-category" element={<SubCategorypage />} />
           </Route>
         </Routes>
       </main>

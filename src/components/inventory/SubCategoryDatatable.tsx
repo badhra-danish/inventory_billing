@@ -1,4 +1,5 @@
 import * as React from "react";
+import Img from "../../assets/images/xls.png";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -53,96 +54,205 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Category[] = [
+const data: SubCategory[] = [
   {
-    name: "wood",
-    slugName: "wood",
+    image: Img,
+    subCategory: "PlyWood",
+    category: "Wood",
+    categoryCode: "CT005",
+    description: "Wood Description",
     status: "active",
   },
   {
-    name: "Plywood",
-    slugName: "plywood",
-    status: "active",
-  },
-  {
-    name: "Laminates",
-    slugName: "laminates",
-    status: "active",
-  },
-  {
-    name: "Hardware",
-    slugName: "hardware",
-    status: "active",
-  },
-  {
-    name: "Glass",
-    slugName: "glass",
+    image: Img,
+    subCategory: "Laminates",
+    category: "Wood",
+    categoryCode: "CT002",
+    description:
+      "Decorative laminates for modern interior finishes and furniture.",
     status: "inactive",
   },
   {
-    name: "Paints",
-    slugName: "paints",
+    image: Img,
+    subCategory: "Door Fittings",
+    category: "Hardware",
+    categoryCode: "CT003",
+    description:
+      "Durable  hsdasjd shavdsvd sajvdjs javdasj jasvdand rust-resistant fittings for all types of doors.",
     status: "active",
   },
   {
-    name: "Doors",
-    slugName: "doors",
+    image: Img,
+    subCategory: "Screws & Nails",
+    category: "Hardware",
+    categoryCode: "CT004",
+    description: "Premium-grade screws, nails, and fasteners for construction.",
+    status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "Paints & Polish",
+    category: "Finishing",
+    categoryCode: "CT005",
+    description:
+      "Range of wood paints, varnish, and polish for smooth finishing.",
     status: "inactive",
   },
   {
-    name: "Flooring",
-    slugName: "flooring",
+    image: Img,
+    subCategory: "Handles & Knobs",
+    category: "Hardware",
+    categoryCode: "CT006",
+    description: "Designer handles and knobs for cabinets and doors.",
     status: "active",
   },
   {
-    name: "Handles & Locks",
-    slugName: "handles-locks",
+    image: Img,
+    subCategory: "MDF Boards",
+    category: "Wood",
+    categoryCode: "CT007",
+    description: "Medium-density fiberboards ideal for furniture and panels.",
     status: "active",
   },
   {
-    name: "Cement Sheets",
-    slugName: "cement-sheets",
+    image: Img,
+    subCategory: "Adhesives",
+    category: "Hardware",
+    categoryCode: "CT008",
+    description:
+      "Strong bonding adhesives for woodworking and construction use.",
     status: "inactive",
   },
   {
-    name: "Doors",
-    slugName: "doors",
+    image: Img,
+    subCategory: "Laminates",
+    category: "Wood",
+    categoryCode: "CT002",
+    description:
+      "Decorative laminates for modern interior finishes and furniture.",
     status: "inactive",
   },
   {
-    name: "Doors",
-    slugName: "doors",
+    image: Img,
+    subCategory: "Door Fittings",
+    category: "Hardware",
+    categoryCode: "CT003",
+    description: "Durable and rust-resistant fittings for all types of doors.",
+    status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "Screws & Nails",
+    category: "Hardware",
+    categoryCode: "CT004",
+    description: "Premium-grade screws, nails, and fasteners for construction.",
+    status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "Paints & Polish",
+    category: "Finishing",
+    categoryCode: "CT005",
+    description:
+      "Range of wood paints, varnish, and polish for smooth finishing.",
     status: "inactive",
   },
   {
-    name: "Flooring",
-    slugName: "flooring",
+    image: Img,
+    subCategory: "Handles & Knobs",
+    category: "Hardware",
+    categoryCode: "CT006",
+    description: "Designer handles and knobs for cabinets and doors.",
     status: "active",
   },
   {
-    name: "Handles & Locks",
-    slugName: "handles-locks",
+    image: Img,
+    subCategory: "MDF Boards",
+    category: "Wood",
+    categoryCode: "CT007",
+    description: "Medium-density fiberboards ideal for furniture and panels.",
     status: "active",
   },
   {
-    name: "Flooring",
-    slugName: "flooring",
+    image: Img,
+    subCategory: "Adhesives",
+    category: "Hardware",
+    categoryCode: "CT008",
+    description:
+      "Strong bonding adhesives for woodworking and construction use.",
+    status: "inactive",
+  },
+  {
+    image: Img,
+    subCategory: "Laminates",
+    category: "Wood",
+    categoryCode: "CT002",
+    description:
+      "Decorative laminates for modern interior finishes and furniture.",
+    status: "inactive",
+  },
+  {
+    image: Img,
+    subCategory: "Door Fittings",
+    category: "Hardware",
+    categoryCode: "CT003",
+    description: "Durable and rust-resistant fittings for all types of doors.",
     status: "active",
   },
   {
-    name: "Handles & Locks",
-    slugName: "handles-locks",
+    image: Img,
+    subCategory: "Screws & Nails",
+    category: "Hardware",
+    categoryCode: "CT004",
+    description: "Premium-grade screws, nails, and fasteners for construction.",
     status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "Paints & Polish",
+    category: "Finishing",
+    categoryCode: "CT005",
+    description:
+      "Range of wood paints, varnish, and polish for smooth finishing.",
+    status: "inactive",
+  },
+  {
+    image: Img,
+    subCategory: "Handles & Knobs",
+    category: "Hardware",
+    categoryCode: "CT006",
+    description: "Designer handles and knobs for cabinets and doors.",
+    status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "MDF Boards",
+    category: "Wood",
+    categoryCode: "CT007",
+    description: "Medium-density fiberboards ideal for furniture and panels.",
+    status: "active",
+  },
+  {
+    image: Img,
+    subCategory: "Adhesives",
+    category: "Hardware",
+    categoryCode: "CT008",
+    description:
+      "Strong bonding adhesives for woodworking and construction use.",
+    status: "inactive",
   },
 ];
 
-export type Category = {
-  name: string;
-  slugName: string;
+export type SubCategory = {
+  image: String;
+  subCategory: String;
+  category: String;
+  categoryCode: String;
+  description: String;
   status: "active" | "inactive";
 };
 
-export default function CategoryDataTable() {
+export default function SubCategoryDatatable() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -155,7 +265,7 @@ export default function CategoryDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<Category>[] = [
+  const columns: ColumnDef<SubCategory>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -179,45 +289,75 @@ export default function CategoryDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "image",
+      header: () => <div className="text-left">Image</div>,
+      cell: ({ row }) => {
+        const imageUrl = row.getValue("image") as string;
+        return (
+          <div className="flex justify-left">
+            <img
+              src={imageUrl}
+              alt="category"
+              className="w-6 h-6 rounded-md object-cover border"
+            />
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "subCategory",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Category
+            Sub Category
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">
+          {row.getValue("subCategory")}
+        </div>
       ),
     },
 
     {
-      accessorKey: "slugName",
-      header: () => <div className="text-left">Category Slug</div>,
+      accessorKey: "category",
+      header: () => <div className="text-left">Category</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("slugName")}
+            {row.getValue("category")}
           </div>
         );
       },
     },
     {
-      accessorKey: "slugName",
-      header: () => <div className="text-left">Created At</div>,
+      accessorKey: "categoryCode",
+      header: () => <div className="text-left">Category Code</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("slugName")}
+            {row.getValue("categoryCode")}
           </div>
         );
       },
     },
+    {
+      accessorKey: "description",
+      header: () => <div className="text-left"> Description</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">
+            {row.getValue("description")}
+          </div>
+        );
+      },
+    },
+
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
@@ -403,7 +543,7 @@ export default function CategoryDataTable() {
                   key={cat}
                   onClick={() => {
                     setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("name");
+                    const categoryColumn = table.getColumn("category");
                     if (categoryColumn) {
                       categoryColumn.setFilterValue(cat === "All" ? "" : cat);
                     }
