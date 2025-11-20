@@ -11,6 +11,9 @@ import CategoryPage from "@/pages/inventory/Category";
 import SubCategorypage from "@/pages/inventory/SubCategory";
 import BrandPage from "@/pages/inventory/Brand";
 import UnitsPage from "@/pages/inventory/Units";
+import VariantPage from "@/pages/inventory/Variant";
+import WarrantiesPage from "@/pages/inventory/Warranties";
+import StockMangepage from "@/pages/stock/StockMange";
 
 function Approutes() {
   return (
@@ -28,6 +31,11 @@ function Approutes() {
             <Route path="/sub-category" element={<SubCategorypage />} />
             <Route path="/brand" element={<BrandPage />} />
             <Route path="/units" element={<UnitsPage />} />
+            <Route path="/variant" element={<VariantPage />} />
+            <Route path="/warranties" element={<WarrantiesPage />} />
+
+            {/* Stock Manage */}
+            <Route path="/manage-stock" element={<StockMangepage />} />
           </Route>
         </Routes>
       </main>

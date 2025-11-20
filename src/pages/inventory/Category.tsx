@@ -12,15 +12,61 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import CategoryDataTable from "@/components/inventory/CategoryDataTable";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, MapPinCheckInside } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { createCategory } from "@/api/ApiClient";
+import toast from "react-hot-toast";
 function CategoryPage() {
   const navigate = useNavigate();
+
+  const [categoryFormData, setcategoryFormData] = React.useState({
+    categoryname: "",
+    slugName: "",
+    status: false,
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+
+    setcategoryFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  // const handleSwithchecked = () => {
+  //   setcategoryFormData((prev) => ({
+  //     ...prev,
+  //     status: checked ? "ACTIVE" : "INACTIVE",
+  //   }));
+  // };
+  const handlesubmit = async () => {
+    try {
+      const payload = {
+        name: categoryFormData.slugName,
+        slug: categoryFormData.slugName,
+        status: categoryFormData.status ? "ACTIVE" : "INACTIVE",
+      };
+
+      const res = await createCategory(payload);
+      if (res?.status === 201) {
+        toast.success("Category Created.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  console.log(categoryFormData);
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -56,14 +102,26 @@ function CategoryPage() {
                     {" "}
                     Category <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="category-1"
+                    type="text"
+                    name="categoryname"
+                    onChange={handleChange}
+                    value={categoryFormData.categoryname}
+                  />
                 </div>
                 <div className="grid gap-4">
                   <Label htmlFor="category-1">
                     {" "}
                     Slug Category <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="category-1"
+                    type="text"
+                    name="slugName"
+                    onChange={handleChange}
+                    value={categoryFormData.slugName}
+                  />
                 </div>
                 <div className="flex items-center justify-between border-b-2 pb-7">
                   <Label htmlFor="category-1">
@@ -72,6 +130,13 @@ function CategoryPage() {
                   </Label>
                   <Switch
                     id="status"
+                    checked={categoryFormData.status}
+                    onCheckedChange={(checked) =>
+                      setcategoryFormData((prev) => ({
+                        ...prev,
+                        status: checked,
+                      }))
+                    }
                     className=" data-[state=checked]:bg-green-500 transition-colors"
                   />
                 </div>
@@ -80,7 +145,7 @@ function CategoryPage() {
                 <DialogClose>
                   <Button variant={"outline"}>Cancel</Button>
                 </DialogClose>
-                <Button>Add Category</Button>
+                <Button onClick={handlesubmit}>Add Category</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

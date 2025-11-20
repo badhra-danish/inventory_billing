@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Menu,
   LayoutDashboard,
+  Layers,
+  SquareActivity,
 } from "lucide-react";
 import {
   Sidebar,
@@ -80,13 +82,26 @@ const InventoryItems = [
   },
   {
     title: "Varient Attribute",
-    url: "#",
+    url: "variant ",
     icon: ClipboardList,
   },
   {
     title: "Warranties",
-    url: "#",
+    url: "/warranties",
     icon: ShieldCheck,
+  },
+];
+
+const StockItems = [
+  {
+    title: "Stock",
+    url: "/manage-stock",
+    icon: Layers,
+  },
+  {
+    title: "Manage Stock",
+    url: "create-product",
+    icon: SquareActivity,
   },
 ];
 
@@ -173,7 +188,20 @@ export default function AppSidebar({
 
           <SidebarGroup>
             <SidebarGroupLabel>Stock</SidebarGroupLabel>
-            <SidebarGroupContent></SidebarGroupContent>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {StockItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="text-base">
+                      <NavLink key={item.title} to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>

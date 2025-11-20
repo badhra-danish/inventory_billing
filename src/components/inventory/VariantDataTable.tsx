@@ -28,10 +28,8 @@ import {
   ChevronDown,
   Edit,
   Eye,
-  Flashlight,
   MoreHorizontal,
   Trash,
-  TrendingUpDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -55,98 +53,84 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllCategory } from "@/api/ApiClient";
-import Loader from "../commen/loader";
-//  const data: Category[] = [
-//     {
-//       name: "wood",
-//       slug: "wood",
-//       status: "active",
-//     },
-//     {
-//       name: "Plywood",
-//       slug: "plywood",
-//       status: "active",
-//     },
-//     {
-//       name: "Laminates",
-//       slug: "laminates",
-//       status: "active",
-//     },
-//     {
-//       name: "Hardware",
-//       slug: "hardware",
-//       status: "active",
-//     },
-//     {
-//       name: "Glass",
-//       slug: "glass",
-//       status: "inactive",
-//     },
-//     {
-//       name: "Paints",
-//       slug: "paints",
-//       status: "active",
-//     },
-//     {
-//       name: "Doors",
-//       slug: "doors",
-//       status: "inactive",
-//     },
-//     {
-//       name: "Flooring",
-//       slug: "flooring",
-//       status: "active",
-//     },
-//     {
-//       name: "Handles & Locks",
-//       slug: "handles-locks",
-//       status: "active",
-//     },
-//     {
-//       name: "Cement Sheets",
-//       slug: "cement-sheets",
-//       status: "inactive",
-//     },
-//     {
-//       name: "Doors",
-//       slug: "doors",
-//       status: "inactive",
-//     },
-//     {
-//       name: "Doors",
-//       slug: "doors",
-//       status: "inactive",
-//     },
-//     {
-//       name: "Flooring",
-//       slug: "flooring",
-//       status: "active",
-//     },
-//     {
-//       name: "Handles & Locks",
-//       slug: "handles-locks",
-//       status: "active",
-//     },
-//     {
-//       name: "Flooring",
-//       slug: "flooring",
-//       status: "active",
-//     },
-//     {
-//       name: "Handles & Locks",
-//       slug: "handles-locks",
-//       status: "active",
-//     },
-//   ];
-export type Category = {
-  name: string;
-  slug: string;
+const data: Variants[] = [
+  {
+    variant: "material",
+    values: "Cotton, Leather, Synthetic",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "color",
+    values: "Red, Blue, Green, Black, White",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "size",
+    values: "S, M, L, XL, XXL",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "thickness",
+    values: "6mm, 12mm, 18mm, 25mm",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "color",
+    values: "Red, Blue, Green, Black, White",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "size",
+    values: "S, M, L, XL, XXL",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "thickness",
+    values: "6mm, 12mm, 18mm, 25mm",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "finish",
+    values: "Matte, Glossy, Textured",
+    createdDate: "24 Dec 2024",
+    status: "inactive",
+  },
+  {
+    variant: "grade",
+    values: "A, B, C",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+  {
+    variant: "finish",
+    values: "Matte, Glossy, Textured",
+    createdDate: "24 Dec 2024",
+    status: "inactive",
+  },
+  {
+    variant: "grade",
+    values: "A, B, C",
+    createdDate: "24 Dec 2024",
+    status: "active",
+  },
+];
+
+export type Variants = {
+  variant: string;
+  values: string;
+  createdDate: string;
   status: "active" | "inactive";
 };
 
-export default function CategoryDataTable() {
-  //const navigate = useNavigate();
+export default function VariantDataTable() {
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -158,28 +142,7 @@ export default function CategoryDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [categoryData, setCategoryData] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const getallCategory = async () => {
-    try {
-      setIsLoading(true);
-      const res = await getAllCategory();
-      if (res?.statusCode === 200) {
-        setCategoryData(res.data);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    getallCategory();
-  }, []);
-
-  const data: Category[] = categoryData;
-  const columns: ColumnDef<Category>[] = [
+  const columns: ColumnDef<Variants>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -203,39 +166,39 @@ export default function CategoryDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "variant",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Category
+            Variant
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">{row.getValue("variant")}</div>
       ),
     },
 
     {
-      accessorKey: "slug",
-      header: () => <div className="text-left">Category Slug</div>,
+      accessorKey: "values",
+      header: () => <div className="text-left">Values</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("slug")}</div>
+          <div className="capitalize text-left ">{row.getValue("values")}</div>
         );
       },
     },
     {
-      accessorKey: "createdAt",
-      header: () => <div className="text-left">Created At</div>,
+      accessorKey: "createdDate",
+      header: () => <div className="text-left">Created Date</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("createdAt")}
+            {row.getValue("createdDate")}
           </div>
         );
       },
@@ -247,7 +210,7 @@ export default function CategoryDataTable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "ACTIVE"
+          status === "active"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -331,8 +294,6 @@ export default function CategoryDataTable() {
     },
   });
 
-  console.log(categoryData);
-
   return (
     <div className="w-full bg-white rounded-md shadow-md p-4">
       {/* 🔍 Top Toolbar */}
@@ -379,72 +340,6 @@ export default function CategoryDataTable() {
               className="hover:bg-blue-500 hover:text-white"
             >
               <Button variant="outline" className="ml-auto">
-                Category: {selectedCategory}{" "}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
-                Filter by Category
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              {[
-                "All",
-                "Wood",
-                "Plywood",
-                "Laminates",
-                "Veneers",
-                "Hardware",
-                "Handles & Locks",
-                "Hinges & Channels",
-                "Screws & Fasteners",
-                "Glass",
-                "Paints & Coatings",
-                "Finishing",
-                "Adhesives",
-                "Plastic Boards",
-                "MDF Boards",
-                "Particle Boards",
-                "Acrylic Sheets",
-                "Cement Sheets",
-                "Doors",
-                "Flooring",
-                "Ceiling Panels",
-                "Edge Banding",
-                "Tools & Accessories",
-                "Electrical Fittings",
-                "Kitchen Fittings",
-                "Bathroom Fittings",
-                "Construction Material",
-                "Safety Equipment",
-                "Decorative Panels",
-                "Sealers & Polishes",
-                "Others",
-              ].map((cat) => (
-                <DropdownMenuItem
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("name");
-                    if (categoryColumn) {
-                      categoryColumn.setFilterValue(cat === "All" ? "" : cat);
-                    }
-                  }}
-                >
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="hover:bg-blue-500 hover:text-white"
-            >
-              <Button variant="outline" className="ml-auto">
                 Status: {selectedStatus}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -477,10 +372,10 @@ export default function CategoryDataTable() {
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.depth}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
-                    key={header.id}
+                    key={header.index}
                     className="text-sm font-semibold text-gray-800  tracking-wide px-4 py-3"
                   >
                     {header.isPlaceholder
@@ -496,47 +391,35 @@ export default function CategoryDataTable() {
           </TableHeader>
 
           <TableBody>
-            {isLoading ? (
-              <>
-                <TableRow>
-                  <TableCell colSpan={columns.length}>
-                    <Loader />
-                  </TableCell>
-                </TableRow>
-              </>
-            ) : (
-              <>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors capitalize"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 capitalize"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.index}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-gray-50 transition-colors capitalize"
+                >
+                  {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center text-gray-500 capitalize"
+                      key={cell.column.id}
+                      className="px-4 py-3 text-sm text-gray-700 capitalize"
                     >
-                      No results found.
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
-                  </TableRow>
-                )}
-              </>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-gray-500 capitalize"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>

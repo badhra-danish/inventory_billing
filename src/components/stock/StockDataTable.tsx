@@ -29,8 +29,8 @@ import {
   ChevronDown,
   Edit,
   Eye,
+  Layers,
   MoreHorizontal,
-  Rows,
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -55,207 +55,111 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllSubCategory } from "@/api/ApiClient";
-import Loader from "../commen/loader";
-// const data: SubCategory[] = [
-//   {
-//     image: Img,
-//     subCategory: "PlyWood",
-//     category: "Wood",
-//     categoryCode: "CT005",
-//     description: "Wood Description",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Laminates",
-//     category: "Wood",
-//     categoryCode: "CT002",
-//     description:
-//       "Decorative laminates for modern interior finishes and furniture.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Door Fittings",
-//     category: "Hardware",
-//     categoryCode: "CT003",
-//     description:
-//       "Durable  hsdasjd shavdsvd sajvdjs javdasj jasvdand rust-resistant fittings for all types of doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Screws & Nails",
-//     category: "Hardware",
-//     categoryCode: "CT004",
-//     description: "Premium-grade screws, nails, and fasteners for construction.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Paints & Polish",
-//     category: "Finishing",
-//     categoryCode: "CT005",
-//     description:
-//       "Range of wood paints, varnish, and polish for smooth finishing.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Handles & Knobs",
-//     category: "Hardware",
-//     categoryCode: "CT006",
-//     description: "Designer handles and knobs for cabinets and doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "MDF Boards",
-//     category: "Wood",
-//     categoryCode: "CT007",
-//     description: "Medium-density fiberboards ideal for furniture and panels.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Adhesives",
-//     category: "Hardware",
-//     categoryCode: "CT008",
-//     description:
-//       "Strong bonding adhesives for woodworking and construction use.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Laminates",
-//     category: "Wood",
-//     categoryCode: "CT002",
-//     description:
-//       "Decorative laminates for modern interior finishes and furniture.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Door Fittings",
-//     category: "Hardware",
-//     categoryCode: "CT003",
-//     description: "Durable and rust-resistant fittings for all types of doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Screws & Nails",
-//     category: "Hardware",
-//     categoryCode: "CT004",
-//     description: "Premium-grade screws, nails, and fasteners for construction.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Paints & Polish",
-//     category: "Finishing",
-//     categoryCode: "CT005",
-//     description:
-//       "Range of wood paints, varnish, and polish for smooth finishing.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Handles & Knobs",
-//     category: "Hardware",
-//     categoryCode: "CT006",
-//     description: "Designer handles and knobs for cabinets and doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "MDF Boards",
-//     category: "Wood",
-//     categoryCode: "CT007",
-//     description: "Medium-density fiberboards ideal for furniture and panels.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Adhesives",
-//     category: "Hardware",
-//     categoryCode: "CT008",
-//     description:
-//       "Strong bonding adhesives for woodworking and construction use.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Laminates",
-//     category: "Wood",
-//     categoryCode: "CT002",
-//     description:
-//       "Decorative laminates for modern interior finishes and furniture.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Door Fittings",
-//     category: "Hardware",
-//     categoryCode: "CT003",
-//     description: "Durable and rust-resistant fittings for all types of doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Screws & Nails",
-//     category: "Hardware",
-//     categoryCode: "CT004",
-//     description: "Premium-grade screws, nails, and fasteners for construction.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Paints & Polish",
-//     category: "Finishing",
-//     categoryCode: "CT005",
-//     description:
-//       "Range of wood paints, varnish, and polish for smooth finishing.",
-//     status: "inactive",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Handles & Knobs",
-//     category: "Hardware",
-//     categoryCode: "CT006",
-//     description: "Designer handles and knobs for cabinets and doors.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "MDF Boards",
-//     category: "Wood",
-//     categoryCode: "CT007",
-//     description: "Medium-density fiberboards ideal for furniture and panels.",
-//     status: "active",
-//   },
-//   {
-//     image: Img,
-//     subCategory: "Adhesives",
-//     category: "Hardware",
-//     categoryCode: "CT008",
-//     description:
-//       "Strong bonding adhesives for woodworking and construction use.",
-//     status: "inactive",
-//   },
-// ];
+const data: StockProduct[] = [
+  {
+    image: Img,
+    productName: "Dell XPS 13 9310",
+    code: "P1200",
+    unit: "piece",
+    quantity: "20",
+    sellingPrice: "60,000",
+    purchasePrice: "50,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "MacBook Air M2",
+    code: "P1201",
+    unit: "piece",
+    quantity: "15",
+    sellingPrice: "95,000",
+    purchasePrice: "80,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "HP Spectre x360",
+    code: "P1202",
+    unit: "piece",
+    quantity: "10",
+    sellingPrice: "88,000",
+    purchasePrice: "72,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "Lenovo ThinkPad X1 Carbon",
+    code: "P1203",
+    unit: "piece",
+    quantity: "25",
+    sellingPrice: "1,10,000",
+    purchasePrice: "90,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "ASUS ROG Zephyrus G14",
+    code: "P1204",
+    unit: "piece",
+    quantity: "5",
+    sellingPrice: "1,25,000",
+    purchasePrice: "1,00,000",
+    status: "out of stock",
+  },
+  {
+    image: Img,
+    productName: "MacBook Air M2",
+    code: "P1201",
+    unit: "piece",
+    quantity: "15",
+    sellingPrice: "95,000",
+    purchasePrice: "80,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "HP Spectre x360",
+    code: "P1202",
+    unit: "piece",
+    quantity: "10",
+    sellingPrice: "88,000",
+    purchasePrice: "72,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "Lenovo ThinkPad X1 Carbon",
+    code: "P1203",
+    unit: "piece",
+    quantity: "25",
+    sellingPrice: "1,10,000",
+    purchasePrice: "90,000",
+    status: "stock In",
+  },
+  {
+    image: Img,
+    productName: "ASUS ROG Zephyrus G14",
+    code: "P1204",
+    unit: "piece",
+    quantity: "5",
+    sellingPrice: "1,25,000",
+    purchasePrice: "1,00,000",
+    status: "out of stock",
+  },
+];
 
-export type SubCategory = {
+export type StockProduct = {
   image: String;
-  subCategory: String;
-  category: String;
-  categoryCode: String;
-  description: String;
-  status: "active" | "inactive";
+  productName: String;
+  code: String;
+  unit: String;
+  quantity: String;
+  sellingPrice: String;
+  purchasePrice: String;
+  status: "stock In" | "out of stock";
 };
 
-export default function SubCategoryDatatable() {
+export default function StockMangeDatatable() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -268,31 +172,7 @@ export default function SubCategoryDatatable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [subCategoryData, setsubCategoryData] = React.useState([]);
-
-  const getallSubCategory = async () => {
-    try {
-      setIsLoading(true);
-      const res = await getAllSubCategory();
-      if (res?.statusCode === 200) {
-        setsubCategoryData(res.data);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    getallSubCategory();
-  }, []);
-  console.log(subCategoryData);
-
-  const data: SubCategory[] = subCategoryData;
-
-  const columns: ColumnDef<SubCategory>[] = [
+  const columns: ColumnDef<StockProduct>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -315,54 +195,54 @@ export default function SubCategoryDatatable() {
       enableSorting: false,
       enableHiding: false,
     },
+    // {
+    //   accessorKey: "image",
+    //   header: () => <div className="text-left">Image</div>,
+    //   cell: ({ row }) => {
+    //     const imageUrl = row.getValue("image") as string;
+    //     return (
+    //       <div className="flex justify-left">
+    //         <img
+    //           src={imageUrl}
+    //           alt="category"
+    //           className="w-6 h-6 rounded-md object-cover border"
+    //         />
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      accessorKey: "imageUrl",
-      header: () => <div className="text-left">Image</div>,
-      cell: ({ row }) => {
-        const imageUrl = row.getValue("image") as string;
-        return (
-          <div className="flex justify-left">
-            <img
-              src={imageUrl}
-              alt="category"
-              className="w-6 h-6 rounded-md object-cover border"
-            />
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "name",
+      accessorKey: "productName",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Sub Category
+            Product
             <ArrowUpDown />
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
-      ),
-    },
-
-    {
-      accessorKey: "categoryName",
-      header: () => <div className="text-left">Category</div>,
       cell: ({ row }) => {
+        // const imageUrl = row.getValue("image") as string;
+        const imageUrl = row.original as any;
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("categoryName")}
+          <div className="capitalize font-bold flex gap-3">
+            <img
+              src={imageUrl.image}
+              alt="category"
+              className="w-6 h-6 rounded-md object-cover border"
+            />
+            {row.getValue("productName")}
           </div>
         );
       },
     },
+
     {
       accessorKey: "code",
-      header: () => <div className="text-left">Category Code</div>,
+      header: () => <div className="text-left">Code</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">{row.getValue("code")}</div>
@@ -370,17 +250,47 @@ export default function SubCategoryDatatable() {
       },
     },
     {
-      accessorKey: "description",
-      header: () => <div className="text-left"> Description</div>,
+      accessorKey: "unit",
+      header: () => <div className="text-left">Unit</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">{row.getValue("unit")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "quantity",
+      header: () => <div className="text-left"> Quantity</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("description")}
+            {row.getValue("quantity")}
           </div>
         );
       },
     },
-
+    {
+      accessorKey: "sellingPrice",
+      header: () => <div className="text-left"> Selling Price</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">
+            {row.getValue("sellingPrice")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "purchasePrice",
+      header: () => <div className="text-left"> Purchase Price</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">
+            {row.getValue("purchasePrice")}
+          </div>
+        );
+      },
+    },
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
@@ -388,7 +298,7 @@ export default function SubCategoryDatatable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "ACTIVE"
+          status === "active"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -399,6 +309,92 @@ export default function SubCategoryDatatable() {
             >
               {status}
             </span>
+          </div>
+        );
+      },
+    },
+
+    {
+      id: "actions",
+      // header: () => <div className="text-left">Action</div>,
+      cell: ({ row }) => {
+        // const product = row.original;
+        return (
+          <div className="flex gap-1">
+            {/* Dialog History veiw */}
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="outline" size="sm" className="bg-gray-200">
+                  <Eye />
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="">
+                <DialogHeader className=" border-b-2  pb-4">
+                  <DialogTitle className="">Product History</DialogTitle>
+                </DialogHeader>
+                Something here
+                {/* <DialogFooter className="mt-1 flex justify-center space-x-1">
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button>Add Quantity</Button>
+                </DialogFooter> */}
+              </DialogContent>
+            </Dialog>
+            {/* Dialog for StockIn */}
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-100 text-green-600"
+                >
+                  <Layers />
+                  Stock In
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="">
+                <DialogHeader className=" border-b-2  pb-4">
+                  <DialogTitle className="">Add Stock In</DialogTitle>
+                </DialogHeader>
+                Something here
+                <DialogFooter className="mt-1 flex justify-center space-x-1">
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button>Add Quantity</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Dialog for Out of Stock */}
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-red-100 text-red-500 text-xs"
+                >
+                  <Layers />
+                  Stock Out
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="">
+                <DialogHeader className=" border-b-2  pb-4">
+                  <DialogTitle className="">Remove Stock </DialogTitle>
+                </DialogHeader>
+                Something here
+                <DialogFooter className="mt-1 flex justify-center space-x-1">
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button>Remove Quantity</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         );
       },
@@ -635,47 +631,35 @@ export default function SubCategoryDatatable() {
           </TableHeader>
 
           <TableBody>
-            {isLoading ? (
-              <>
-                <TableRow>
-                  <TableCell colSpan={columns.length}>
-                    <Loader />
-                  </TableCell>
-                </TableRow>
-              </>
-            ) : (
-              <>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.index}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors capitalize"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.column.id}
-                          className="px-4 py-3 text-sm text-gray-700 capitalize"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.index}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-gray-50 transition-colors capitalize"
+                >
+                  {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center text-gray-500 capitalize"
+                      key={cell.column.id}
+                      className="px-4 py-3 text-sm text-gray-700 capitalize"
                     >
-                      No results found.
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
-                  </TableRow>
-                )}
-              </>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-gray-500 capitalize"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
