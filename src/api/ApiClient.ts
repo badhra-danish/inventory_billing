@@ -12,6 +12,8 @@ const endPoint = {
   getAllCategory: "/v1/category/all",
   subCategory:"/v1/sub-category/create",
   getAllSubCategory:"/v1/sub-category/all",
+  updateCategory : "/v1/category/update",
+  deleteCategory:"/v1/category/delete/"
 };
 
 
@@ -43,7 +45,7 @@ export const createSubCategory = async (formData :FormData) => {
         "Content-Type" : "multipart/form-data1"
       }
     });
-    return res;
+    return (await res).data;
   } catch (error) {
     console.error(error);
   }
@@ -56,4 +58,22 @@ export const getAllSubCategory = async () => {
   } catch (error) {
     console.error( error)
   }
+}
+
+export const updateCategory = async(id :string, payload : object) => {
+try {
+  const res = await axiosClient.put(`${endPoint.updateCategory}/${id}`,payload);
+  return res.data;
+} catch (error) {
+  console.error(error)
+}
+}
+
+export const deleteCategory = async(id :string) => {
+try {
+  const res = await axiosClient.delete(`${endPoint.deleteCategory}/${id}`);
+  return res;
+} catch (error) {
+  console.error(error)
+}
 }

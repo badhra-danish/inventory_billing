@@ -15,6 +15,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@radix-ui/react-label";
 import {
   flexRender,
   getCoreRowModel,
@@ -34,6 +35,7 @@ import {
   TrendingUpDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Switch } from "../ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,8 +57,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllCategory } from "@/api/ApiClient";
+import {
+  deleteCategory,
+  getAllCategory,
+  updateCategory,
+} from "@/api/ApiClient";
 import Loader from "../commen/loader";
+import toast from "react-hot-toast";
 //  const data: Category[] = [
 //     {
 //       name: "wood",
@@ -140,12 +147,15 @@ import Loader from "../commen/loader";
 //     },
 //   ];
 export type Category = {
+  categoryID: string;
   name: string;
   slug: string;
-  status: "active" | "inactive";
+  status: "ACTIVE" | "INACTIVE";
 };
-
-export default function CategoryDataTable() {
+type CategoryDataTableProps = {
+  refresh: boolean;
+};
+export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   //const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -160,6 +170,12 @@ export default function CategoryDataTable() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [categoryData, setCategoryData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [openEdit, setOpenEdit] = React.useState(false);
+  const [selectedCategoryUpdate, setSelectedCategoryUpdate] =
+    React.useState<Category | null>(null);
+
+  console.log(selectedCategoryUpdate);
+
   const getallCategory = async () => {
     try {
       setIsLoading(true);
@@ -176,8 +192,46 @@ export default function CategoryDataTable() {
 
   React.useEffect(() => {
     getallCategory();
-  }, []);
+  }, [refresh]);
 
+  const handleupdate = async () => {
+    try {
+      const payload = {
+        name: selectedCategoryUpdate?.name,
+        slug: selectedCategoryUpdate?.slug,
+        status: selectedCategoryUpdate?.status,
+      };
+      if (!selectedCategoryUpdate?.categoryID) {
+        toast.error("No category selected!");
+        return;
+      }
+
+      const res = await updateCategory(
+        selectedCategoryUpdate?.categoryID,
+        payload
+      );
+      if (res.statusCode === 200) {
+        toast.success(res.message);
+        setOpenEdit(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleDelete = async () => {
+    try {
+      if (!selectedCategoryUpdate?.categoryID) {
+        toast.error("No category selected!");
+        return;
+      }
+      const res = await deleteCategory(selectedCategoryUpdate.categoryID);
+      if (res?.status == 204) {
+        toast.success("Category Deleted..");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const data: Category[] = categoryData;
   const columns: ColumnDef<Category>[] = [
     {
@@ -265,14 +319,22 @@ export default function CategoryDataTable() {
 
     {
       id: "actions",
-      // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        // const product = row.original;
+        const category = row.original;
+
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedCategoryUpdate(category);
+                setOpenEdit(true);
+              }}
+            >
               <Edit />
             </Button>
+
             {/* <Button variant="outline" size="sm">
               <Trash />
             </Button> */}
@@ -301,7 +363,9 @@ export default function CategoryDataTable() {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="destructive">Delete</Button>
+                  <Button variant="destructive" onClick={handleDelete}>
+                    Delete
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -330,8 +394,6 @@ export default function CategoryDataTable() {
       globalFilter,
     },
   });
-
-  console.log(categoryData);
 
   return (
     <div className="w-full bg-white rounded-md shadow-md p-4">
@@ -541,6 +603,79 @@ export default function CategoryDataTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Single Edit Dialog (controlled) */}
+      <Dialog
+        open={openEdit}
+        onOpenChange={(open) => {
+          setOpenEdit(open);
+          if (!open) setSelectedCategoryUpdate(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+            <div className="grid gap-4">
+              <Label htmlFor="category-1">
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="category-1"
+                type="text"
+                name="categoryname"
+                value={selectedCategoryUpdate?.name}
+                onChange={(e) =>
+                  setSelectedCategoryUpdate((prev) => {
+                    if (!prev) return prev;
+                    return { ...prev, name: e.target.value };
+                  })
+                }
+              />
+            </div>
+            <div className="grid gap-4">
+              <Label htmlFor="slug-1">
+                Slug Category <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="slug-1"
+                type="text"
+                name="slugName"
+                value={selectedCategoryUpdate?.slug}
+                onChange={(e) =>
+                  setSelectedCategoryUpdate((prev) => {
+                    if (!prev) return prev;
+                    return { ...prev, slug: e.target.value };
+                  })
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between border-b-2 pb-7">
+              <Label htmlFor="status">
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Switch
+                id="status"
+                checked={selectedCategoryUpdate?.status === "ACTIVE"}
+                onCheckedChange={(checked) =>
+                  setSelectedCategoryUpdate((prev) => ({
+                    ...prev!,
+                    status: checked ? "ACTIVE" : "INACTIVE",
+                  }))
+                }
+                className=" data-[state=checked]:bg-green-500 transition-colors"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant={"outline"}>Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleupdate}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 📄 Pagination + Footer Info */}
       <div className="flex items-center justify-between py-4 text-sm text-gray-600">

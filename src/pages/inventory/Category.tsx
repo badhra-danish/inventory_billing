@@ -23,7 +23,8 @@ import { createCategory } from "@/api/ApiClient";
 import toast from "react-hot-toast";
 function CategoryPage() {
   const navigate = useNavigate();
-
+  const [open, setOpen] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(false);
   const [categoryFormData, setcategoryFormData] = React.useState({
     categoryname: "",
     slugName: "",
@@ -58,10 +59,17 @@ function CategoryPage() {
 
       const res = await createCategory(payload);
       if (res?.status === 201) {
-        toast.success("Category Created.");
+        toast.success(res.data.message);
+        setOpen(false);
+        setRefresh((prev) => !prev);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      if (error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 
@@ -84,10 +92,10 @@ function CategoryPage() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
               {" "}
-              <Button>
+              <Button onClick={() => setOpen(true)}>
                 <CirclePlus />
                 Add Category
               </Button>
@@ -155,7 +163,7 @@ function CategoryPage() {
           </Button> */}
         </div>
       </div>
-      <CategoryDataTable />
+      <CategoryDataTable refresh={refresh} />
     </>
   );
 }

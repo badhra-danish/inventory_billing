@@ -19,11 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuArrow,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+
 import {
   Select,
   SelectContent,
@@ -32,21 +28,87 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
+import { createCategory, createSubCategory } from "@/api/ApiClient";
+import toast from "react-hot-toast";
+export interface SubCategory {
+  name: string;
+  code: string;
+  description: string;
+  categoryID: string;
+  status: boolean;
+}
 function SubCategorypage() {
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState<File | null>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(false);
+  const { categories } = useCategory();
+  const [subCateFormData, setSubCategoryFormData] = React.useState<SubCategory>(
+    {
+      name: "",
+      code: "",
+      description: "",
+      categoryID: "",
+      status: false,
+    }
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFileName(file.name);
-
+      setFile(file);
       const url = URL.createObjectURL(file);
       setImageUrl(url);
     }
   };
 
-  const navigate = useNavigate();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setSubCategoryFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const payLoad = {
+        name: subCateFormData.name,
+        code: subCateFormData.code,
+        description: subCateFormData.description,
+        categoryID: subCateFormData.categoryID,
+        status: subCateFormData.status ? "ACTIVE" : "INACTIVE",
+      };
+
+      const formData = new FormData();
+      if (!file) return;
+      formData.append("file", file);
+      formData.append("subCategory", JSON.stringify(payLoad));
+
+      const promise = createSubCategory(formData);
+
+      toast.promise(promise, {
+        loading: "Creating Subcategory...",
+        success: (res) => {
+          setOpen(false);
+          setRefresh((prev) => !prev);
+          return "Subcategory Created Successfully!";
+        },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return "Failed to create subcategory.";
+        },
+      });
+    } catch (error) {
+      console.error("Error During the create Category", error);
+    }
+  };
+  console.log(subCateFormData);
+
+  //const navigate = useNavigate();
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -64,10 +126,10 @@ function SubCategorypage() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
               {" "}
-              <Button>
+              <Button onClick={() => setOpen(true)}>
                 <CirclePlus />
                 Add Sub Category
               </Button>
@@ -114,7 +176,7 @@ function SubCategorypage() {
                       className="hidden"
                       onChange={handleFileChange}
                     />
-                    {fileName ? fileName : <p>JPEG, PNG up to 2 MB</p>}
+                    {file ? file.name : <p>JPEG, PNG up to 2 MB</p>}
                   </div>
                 </div>
 
@@ -124,16 +186,24 @@ function SubCategorypage() {
                     Category <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    onValueChange={(value) => console.log("Selected:", value)}
+                    onValueChange={(value) =>
+                      setSubCategoryFormData((prev) => ({
+                        ...prev,
+                        categoryID: value,
+                      }))
+                    }
+                    name="categoryID"
+                    value={subCateFormData.categoryID}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="wood">Wood</SelectItem>
-                      <SelectItem value="hardware">Hardware</SelectItem>
-                      <SelectItem value="finishing">Finishing</SelectItem>
-                      <SelectItem value="tools">Tools</SelectItem>
+                      {categories?.map((cat) => (
+                        <SelectItem value={cat?.categoryID}>
+                          {cat?.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -143,7 +213,12 @@ function SubCategorypage() {
                     {" "}
                     Sub Category <span className="text-red-500">*</span>
                   </Label>
-                  <Input type="text" name="sub-category" />
+                  <Input
+                    type="text"
+                    name="name"
+                    value={subCateFormData.name}
+                    onChange={handleChange}
+                  />
                 </div>
 
                 <div className="grid gap-4">
@@ -151,7 +226,12 @@ function SubCategorypage() {
                     {" "}
                     Category Code <span className="text-red-500">*</span>
                   </Label>
-                  <Input type="text" name="category-code" />
+                  <Input
+                    type="text"
+                    name="code"
+                    value={subCateFormData.code}
+                    onChange={handleChange}
+                  />
                 </div>
 
                 <div className="grid gap-4">
@@ -164,6 +244,8 @@ function SubCategorypage() {
                     name="description"
                     placeholder="Enter category description..."
                     className="min-h-[80px] resize-y"
+                    value={subCateFormData.description}
+                    onChange={handleChange}
                   />
                 </div>
 
@@ -174,6 +256,13 @@ function SubCategorypage() {
                   </Label>
                   <Switch
                     id="status"
+                    checked={subCateFormData.status}
+                    onCheckedChange={(checked) =>
+                      setSubCategoryFormData((prev) => ({
+                        ...prev,
+                        status: checked,
+                      }))
+                    }
                     className=" data-[state=checked]:bg-green-500 transition-colors"
                   />
                 </div>
@@ -182,7 +271,7 @@ function SubCategorypage() {
                 <DialogClose>
                   <Button variant={"outline"}>Cancel</Button>
                 </DialogClose>
-                <Button>Add Category</Button>
+                <Button onClick={handleSubmit}>Add Category</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -192,7 +281,7 @@ function SubCategorypage() {
           </Button> */}
         </div>
       </div>
-      <SubCategoryDatatable />
+      <SubCategoryDatatable refresh={refresh} />
     </>
   );
 }

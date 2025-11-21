@@ -254,8 +254,12 @@ export type SubCategory = {
   description: String;
   status: "active" | "inactive";
 };
-
-export default function SubCategoryDatatable() {
+type SubCategoryDataTableProps = {
+  refresh: boolean;
+};
+export default function SubCategoryDatatable({
+  refresh,
+}: SubCategoryDataTableProps) {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -287,8 +291,7 @@ export default function SubCategoryDatatable() {
 
   React.useEffect(() => {
     getallSubCategory();
-  }, []);
-  console.log(subCategoryData);
+  }, [refresh]);
 
   const data: SubCategory[] = subCategoryData;
 
@@ -319,13 +322,13 @@ export default function SubCategoryDatatable() {
       accessorKey: "imageUrl",
       header: () => <div className="text-left">Image</div>,
       cell: ({ row }) => {
-        const imageUrl = row.getValue("image") as string;
+        const imageUrl = row.getValue("imageUrl") as string;
         return (
           <div className="flex justify-left">
             <img
               src={imageUrl}
               alt="category"
-              className="w-6 h-6 rounded-md object-cover border"
+              className="w-8 h-8 rounded-md object-cover border"
             />
           </div>
         );
