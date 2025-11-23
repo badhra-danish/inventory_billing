@@ -27,6 +27,7 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
+  CirclePlus,
   Edit,
   Eye,
   Layers,
@@ -55,6 +56,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Label } from "../ui/label";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Textarea } from "../ui/textarea";
 const data: StockProduct[] = [
   {
     image: Img,
@@ -172,6 +184,14 @@ export default function StockMangeDatatable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // DialogBox State Variable
+  const [openStockIn, setOpenStockIn] = React.useState(false);
+  const [openStockOut, setOpenStockOut] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const [openUpdate, setOpenUpdate] = React.useState(false);
+  const [openHistory, setOpenHistory] = React.useState(false);
+
   const columns: ColumnDef<StockProduct>[] = [
     {
       id: "select",
@@ -298,7 +318,7 @@ export default function StockMangeDatatable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "active"
+          status === "stock In"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -322,79 +342,34 @@ export default function StockMangeDatatable() {
         return (
           <div className="flex gap-1">
             {/* Dialog History veiw */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm" className="bg-gray-200">
-                  <Eye />
-                </Button>
-              </DialogTrigger>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-gray-200"
+              onClick={() => setOpenHistory(true)}
+            >
+              <Eye />
+            </Button>
 
-              <DialogContent className="">
-                <DialogHeader className=" border-b-2  pb-4">
-                  <DialogTitle className="">Product History</DialogTitle>
-                </DialogHeader>
-                Something here
-                {/* <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button>Add Quantity</Button>
-                </DialogFooter> */}
-              </DialogContent>
-            </Dialog>
-            {/* Dialog for StockIn */}
-            <Dialog>
-              <DialogTrigger>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-green-100 text-green-600"
-                >
-                  <Layers />
-                  Stock In
-                </Button>
-              </DialogTrigger>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-green-100 text-green-600"
+              onClick={() => setOpenStockIn(true)}
+            >
+              <Layers />
+              Stock In
+            </Button>
 
-              <DialogContent className="">
-                <DialogHeader className=" border-b-2  pb-4">
-                  <DialogTitle className="">Add Stock In</DialogTitle>
-                </DialogHeader>
-                Something here
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button>Add Quantity</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
-            {/* Dialog for Out of Stock */}
-            <Dialog>
-              <DialogTrigger>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-red-100 text-red-500 text-xs"
-                >
-                  <Layers />
-                  Stock Out
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="">
-                <DialogHeader className=" border-b-2  pb-4">
-                  <DialogTitle className="">Remove Stock </DialogTitle>
-                </DialogHeader>
-                Something here
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button>Remove Quantity</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-red-100 text-red-500 text-xs"
+              onClick={() => setOpenStockOut(true)}
+            >
+              <Layers />
+              Stock Out
+            </Button>
           </div>
         );
       },
@@ -407,41 +382,21 @@ export default function StockMangeDatatable() {
         // const product = row.original;
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setOpenUpdate(true)}
+            >
               <Edit />
             </Button>
-            {/* <Button variant="outline" size="sm">
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setOpenDelete(true)}
+            >
               <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </Button>
           </div>
         );
       },
@@ -586,7 +541,7 @@ export default function StockMangeDatatable() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="shadow-lg">
-              {["All", "active", "inactive"].map((status) => (
+              {["All", "stock In", "out of stock"].map((status) => (
                 <DropdownMenuItem
                   //key={status}
                   onClick={() => {
@@ -690,6 +645,366 @@ export default function StockMangeDatatable() {
           </Button>
         </div>
       </div>
+
+      {/* All Dialog Box of the Table */}
+      <Dialog open={openHistory} onOpenChange={setOpenHistory}>
+        <DialogContent className="">
+          <DialogHeader className=" border-b-2  pb-4">
+            <DialogTitle className="">Product History</DialogTitle>
+          </DialogHeader>
+          Something here
+          {/* <DialogFooter className="mt-1 flex justify-center space-x-1">
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button>Add Quantity</Button>
+                </DialogFooter> */}
+        </DialogContent>
+      </Dialog>
+      {/* Dialog for StockIn */}
+      <Dialog open={openStockIn} onOpenChange={setOpenStockIn}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogHeader>
+            <DialogTitle>Add Quantity</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Product Type <span className="text-red-500">*</span>
+              </Label>
+              <RadioGroup className="flex gap-6">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="single" id="single" />
+                  <Label
+                    htmlFor="single"
+                    className="font-normal cursor-pointer"
+                  >
+                    Single Product
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="variable" id="variable" />
+                  <Label
+                    htmlFor="variable"
+                    className="font-normal cursor-pointer"
+                  >
+                    Variable Product
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Product <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                onValueChange={(value) => console.log("Selected:", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wood">Wood</SelectItem>
+                  <SelectItem value="hardware">Hardware</SelectItem>
+                  <SelectItem value="finishing">Finishing</SelectItem>
+                  <SelectItem value="tools">Tools</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Product details codec,quantiy */}
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Code <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Unit <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+            </div>
+
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Quantity <span className="text-red-500">*</span>
+              </Label>
+              <Input type="text" name="sub-category" />
+            </div>
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Notes <span className="text-red-500">*</span>
+              </Label>
+              <Textarea rows={5} />
+            </div>
+          </div>
+
+          <div className="border-t-1 pt-5">
+            <DialogFooter>
+              <DialogClose>
+                <Button variant={"outline"}>Cancel</Button>
+              </DialogClose>
+              <Button>Add Quantity</Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Dialog for Out of Stock */}
+      <Dialog open={openStockOut} onOpenChange={setOpenStockOut}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogHeader>
+            <DialogTitle>Remove Quantity</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Product Type <span className="text-red-500">*</span>
+              </Label>
+              <RadioGroup className="flex gap-6">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="single" id="single" />
+                  <Label
+                    htmlFor="single"
+                    className="font-normal cursor-pointer"
+                  >
+                    Single Product
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="variable" id="variable" />
+                  <Label
+                    htmlFor="variable"
+                    className="font-normal cursor-pointer"
+                  >
+                    Variable Product
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Product <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                onValueChange={(value) => console.log("Selected:", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wood">Wood</SelectItem>
+                  <SelectItem value="hardware">Hardware</SelectItem>
+                  <SelectItem value="finishing">Finishing</SelectItem>
+                  <SelectItem value="tools">Tools</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Product details codec,quantiy */}
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Code <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Unit <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+            </div>
+
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Quantity <span className="text-red-500">*</span>
+              </Label>
+              <Input type="text" name="sub-category" />
+            </div>
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Notes <span className="text-red-500">*</span>
+              </Label>
+              <Textarea rows={5} />
+            </div>
+          </div>
+          <div className="border-t-1 pt-5">
+            <DialogFooter>
+              <DialogClose>
+                <Button variant={"outline"}>Cancel</Button>
+              </DialogClose>
+              <Button>Remove Quantity</Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialogbox of the delete Update  */}
+      <Dialog open={openUpdate} onOpenChange={setOpenUpdate}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <DialogHeader>
+            <DialogTitle>Update Stock</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                Product Type <span className="text-red-500">*</span>
+              </Label>
+              <RadioGroup className="flex gap-6">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="single" id="single" />
+                  <Label
+                    htmlFor="single"
+                    className="font-normal cursor-pointer"
+                  >
+                    Single Product
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="variable" id="variable" />
+                  <Label
+                    htmlFor="variable"
+                    className="font-normal cursor-pointer"
+                  >
+                    Variable Product
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Product <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                onValueChange={(value) => console.log("Selected:", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wood">Wood</SelectItem>
+                  <SelectItem value="hardware">Hardware</SelectItem>
+                  <SelectItem value="finishing">Finishing</SelectItem>
+                  <SelectItem value="tools">Tools</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Product details codec,quantiy */}
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Code <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Unit <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+            </div>
+
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Selling Price <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Purchase Price <span className="text-red-500">*</span>
+                </Label>
+                <Input type="text" name="sub-category" readOnly disabled />
+              </div>
+            </div>
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Quantity <span className="text-red-500">*</span>
+              </Label>
+              <Input type="text" name="sub-category" />
+            </div>
+            {/* *** */}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                onValueChange={(value) => console.log("Selected:", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wood">InStock</SelectItem>
+                  <SelectItem value="hardware">StockOut</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="border-t-1 pt-5">
+            <DialogFooter>
+              <DialogClose>
+                <Button variant={"outline"}>Cancel</Button>
+              </DialogClose>
+              <Button>Save Changes</Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive">Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

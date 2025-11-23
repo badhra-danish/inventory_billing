@@ -8,7 +8,10 @@ function App() {
     <>
       <CategoryProvider>
         <Toaster position="top-center" reverseOrder={false} />
-        <Approutes />
+        <div className="font-sans">
+          {" "}
+          <Approutes />
+        </div>
       </CategoryProvider>
     </>
   );

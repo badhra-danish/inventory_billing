@@ -25,6 +25,7 @@ export const createCategory = async (payload :object) => {
     return (await res);
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
@@ -34,6 +35,7 @@ export const getAllCategory = async () => {
     return res.data;
   } catch (error) {
     console.error( error)
+    throw error;
   }
 }
 
@@ -48,6 +50,7 @@ export const createSubCategory = async (formData :FormData) => {
     return (await res).data;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
@@ -57,6 +60,7 @@ export const getAllSubCategory = async () => {
     return res.data;
   } catch (error) {
     console.error( error)
+    throw error;
   }
 }
 
@@ -66,6 +70,7 @@ try {
   return res.data;
 } catch (error) {
   console.error(error)
+  throw error;
 }
 }
 
@@ -75,5 +80,6 @@ try {
   return res;
 } catch (error) {
   console.error(error)
+  throw error;
 }
 }

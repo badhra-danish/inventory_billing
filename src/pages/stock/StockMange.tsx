@@ -10,6 +10,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { Switch } from "@/components/ui/switch";
 import { CirclePlus, Plus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
@@ -32,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 function StockMangepage() {
   const [fileName, setFileName] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -69,59 +71,43 @@ function StockMangepage() {
               {" "}
               <Button>
                 <CirclePlus />
-                Add Sub Category
+                Add Stock
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
               <DialogHeader>
-                <DialogTitle>Add Sub Category</DialogTitle>
+                <DialogTitle>Add Stock</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-8 pt-5 mt-3 border-t-2">
-                <div className="flex items-center gap-5">
-                  <div>
-                    {imageUrl ? (
-                      <>
-                        <div className="w-32 h-32 border-2 overflow-hidden flex items-center justify-center bg-gray-50 rounded-lg object-contain">
-                          <img
-                            src={imageUrl}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {" "}
-                        <div className="w-30 h-30 border-2 rounded-lg flex items-center justify-center flex-col text-gray-500">
-                          <CirclePlus />
-                          <p className="text-gray-500  text-sm">Add Image</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="flex items-center flex-col">
-                    <label htmlFor="image-upload">
-                      <Button asChild>
-                        <span>Upload Image</span>
-                      </Button>
-                    </label>
-
-                    {/* Hidden input field */}
-                    <Input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                    {fileName ? fileName : <p>JPEG, PNG up to 2 MB</p>}
-                  </div>
+              <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                    Product Type <span className="text-red-500">*</span>
+                  </Label>
+                  <RadioGroup className="flex gap-6">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="single" id="single" />
+                      <Label
+                        htmlFor="single"
+                        className="font-normal cursor-pointer"
+                      >
+                        Single Product
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="variable" id="variable" />
+                      <Label
+                        htmlFor="variable"
+                        className="font-normal cursor-pointer"
+                      >
+                        Variable Product
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
-
                 <div className="grid gap-4">
                   <Label>
                     {" "}
-                    Category <span className="text-red-500">*</span>
+                    Product <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     onValueChange={(value) => console.log("Selected:", value)}
@@ -138,52 +124,76 @@ function StockMangepage() {
                   </Select>
                 </div>
 
+                {/* Product details codec,quantiy */}
+                <div className="flex gap-2 ">
+                  <div className="w-full grid gap-3">
+                    <Label>
+                      {" "}
+                      Code <span className="text-red-500">*</span>
+                    </Label>
+                    <Input type="text" name="sub-category" readOnly disabled />
+                  </div>
+                  <div className="w-full grid gap-3">
+                    <Label>
+                      {" "}
+                      Unit <span className="text-red-500">*</span>
+                    </Label>
+                    <Input type="text" name="sub-category" readOnly disabled />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 ">
+                  <div className="w-full grid gap-3">
+                    <Label>
+                      {" "}
+                      Selling Price <span className="text-red-500">*</span>
+                    </Label>
+                    <Input type="text" name="sub-category" readOnly disabled />
+                  </div>
+                  <div className="w-full grid gap-3">
+                    <Label>
+                      {" "}
+                      Purchase Price <span className="text-red-500">*</span>
+                    </Label>
+                    <Input type="text" name="sub-category" readOnly disabled />
+                  </div>
+                </div>
+                {/* *** */}
                 <div className="grid gap-4">
                   <Label>
                     {" "}
-                    Sub Category <span className="text-red-500">*</span>
+                    Quantity <span className="text-red-500">*</span>
                   </Label>
                   <Input type="text" name="sub-category" />
                 </div>
-
+                {/* *** */}
                 <div className="grid gap-4">
-                  <Label>
-                    {" "}
-                    Category Code <span className="text-red-500">*</span>
-                  </Label>
-                  <Input type="text" name="category-code" />
-                </div>
-
-                <div className="grid gap-4">
-                  <Label>
-                    {" "}
-                    Descriptions <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Enter category description..."
-                    className="min-h-[80px] resize-y"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between border-b-2 pb-7">
                   <Label>
                     {" "}
                     Status <span className="text-red-500">*</span>
                   </Label>
-                  <Switch
-                    id="status"
-                    className=" data-[state=checked]:bg-green-500 transition-colors"
-                  />
+                  <Select
+                    onValueChange={(value) => console.log("Selected:", value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wood">InStock</SelectItem>
+                      <SelectItem value="hardware">StockOut</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <DialogFooter>
-                <DialogClose>
-                  <Button variant={"outline"}>Cancel</Button>
-                </DialogClose>
-                <Button>Add Category</Button>
-              </DialogFooter>
+
+              <div className="border-t-1 pt-5">
+                <DialogFooter>
+                  <DialogClose>
+                    <Button variant={"outline"}>Cancel</Button>
+                  </DialogClose>
+                  <Button>Add Stock</Button>
+                </DialogFooter>
+              </div>
             </DialogContent>
           </Dialog>
           {/* <Button onClick={() => navigate("/create-product")}>

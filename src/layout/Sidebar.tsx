@@ -15,6 +15,9 @@ import {
   LayoutDashboard,
   Layers,
   SquareActivity,
+  BadgeIndianRupee,
+  ReceiptIndianRupee,
+  Undo2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -105,6 +108,23 @@ const StockItems = [
   },
 ];
 
+const SalesItems = [
+  {
+    title: "Sales",
+    url: "sales",
+    icon: BadgeIndianRupee,
+  },
+  {
+    title: "Invoice",
+    url: "invoices",
+    icon: ReceiptIndianRupee,
+  },
+  {
+    title: "Sales Return",
+    url: "sales-return",
+    icon: Undo2,
+  },
+];
 export default function AppSidebar({
   open,
   setOpen,
@@ -118,11 +138,11 @@ export default function AppSidebar({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center justify-between">
-            <div>ERP</div>
+            <div>STAR HARDWARE</div>
 
-            <div onClick={() => setOpen((o) => !o)}>
+            {/* <div onClick={() => setOpen((o) => !o)}>
               <Menu />
-            </div>
+            </div> */}
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -148,8 +168,18 @@ export default function AppSidebar({
                 {InventoryItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild className="text-base">
-                      <NavLink key={item.title} to={item.url}>
-                        <item.icon />
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium text-primary"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
                         <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
@@ -182,10 +212,9 @@ export default function AppSidebar({
                 </SidebarMenuItem>
               </Collapsible> */}
               </SidebarMenu>
-              <SidebarSeparator />
             </SidebarGroupContent>
           </SidebarGroup>
-
+          <SidebarSeparator />
           <SidebarGroup>
             <SidebarGroupLabel>Stock</SidebarGroupLabel>
             <SidebarGroupContent>
@@ -193,8 +222,46 @@ export default function AppSidebar({
                 {StockItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild className="text-base">
-                      <NavLink key={item.title} to={item.url}>
-                        <item.icon />
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarSeparator />
+          <SidebarGroup>
+            <SidebarGroupLabel>Sales</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {SalesItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="text-base">
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
                         <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>

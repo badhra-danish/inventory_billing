@@ -490,6 +490,7 @@ function CreateProduct() {
                 <Label className="text-sm font-medium text-gray-700 mb-3 block">
                   Product Type <span className="text-red-500">*</span>
                 </Label>
+
                 <RadioGroup
                   className="flex gap-6"
                   onValueChange={handleProductTypeChange}

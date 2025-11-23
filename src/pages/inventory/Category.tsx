@@ -57,14 +57,27 @@ function CategoryPage() {
         status: categoryFormData.status ? "ACTIVE" : "INACTIVE",
       };
 
-      const res = await createCategory(payload);
-      if (res?.status === 201) {
-        toast.success(res.data.message);
-        setOpen(false);
-        setRefresh((prev) => !prev);
-      }
+      const promise = createCategory(payload);
+
+      await toast.promise(promise, {
+        loading: "Creating category...",
+        success: (res) => {
+          setOpen(false);
+          setRefresh((prev) => !prev);
+          return "Category Created!";
+        },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return "Failed to create Category.";
+        },
+      });
+      // if (res?.status === 201) {
+      //   toast.success(res.data.message);
+      //   setOpen(false);
+      //   setRefresh((prev) => !prev);
+      // }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
       if (error.response?.data?.error) {
         toast.error(error.response.data.error);
       } else {
