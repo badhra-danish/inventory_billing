@@ -15,8 +15,9 @@ import VariantPage from "@/pages/inventory/Variant";
 import WarrantiesPage from "@/pages/inventory/Warranties";
 import StockMangepage from "@/pages/stock/StockMange";
 import Sales from "@/pages/Sales/Sales";
-import Invoives from "@/pages/Sales/Invoives";
+import AddSales from "@/pages/Sales/AddSales";
 import SalesReturn from "@/pages/Sales/SalesReturn";
+import Invoives from "@/pages/Sales/Invoives";
 function Approutes() {
   return (
     <BrowserRouter>
@@ -40,6 +41,7 @@ function Approutes() {
             <Route path="/manage-stock" element={<StockMangepage />} />
             <Route path="/sales" element={<Sales />} />
             <Route path="/sales-return" element={<SalesReturn />} />
+            <Route path="/add-sales" element={<AddSales />} />
             <Route path="/invoices" element={<Invoives />} />
             {/* Sales Invoices*/}
           </Route>

@@ -66,10 +66,10 @@ function CategoryPage() {
           setRefresh((prev) => !prev);
           return "Category Created!";
         },
-        error: (err) => {
-          console.error("Error During Create:", err);
-          return "Failed to create Category.";
-        },
+        // error: (err) => {
+        //   console.error("Error During Create:", err);
+        //   return err.response.data.message;
+        // },
       });
       // if (res?.status === 201) {
       //   toast.success(res.data.message);
@@ -78,8 +78,8 @@ function CategoryPage() {
       // }
     } catch (error: any) {
       console.error(error);
-      if (error.response?.data?.error) {
-        toast.error(error.response.data.error);
+      if (error.response?.data) {
+        toast.error(error.response.data.message);
       } else {
         toast.error("Something went wrong");
       }

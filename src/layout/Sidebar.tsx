@@ -145,6 +145,7 @@ export default function AppSidebar({
             </div> */}
           </div>
         </SidebarHeader>
+        <SidebarSeparator />
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Main</SidebarGroupLabel>

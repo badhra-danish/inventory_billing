@@ -11,7 +11,9 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import SalesDataTable from "@/components/Sales/SalesDataTable";
+import { useNavigate } from "react-router-dom";
 function Sales() {
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
   return (
@@ -31,21 +33,10 @@ function Sales() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
-              {" "}
-              <Button onClick={() => setOpen(true)}>
-                <CirclePlus />
-                Add Sales
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <p>Add Sales</p>
-              </DialogHeader>
-              <DialogFooter></DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => navigate("/add-sales")}>
+            <CirclePlus />
+            Add Sales
+          </Button>
         </div>
       </div>
       <SalesDataTable />

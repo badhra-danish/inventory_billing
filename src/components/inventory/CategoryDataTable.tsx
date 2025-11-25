@@ -171,17 +171,24 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   const [categoryData, setCategoryData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [openEdit, setOpenEdit] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
   const [selectedCategoryUpdate, setSelectedCategoryUpdate] =
     React.useState<Category | null>(null);
+  const [selectedCetogoryDelete, setSelectCetogoryDelete] =
+    React.useState<Category | null>();
 
-  console.log(selectedCategoryUpdate);
+  const [page, setPage] = React.useState(1);
+  const [pageMeteData, setPageMetaData] = React.useState({
+    totalPages: 0,
+  });
 
   const getallCategory = async () => {
     try {
       setIsLoading(true);
-      const res = await getAllCategory();
+      const res = await getAllCategory(page, 10);
       if (res?.statusCode === 200) {
         setCategoryData(res.data);
+        setPageMetaData(res.pageMetaData);
         setIsLoading(false);
       }
     } catch (error) {
@@ -189,10 +196,11 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       console.error(error);
     }
   };
+  console.log(pageMeteData);
 
   React.useEffect(() => {
     getallCategory();
-  }, [refresh]);
+  }, [refresh, page]);
 
   const handleupdate = async () => {
     try {
@@ -213,6 +221,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       if (res.statusCode === 200) {
         toast.success(res.message);
         setOpenEdit(false);
+        getallCategory();
       }
     } catch (error) {
       console.log(error);
@@ -220,13 +229,17 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   };
   const handleDelete = async () => {
     try {
-      if (!selectedCategoryUpdate?.categoryID) {
+      //console.log(selectedCetogoryDelete?.categoryID);
+
+      if (!selectedCetogoryDelete?.categoryID) {
         toast.error("No category selected!");
         return;
       }
-      const res = await deleteCategory(selectedCategoryUpdate.categoryID);
+      const res = await deleteCategory(selectedCetogoryDelete.categoryID);
       if (res?.status == 204) {
         toast.success("Category Deleted..");
+        setOpenDelete(false);
+        getallCategory();
       }
     } catch (error) {
       console.log(error);
@@ -278,9 +291,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       accessorKey: "slug",
       header: () => <div className="text-left">Category Slug</div>,
       cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">{row.getValue("slug")}</div>
-        );
+        return <div className=" text-left ">{row.getValue("slug")}</div>;
       },
     },
     {
@@ -334,41 +345,19 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
             >
               <Edit />
             </Button>
-
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectCetogoryDelete(category);
+                setOpenDelete(true);
+              }}
+            >
+              <Trash />
+            </Button>
             {/* <Button variant="outline" size="sm">
               <Trash />
             </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive" onClick={handleDelete}>
-                    Delete
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </div>
         );
       },
@@ -573,12 +562,12 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors capitalize"
+                      className="hover:bg-gray-50 transition-colors "
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 capitalize"
+                          className="px-4 py-3 text-sm text-gray-700 "
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -676,7 +665,32 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* for the Delete */}
+      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
 
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* 📄 Pagination + Footer Info */}
       <div className="flex items-center justify-between py-4 text-sm text-gray-600">
         <div>
@@ -687,16 +701,22 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            //onClick={() => table.previousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page == 1}
+            //  disabled={!table.getCanPreviousPage()}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            // onClick={() => table.nextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+            }
+            disabled={page >= pageMeteData?.totalPages}
+            //  disabled={!table.getCanNextPage()}
           >
             Next
           </Button>

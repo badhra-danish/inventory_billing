@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+// react-window list removed; using direct mapping for SelectItem
 import { Switch } from "@/components/ui/switch";
 import SubCategoryDatatable from "@/components/inventory/SubCategoryDatatable";
 import { CirclePlus, Plus } from "lucide-react";
@@ -31,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
 import { createCategory, createSubCategory } from "@/api/ApiClient";
 import toast from "react-hot-toast";
+import { SelectViewport } from "@radix-ui/react-select";
 export interface SubCategory {
   name: string;
   code: string;
@@ -43,7 +45,10 @@ function SubCategorypage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
-  const { categories } = useCategory();
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const { categoryPageMetaData, refreshCategories, categories, loading } =
+    useCategory();
   const [subCateFormData, setSubCategoryFormData] = React.useState<SubCategory>(
     {
       name: "",
@@ -106,7 +111,7 @@ function SubCategorypage() {
       console.error("Error During the create Category", error);
     }
   };
-  console.log(subCateFormData);
+  console.log(page);
 
   //const navigate = useNavigate();
   return (
@@ -199,11 +204,27 @@ function SubCategorypage() {
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories?.map((cat) => (
-                        <SelectItem value={cat?.categoryID}>
-                          {cat?.name}
-                        </SelectItem>
-                      ))}
+                      <SelectViewport className="max-h-40 overflow-y-auto">
+                        {categories?.length ? (
+                          categories.map((cat) => (
+                            <SelectItem
+                              key={cat.categoryID}
+                              value={cat.categoryID}
+                            >
+                              {cat.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-gray-500">
+                            No categories found
+                          </div>
+                        )}
+                        {/* {categories?.map((cat) => (
+                          <SelectItem value={cat?.categoryID}>
+                            {cat?.name}
+                          </SelectItem>
+                        ))} */}
+                      </SelectViewport>
                     </SelectContent>
                   </Select>
                 </div>

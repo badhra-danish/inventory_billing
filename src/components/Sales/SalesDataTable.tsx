@@ -30,7 +30,21 @@ import {
   Eye,
   MoreHorizontal,
   Trash,
+  EllipsisVertical,
+  ReceiptIndianRupee,
+  ReceiptIndianRupeeIcon,
+  BadgeIndianRupee,
+  CirclePlus,
 } from "lucide-react";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -53,189 +67,219 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Product[] = [
+import custImg from "../../assets/images/customer.jpg";
+import { Badge } from "../ui/badge";
+const data: SalesDetail[] = [
   {
-    id: "P001",
-    name: "Plywood Sheet 12mm",
-    category: "Wood & Boards",
-    brand: "GreenPly",
-    unit: "pc",
-    qty: 300,
-    price: 1200,
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "JHones",
+    refrence: "SL0021",
+    date: "12-MAR-2024",
+    status: "Completed",
+    grandTotal: "12,000",
+    paid: "2000",
+    due: "10,000",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P002",
-    name: "Laminated Sheet 18mm",
-    category: "Wood & Boards",
-    brand: "Century",
-    unit: "pc",
-    qty: 300,
-    price: 1800,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "Mohan Kumar",
+    refrence: "SL0022",
+    date: "15-MAR-2024",
+    status: "Pending",
+    grandTotal: "8,500",
+    paid: "5,000",
+    due: "3,500",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P003",
-    name: "Hinges 3-inch",
-    category: "Hardware",
-    brand: "Godrej",
-    unit: "pc",
-    qty: 300,
-    price: 50,
-
-    status: "Out of Stock",
+    imgUrl: custImg,
+    customer: "Aisha Patel",
+    refrence: "SL0023",
+    date: "20-MAR-2024",
+    status: "Completed",
+    grandTotal: "15,000",
+    paid: "15,000",
+    due: "0",
+    paymentStatus: "Paid",
   },
   {
-    id: "P004",
-    name: "Wood Glue 1L",
-    category: "Adhesives",
-    brand: "Fevicol",
-    unit: "pc",
-    qty: 300,
-    price: 250,
-
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Rahul Sharma",
+    refrence: "SL0024",
+    date: "25-MAR-2024",
+    status: "Cancelled",
+    grandTotal: "6,200",
+    paid: "0",
+    due: "6,200",
+    paymentStatus: "Unpaid",
   },
   {
-    id: "P005",
-    name: "Drawer Slide Set",
-    category: "Hardware",
-    brand: "Hettich",
-    unit: "pc",
-    qty: 300,
-    price: 300,
-
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Sneha Verma",
+    refrence: "SL0025",
+    date: "28-MAR-2024",
+    status: "Completed",
+    grandTotal: "22,000",
+    paid: "20,000",
+    due: "2,000",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P006",
-    name: "Veneer Sheet 4x8ft",
-    category: "Finishing",
-    brand: "Kitply",
-    unit: "pc",
-    qty: 300,
-    price: 950,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "David Wilson",
+    refrence: "SL0026",
+    date: "02-APR-2024",
+    status: "Pending",
+    grandTotal: "9,200",
+    paid: "4,000",
+    due: "5,200",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P007",
-    name: "Screw Pack (100pcs)",
-    category: "Fasteners",
-    brand: "Taparia",
-    unit: "pc",
-    qty: 300,
-    price: 120,
-
-    status: "Out of Stock",
+    imgUrl: custImg,
+    customer: "Anil Mehta",
+    refrence: "SL0027",
+    date: "05-APR-2024",
+    status: "Completed",
+    grandTotal: "18,500",
+    paid: "18,500",
+    due: "0",
+    paymentStatus: "Paid",
   },
   {
-    id: "P008",
-    name: "Edge Band Roll",
-    category: "Finishing",
-    brand: "Rehau",
-    unit: "pc",
-    qty: 300,
-    price: 200,
-
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Emma Watson",
+    refrence: "SL0028",
+    date: "07-APR-2024",
+    status: "Completed",
+    grandTotal: "27,000",
+    paid: "10,000",
+    due: "17,000",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "Ramesh Chauhan",
+    refrence: "SL0029",
+    date: "10-APR-2024",
+    status: "Completed",
+    grandTotal: "14,800",
+    paid: "10,000",
+    due: "4,800",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Priya Nair",
+    refrence: "SL0030",
+    date: "12-APR-2024",
+    status: "Pending",
+    grandTotal: "7,400",
+    paid: "3,000",
+    due: "4,400",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "Chris Martin",
+    refrence: "SL0031",
+    date: "14-APR-2024",
+    status: "Completed",
+    grandTotal: "32,000",
+    paid: "32,000",
+    due: "0",
+    paymentStatus: "Paid",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Vinay Gupta",
+    refrence: "SL0032",
+    date: "16-APR-2024",
+    status: "Completed",
+    grandTotal: "11,500",
+    paid: "2,000",
+    due: "9,500",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "Sarah Thompson",
+    refrence: "SL0033",
+    date: "18-APR-2024",
+    status: "Cancelled",
+    grandTotal: "5,900",
+    paid: "0",
+    due: "5,900",
+    paymentStatus: "Unpaid",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Kunal Singh",
+    refrence: "SL0034",
+    date: "20-APR-2024",
+    status: "Pending",
+    grandTotal: "19,200",
+    paid: "12,000",
+    due: "7,200",
+    paymentStatus: "OverDue",
   },
   {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
-
-    status: "Low Stock",
+    imgUrl: custImg,
+    customer: "Olivia Brown",
+    refrence: "SL0035",
+    date: "22-APR-2024",
+    status: "Completed",
+    grandTotal: "24,000",
+    paid: "24,000",
+    due: "0",
+    paymentStatus: "Paid",
   },
   {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
+    imgUrl: custImg,
+    customer: "Rohit Verma",
+    refrence: "SL0036",
+    date: "25-APR-2024",
+    status: "Completed",
+    grandTotal: "17,800",
+    paid: "5,000",
+    due: "12,800",
+    paymentStatus: "OverDue",
+  },
+  {
+    imgUrl: custImg,
+    customer: "Daniel Harris",
+    refrence: "SL0037",
+    date: "26-APR-2024",
+    status: "Pending",
+    grandTotal: "9,900",
+    paid: "0",
+    due: "9,900",
+    paymentStatus: "Unpaid",
+  },
+  {
+    imgUrl: custImg,
+    customer: "Siddharth Patel",
+    refrence: "SL0038",
+    date: "28-APR-2024",
+    status: "Completed",
+    grandTotal: "29,500",
+    paid: "20,000",
+    due: "9,500",
+    paymentStatus: "OverDue",
   },
 ];
 
-export type Product = {
-  id: string;
-  name: string;
-  category: string;
-  brand: string;
-  unit: string;
-  qty: number;
-  price: number;
-  status: "In Stock" | "Low Stock" | "Out of Stock" | "failed";
+export type SalesDetail = {
+  imgUrl: string;
+  customer: string;
+  refrence: string;
+  date: string;
+  status: "Completed" | "Pending" | "Cancelled";
+  grandTotal: string;
+  paid: string;
+  due: string;
+  paymentStatus: "Paid" | "Unpaid" | "OverDue";
 };
 
 export default function SalesDataTable() {
@@ -251,7 +295,7 @@ export default function SalesDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<SalesDetail>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -274,17 +318,9 @@ export default function SalesDataTable() {
       enableSorting: false,
       enableHiding: false,
     },
+
     {
-      accessorKey: "id",
-      header: () => <div className="text-left">SKU</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">{row.getValue("id")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "name",
+      accessorKey: "customer",
       header: ({ column }) => {
         return (
           <Button
@@ -296,52 +332,125 @@ export default function SalesDataTable() {
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
-      ),
-    },
-    {
-      accessorKey: "category",
-      header: () => <div className="text-left">Category</div>,
       cell: ({ row }) => {
+        const sales = row.original;
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("category")}
+          <div className="flex items-center gap-3">
+            {/* Customer Image */}
+            <img
+              src={sales.imgUrl}
+              alt={sales.customer}
+              className="w-10 h-10 rounded-full object-cover border"
+            />
+
+            {/* Customer Name */}
+            <span className="capitalize font-bold">
+              {row.getValue("customer")}
+            </span>
           </div>
         );
       },
     },
     {
-      accessorKey: "brand",
-      header: () => <div className="text-left">Brand</div>,
+      accessorKey: "refrence",
+      header: () => <div className="text-left">Refrence</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("brand")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("refrence")}
+          </div>
         );
       },
     },
     {
-      accessorKey: "qty",
-      header: () => <div className="text-left">Quantity</div>,
-      cell: ({ row }) => {
-        return <div className="lowercase text-left">{row.getValue("qty")}</div>;
-      },
-    },
-    {
-      accessorKey: "price",
-      header: () => <div className="text-left">Price</div>,
+      accessorKey: "date",
+      header: () => <div className="text-left">Date</div>,
       cell: ({ row }) => {
         return (
-          <div className="lowercase text-left">{row.getValue("price")}</div>
+          <div className=" text-left capitalize">{row.getValue("date")}</div>
         );
       },
     },
     {
-      accessorKey: "unit",
-      header: () => <div className="text-right">Unit</div>,
+      accessorKey: "status",
+      header: () => <div className="text-left">Status</div>,
+      cell: ({ row }) => {
+        const status = String(row.getValue("status")).toLowerCase();
+
+        let color = "bg-gray-500";
+        let label = status;
+
+        if (status === "completed") {
+          color = "bg-green-400";
+        } else if (status === "pending") {
+          color = "bg-blue-400";
+        } else if (status === "cancelled") {
+          color = "bg-red-400 ";
+        }
+        return (
+          <div className="lowercase text-left">
+            <Badge
+              className={`${color} px-3 py-1 rounded-md capitalize text-[10px]`}
+            >
+              {label}
+            </Badge>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "grandTotal",
+      header: () => <div className="text-left">Total</div>,
       cell: ({ row }) => {
         return (
-          <div className="lowercase text-left">{row.getValue("unit")}</div>
+          <div className="lowercase text-left">
+            ₹{row.getValue("grandTotal")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "paid",
+      header: () => <div className="text-left">Paid</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">₹{row.getValue("paid")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "due",
+      header: () => <div className="text-left">Due</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">₹{row.getValue("due")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "paymentStatus",
+      header: () => <div className="text-left">Payment Status</div>,
+      cell: ({ row }) => {
+        const status = String(row.getValue("paymentStatus")).toLowerCase();
+
+        let color = "bg-gray-500";
+        let label = status;
+
+        if (status === "paid") {
+          color = "bg-green-100 text-green-400 ";
+        } else if (status === "overdue") {
+          color = "bg-yellow-50 text-yellow-400";
+        } else if (status === "unpaid") {
+          color = "bg-red-50 text-red-400";
+        }
+        return (
+          <div className="lowercase text-left">
+            <Badge
+              className={`${color} px-3 py-1 rounded-md capitalize font-semibold flex items-center`}
+            >
+              {label}
+            </Badge>
+          </div>
         );
       },
     },
@@ -351,49 +460,39 @@ export default function SalesDataTable() {
       cell: ({ row }) => {
         const product = row.original;
         return (
-          <div className="flex gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(`/product-detail/${product.id}`)}
-            >
-              <Eye />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Edit />
-            </Button>
-            {/* <Button variant="outline" size="sm">
-              <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+          <div>
+            <Menubar className="border-0 bg-transparent shadow-none">
+              <MenubarMenu>
+                <MenubarTrigger>
+                  <EllipsisVertical className="w-5 h-5 hover:text-blue-600" />
+                </MenubarTrigger>
+                <MenubarContent>
+                  <MenubarItem>
+                    {" "}
+                    <Eye />
+                    Sales Details
+                  </MenubarItem>
+                  <MenubarItem>
+                    <Edit />
+                    Edit Sales
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem>
+                    <CirclePlus />
+                    Create Payment
+                  </MenubarItem>
+                  <MenubarItem>
+                    <BadgeIndianRupee />
+                    Show Payment
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem>
+                    <Trash />
+                    Delete Sales
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           </div>
         );
       },

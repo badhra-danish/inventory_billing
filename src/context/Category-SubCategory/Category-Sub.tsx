@@ -1,7 +1,11 @@
 import React from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAllCategory, getAllSubCategory } from "@/api/ApiClient";
+import {
+  getAllCategory,
+  getAllCategoryall,
+  getAllSubCategory,
+} from "@/api/ApiClient";
 export interface Category {
   categoryID: string;
   name: string;
@@ -21,8 +25,14 @@ type CategoryContextType = {
   categories: Category[];
   subCategories: SubCategory[];
   loading: boolean;
-  refreshCategories: () => void;
+  refreshCategories: (page: number, pageSize: number) => void;
   refreshSubCategories: () => void;
+  categoryPageMetaData: {
+    totalPages: number;
+    totalElements: number;
+    elementCountInCurrentPage: number;
+    currentPageNumber: number;
+  };
 };
 
 const CategoryContext = createContext<CategoryContextType | null>(null);
@@ -34,15 +44,27 @@ export const CategoryProvider = ({
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [categoryPageMetaData, setCategoryPageMetaData] = React.useState({
+    totalPages: 0,
+    totalElements: 0,
+    elementCountInCurrentPage: 0,
+    currentPageNumber: 0,
+  });
   const [loading, setLoading] = useState(false);
 
   // Fetch categories
   const refreshCategories = async () => {
     setLoading(true);
     try {
-      const res = await getAllCategory();
+      const res = await getAllCategoryall();
       if (res?.statusCode === 200) {
+        // append or replace depending on page
         setCategories(res.data || []);
+        // setCategories((prev) =>
+        //   page > 1 ? [...prev, ...(res.data || [])] : res.data || []
+        // );
+        //setCategories((prev) => [...prev, ...res.data]);
+        // setCategoryPageMetaData(res.pageMetaData);
       }
     } catch (error) {
       console.log("Error fetching categories:", error);
@@ -51,11 +73,14 @@ export const CategoryProvider = ({
     }
   };
 
-  const refreshSubCategories = async () => {
+  const refreshSubCategories = async (
+    page: number = 1,
+    pageSize: number = 10
+  ) => {
     setLoading(true);
     try {
-      const data = await getAllSubCategory();
-      setSubCategories(data || []);
+      const res = await getAllSubCategory(page, pageSize);
+      setSubCategories(res?.data || []);
     } catch (error) {
       console.log("Error fetching categories:", error);
     } finally {
@@ -64,8 +89,8 @@ export const CategoryProvider = ({
   };
 
   useEffect(() => {
-    refreshCategories();
     refreshSubCategories();
+    refreshCategories();
   }, []);
 
   return (
@@ -73,6 +98,7 @@ export const CategoryProvider = ({
       value={{
         categories,
         subCategories,
+        categoryPageMetaData,
         refreshCategories,
         refreshSubCategories,
         loading,
