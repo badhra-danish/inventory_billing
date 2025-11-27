@@ -21,6 +21,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 function UnitsPage() {
   const navigate = useNavigate();
+  const [unitFormData, setUnitFormData] = React.useState({
+    unitName: "",
+    shortName: "",
+    status: "INACTIVE",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setUnitFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -56,14 +73,26 @@ function UnitsPage() {
                     {" "}
                     Unit Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="category-1"
+                    type="text"
+                    name="unitName"
+                    value={unitFormData.unitName}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div className="grid gap-4">
                   <Label htmlFor="category-1">
                     {" "}
                     Short Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="category-1"
+                    type="text"
+                    name="shortName"
+                    value={unitFormData.shortName}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div className="flex items-center justify-between border-b-2 pb-7">
                   <Label htmlFor="category-1">
@@ -73,6 +102,13 @@ function UnitsPage() {
                   <Switch
                     id="status"
                     className=" data-[state=checked]:bg-green-500 transition-colors"
+                    checked={unitFormData.status == "ACTIVE"}
+                    onCheckedChange={(e) => {
+                      setUnitFormData((prev) => ({
+                        ...prev,
+                        status: e ? "ACTIVE" : "INACTIVE",
+                      }));
+                    }}
                   />
                 </div>
               </div>

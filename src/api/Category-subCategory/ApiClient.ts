@@ -1,12 +1,5 @@
-import axios from "axios";
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+import { axiosClient } from "../index";
 
-const axiosClient = axios.create({
-  baseURL, // our backend base URL
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 const endPoint = {
   createCetogory: "/v1/category/create",
   getAllCategoryPage: "/v1/category/page",

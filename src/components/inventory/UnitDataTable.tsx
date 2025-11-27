@@ -53,74 +53,75 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Units[] = [
-  {
-    unit: "ton",
-    shortName: "tn",
-    noOfProduct: 20,
-    status: "active",
-  },
-  {
-    unit: "Liters",
-    shortName: "L",
-    noOfProduct: 18,
-    status: "active",
-  },
-  {
-    unit: "Kilograms",
-    shortName: "kg",
-    noOfProduct: 25,
-    status: "active",
-  },
-  {
-    unit: "Dozen",
-    shortName: "dz",
-    noOfProduct: 30,
-    status: "active",
-  },
-  {
-    unit: "Pieces",
-    shortName: "pcs",
-    noOfProduct: 42,
-    status: "active",
-  },
-  {
-    unit: "Meters",
-    shortName: "m",
-    noOfProduct: 15,
-    status: "inactive",
-  },
-  {
-    unit: "Feet",
-    shortName: "ft",
-    noOfProduct: 22,
-    status: "active",
-  },
-  {
-    unit: "Inches",
-    shortName: "in",
-    noOfProduct: 28,
-    status: "active",
-  },
-  {
-    unit: "Packets",
-    shortName: "pkt",
-    noOfProduct: 12,
-    status: "inactive",
-  },
-  {
-    unit: "Boxes",
-    shortName: "bx",
-    noOfProduct: 35,
-    status: "active",
-  },
-];
+import { getAllUnit } from "@/api/unit/UnitApiClient";
+// const data: Units[] = [
+//   // {
+//   //   unit: "ton",
+//   //   shortName: "tn",
+//   //   noOfProduct: 20,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Liters",
+//   //   shortName: "L",
+//   //   noOfProduct: 18,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Kilograms",
+//   //   shortName: "kg",
+//   //   noOfProduct: 25,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Dozen",
+//   //   shortName: "dz",
+//   //   noOfProduct: 30,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Pieces",
+//   //   shortName: "pcs",
+//   //   noOfProduct: 42,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Meters",
+//   //   shortName: "m",
+//   //   noOfProduct: 15,
+//   //   status: "inactive",
+//   // },
+//   // {
+//   //   unit: "Feet",
+//   //   shortName: "ft",
+//   //   noOfProduct: 22,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Inches",
+//   //   shortName: "in",
+//   //   noOfProduct: 28,
+//   //   status: "active",
+//   // },
+//   // {
+//   //   unit: "Packets",
+//   //   shortName: "pkt",
+//   //   noOfProduct: 12,
+//   //   status: "inactive",
+//   // },
+//   // {
+//   //   unit: "Boxes",
+//   //   shortName: "bx",
+//   //   noOfProduct: 35,
+//   //   status: "active",
+//   // },
+// ];
 
 export type Units = {
-  unit: string;
+  name: string;
   shortName: string;
-  noOfProduct: number;
-  status: "active" | "inactive";
+  //noOfProduct: number;
+  status: "ACTIVE" | "INACTIVE";
 };
 
 export default function UnitsDataTable() {
@@ -136,6 +137,22 @@ export default function UnitsDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [unitData, setUnitData] = React.useState([]);
+
+  const getallUnit = async () => {
+    try {
+      const res = await getAllUnit(page, 10);
+      if (res.statusCode === 200) {
+        setUnitData(res.data || []);
+      }
+    } catch (error) {}
+  };
+  React.useEffect(() => {
+    getallUnit();
+  });
+
+  const data: Units[] = unitData;
   const columns: ColumnDef<Units>[] = [
     {
       id: "select",
@@ -160,7 +177,7 @@ export default function UnitsDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "unit",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -173,7 +190,7 @@ export default function UnitsDataTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("unit")}</div>
+        <div className="capitalize font-bold">{row.getValue("name")}</div>
       ),
     },
 
@@ -188,17 +205,17 @@ export default function UnitsDataTable() {
         );
       },
     },
-    {
-      accessorKey: "noOfProduct",
-      header: () => <div className="text-left">No Of Products</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("noOfProduct")}
-          </div>
-        );
-      },
-    },
+    // {
+    //   accessorKey: "noOfProduct",
+    //   header: () => <div className="text-left">No Of Products</div>,
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="capitalize text-left ">
+    //         {row.getValue("noOfProduct")}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
@@ -206,7 +223,7 @@ export default function UnitsDataTable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "active"
+          status === "ACTIVE"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 

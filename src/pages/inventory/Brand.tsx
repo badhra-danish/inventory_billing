@@ -19,8 +19,62 @@ import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { createBrand } from "@/api/brand/BrandApiClient";
+import toast from "react-hot-toast";
 function BrandPage() {
   const navigate = useNavigate();
+  type BrandStatus = "ACTIVE" | "INACTIVE";
+  const [openAddBrand, setOpenAddBrand] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(false);
+  const [brandFormData, setBrandFormData] = React.useState<{
+    brandName: string;
+    status: BrandStatus;
+  }>({
+    brandName: "",
+    status: "INACTIVE",
+  });
+  const handleCreateBrand = async () => {
+    try {
+      const payload = {
+        name: brandFormData.brandName,
+        status: brandFormData.status,
+      };
+      const brandPromise = createBrand(payload);
+      toast.promise(brandPromise, {
+        loading: "Creating Brand",
+        success: (res) => {
+          setOpenAddBrand(false);
+          setRefresh(true);
+          setBrandFormData({
+            brandName: "",
+            status: "INACTIVE",
+          });
+          return res.message;
+        },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setRefresh(false);
+    }
+  };
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setBrandFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  console.log(brandFormData);
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -38,7 +92,7 @@ function BrandPage() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog>
+          <Dialog open={openAddBrand} onOpenChange={setOpenAddBrand}>
             <DialogTrigger>
               {" "}
               <Button>
@@ -56,15 +110,15 @@ function BrandPage() {
                     {" "}
                     Brand Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="brand-1"
+                    type="text"
+                    name="brandName"
+                    value={brandFormData.brandName}
+                    onChange={handleChange}
+                  />
                 </div>
-                {/* <div className="grid gap-4">
-                  <Label htmlFor="category-1">
-                    {" "}
-                    Slug Category <span className="text-red-500">*</span>
-                  </Label>
-                  <Input id="category-1" type="text" name="category" />
-                </div> */}
+
                 <div className="flex items-center justify-between border-b-2 pb-7">
                   <Label htmlFor="category-1">
                     {" "}
@@ -73,6 +127,13 @@ function BrandPage() {
                   <Switch
                     id="status"
                     className=" data-[state=checked]:bg-green-500 transition-colors"
+                    checked={brandFormData.status === "ACTIVE"}
+                    onCheckedChange={(checked) =>
+                      setBrandFormData((prev) => ({
+                        ...prev,
+                        status: checked ? "ACTIVE" : "INACTIVE",
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -80,7 +141,7 @@ function BrandPage() {
                 <DialogClose>
                   <Button variant={"outline"}>Cancel</Button>
                 </DialogClose>
-                <Button>Add Brand</Button>
+                <Button onClick={handleCreateBrand}>Add Brand</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -90,7 +151,7 @@ function BrandPage() {
           </Button> */}
         </div>
       </div>
-      <BrandDataTable />
+      <BrandDataTable refresh={refresh} />
     </>
   );
 }

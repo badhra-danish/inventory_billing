@@ -26,6 +26,7 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
+  CirclePlus,
   Edit,
   Eye,
   MoreHorizontal,
@@ -53,25 +54,37 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Brand[] = [
-  { brand: "greenply", status: "active" },
-  { brand: "Century", status: "inactive" },
-  { brand: "Kitply", status: "active" },
-  { brand: "Archidply", status: "active" },
-  { brand: "Austin", status: "inactive" },
-  { brand: "RoyalTouch", status: "active" },
-  { brand: "Merino", status: "active" },
-  { brand: "Alishan", status: "inactive" },
-  { brand: "ActionTesa", status: "active" },
-  { brand: "Durian", status: "active" },
-];
+import {
+  deleteBrand,
+  getAllBrand,
+  upadateBrand,
+} from "@/api/brand/BrandApiClient";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import toast from "react-hot-toast";
+// const data: Brand[] = [
+//   { brand: "greenply", status: "active" },
+//   { brand: "Century", status: "inactive" },
+//   { brand: "Kitply", status: "active" },
+//   { brand: "Archidply", status: "active" },
+//   { brand: "Austin", status: "inactive" },
+//   { brand: "RoyalTouch", status: "active" },
+//   { brand: "Merino", status: "active" },
+//   { brand: "Alishan", status: "inactive" },
+//   { brand: "ActionTesa", status: "active" },
+//   { brand: "Durian", status: "active" },
+// ];
 
 export type Brand = {
-  brand: string;
-  status: "active" | "inactive";
+  brandID: string;
+  name: string;
+  createdAt: string;
+  status: "ACTIVE" | "INACTIVE";
 };
-
-export default function BrandDataTable() {
+type brandDatatable = {
+  refresh: boolean;
+};
+export default function BrandDataTable({ refresh }: brandDatatable) {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -84,6 +97,100 @@ export default function BrandDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPages: 0,
+    totalElements: 0,
+    currentPageNumber: 0,
+    elementCountInCurrentPage: 0,
+  });
+  const [brandData, setBrandData] = React.useState([]);
+  const [selectedBrand, setSelectedBrand] = React.useState<Brand | null>();
+  const [openBrandUpdate, setOpenBrandUpdate] = React.useState(false);
+  const [openBrandDelete, setOpenBrandDelete] = React.useState(false);
+  const getallBrandPage = async () => {
+    try {
+      const res = await getAllBrand(page, 10);
+      if (res.statusCode === 200) {
+        setBrandData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(selectedBrand);
+
+  React.useEffect(() => {
+    getallBrandPage();
+  }, [page, refresh]);
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setSelectedBrand((prev) => {
+      if (!prev) return prev; // Ensure `prev` is not null or undefined
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  const handleUpdate = () => {
+    try {
+      const payload = {
+        name: selectedBrand?.name,
+        status: selectedBrand?.status,
+      };
+      if (!selectedBrand?.brandID) {
+        console.error("Brand ID is undefined");
+        return;
+      }
+      const updatePomise = upadateBrand(selectedBrand.brandID, payload);
+      toast.promise(updatePomise, {
+        loading: "Updating Brand..",
+        success: (res) => {
+          setOpenBrandUpdate(false);
+          getallBrandPage();
+          return res.message;
+        },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleDelete = () => {
+    try {
+      if (selectedBrand?.brandID) {
+        const deletePromise = deleteBrand(selectedBrand.brandID);
+        toast.promise(deletePromise, {
+          loading: "Deleting Brand",
+          success: () => {
+            setOpenBrandDelete(false);
+            getallBrandPage();
+            return "Brand Deleted";
+          },
+          error: (err) => {
+            console.error(err);
+            return "Brand Not Deleted";
+          },
+        });
+      } else {
+        console.error("Brand ID is undefined");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const data: Brand[] = brandData;
+
   const columns: ColumnDef<Brand>[] = [
     {
       id: "select",
@@ -108,7 +215,7 @@ export default function BrandDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "brand",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -121,16 +228,18 @@ export default function BrandDataTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("brand")}</div>
+        <div className="capitalize font-bold">{row.getValue("name")}</div>
       ),
     },
 
     {
-      accessorKey: "brand",
+      accessorKey: "createdAt",
       header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("brand")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("createdAt")}
+          </div>
         );
       },
     },
@@ -142,7 +251,7 @@ export default function BrandDataTable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "active"
+          status === "ACTIVE"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -162,44 +271,30 @@ export default function BrandDataTable() {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        // const product = row.original;
+        const brand = row.original;
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedBrand(brand);
+                setOpenBrandUpdate(true);
+              }}
+            >
               <Edit />
             </Button>
-            {/* <Button variant="outline" size="sm">
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedBrand(brand);
+                setOpenBrandDelete(true);
+              }}
+            >
               <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </Button>
           </div>
         );
       },
@@ -265,72 +360,6 @@ export default function BrandDataTable() {
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="hover:bg-blue-500 hover:text-white"
-            >
-              <Button variant="outline" className="ml-auto">
-                Category: {selectedCategory}{" "}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
-                Filter by Category
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              {[
-                "All",
-                "Wood",
-                "Plywood",
-                "Laminates",
-                "Veneers",
-                "Hardware",
-                "Handles & Locks",
-                "Hinges & Channels",
-                "Screws & Fasteners",
-                "Glass",
-                "Paints & Coatings",
-                "Finishing",
-                "Adhesives",
-                "Plastic Boards",
-                "MDF Boards",
-                "Particle Boards",
-                "Acrylic Sheets",
-                "Cement Sheets",
-                "Doors",
-                "Flooring",
-                "Ceiling Panels",
-                "Edge Banding",
-                "Tools & Accessories",
-                "Electrical Fittings",
-                "Kitchen Fittings",
-                "Bathroom Fittings",
-                "Construction Material",
-                "Safety Equipment",
-                "Decorative Panels",
-                "Sealers & Polishes",
-                "Others",
-              ].map((cat) => (
-                <DropdownMenuItem
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("name");
-                    if (categoryColumn) {
-                      categoryColumn.setFilterValue(cat === "All" ? "" : cat);
-                    }
-                  }}
-                >
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -433,21 +462,103 @@ export default function BrandDataTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData?.totalPages, p + 1))
+            }
+            disabled={page >= pageMetaData?.totalPages}
           >
             Next
           </Button>
         </div>
       </div>
+
+      {/* Update dialog */}
+      <Dialog open={openBrandUpdate} onOpenChange={setOpenBrandUpdate}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Brand</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+            <div className="grid gap-4">
+              <Label htmlFor="category-1">
+                {" "}
+                Brand Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="brand-1"
+                type="text"
+                name="name"
+                value={selectedBrand?.name}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="flex items-center justify-between border-b-2 pb-7">
+              <Label htmlFor="category-1">
+                {" "}
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Switch
+                id="status"
+                className=" data-[state=checked]:bg-green-500 transition-colors"
+                checked={selectedBrand?.status === "ACTIVE"}
+                onCheckedChange={(checked) =>
+                  setSelectedBrand((prev) => {
+                    if (!prev) return prev; // Ensure `prev` is not null or undefined
+                    return {
+                      ...prev,
+                      status: checked ? "ACTIVE" : "INACTIVE",
+                      brandID: prev.brandID,
+                      name: prev.name,
+                      createdAt: prev.createdAt,
+                    };
+                  })
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant={"outline"}>Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleUpdate}>Save Change</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Delete dialog */}
+      <Dialog open={openBrandDelete} onOpenChange={setOpenBrandDelete}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

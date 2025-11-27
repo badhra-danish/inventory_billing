@@ -29,11 +29,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
 function CreateProduct() {
   const navigate = useNavigate();
   const [productType, setProductType] = React.useState<
     "single" | "variable" | ""
-  >("");
+  >("single");
   const [isOpen, setIsOpen] = React.useState(true);
 
   const handleProductTypeChange = (value: "single" | "variable") => {
@@ -79,17 +80,24 @@ function CreateProduct() {
 
   const addAttribute = () => {
     if (!newAttrName.trim()) return;
+
+    // split by comma
+    const names = newAttrName
+      .split(",")
+      .map((n) => n.trim())
+      .filter(Boolean);
+
     setAttributes((prev) => [
       ...prev,
-      {
+      ...names.map((name) => ({
         id: Math.random().toString(36).slice(2, 9),
-        name: newAttrName.trim(),
+        name,
         options: [],
-      },
+      })),
     ]);
+
     setNewAttrName("");
   };
-
   const removeAttribute = (id: string) => {
     setAttributes((prev) => prev.filter((a) => a.id !== id));
   };
@@ -141,6 +149,8 @@ function CreateProduct() {
 
     setVariants(newVariants);
   };
+  console.log("att", attributes);
+  console.log("var", variants);
 
   const updateVariantField = (
     variantId: string,
@@ -151,7 +161,9 @@ function CreateProduct() {
       prev.map((v) => (v.id === variantId ? { ...v, [field]: value } : v))
     );
   };
-
+  const deleteVariant = (id: string) => {
+    setVariants((prev) => prev.filter((v) => v.id != id));
+  };
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -215,40 +227,6 @@ function CreateProduct() {
             <>
               <div className="w-full max-w-7xl mx-auto  bg-white border-t pt-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Store */}
-                  {/* <div className="space-y-2 grid items-center">
-                    <Label htmlFor="store">
-                      Store <span className="text-red-500">*</span>
-                    </Label>
-                    <Select>
-                      <SelectTrigger id="store" className="w-full">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="store1">Store 1</SelectItem>
-                        <SelectItem value="store2">Store 2</SelectItem>
-                        <SelectItem value="store3">Store 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div> */}
-
-                  {/* Warehouse */}
-                  {/* <div className="space-y-2 grid">
-                    <Label htmlFor="warehouse">
-                      Warehouse <span className="text-red-500">*</span>
-                    </Label>
-                    <Select>
-                      <SelectTrigger id="warehouse" className="w-full">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="warehouse1">Warehouse 1</SelectItem>
-                        <SelectItem value="warehouse2">Warehouse 2</SelectItem>
-                        <SelectItem value="warehouse3">Warehouse 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div> */}
-
                   {/* Product Name */}
                   <div className="space-y-2 grid">
                     <Label htmlFor="productName">
@@ -383,66 +361,16 @@ function CreateProduct() {
                     </Select>
                   </div>
 
-                  {/* Barcode Symbology */}
-                  <div className="space-y-2 grid">
-                    <Label htmlFor="barcodeSymbology">
-                      Size <span className="text-red-500">*</span>
-                    </Label>
-                    <Select>
-                      <SelectTrigger id="barcodeSymbology" className="w-full">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="code128">Code 128</SelectItem>
-                        <SelectItem value="ean13">EAN-13</SelectItem>
-                        <SelectItem value="upc">UPC</SelectItem>
-                        <SelectItem value="code39">Code 39</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Barcode Symbology (Right side) */}
-                  <div className="space-y-2 grid">
-                    <Label htmlFor="barcodeSymbologyRight">
-                      Barcode Symbology
-                    </Label>
-                    <Select>
-                      <SelectTrigger
-                        id="barcodeSymbologyRight"
-                        className="w-full"
-                      >
-                        <SelectValue placeholder="Choose" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="code128">Code 128</SelectItem>
-                        <SelectItem value="ean13">EAN-13</SelectItem>
-                        <SelectItem value="upc">UPC</SelectItem>
-                        <SelectItem value="code39">Code 39</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Item Barcode */}
-                  <div className="space-y-2 md:col-span-2 grid">
-                    <Label htmlFor="itemBarcode">
-                      Item Barcode <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="itemBarcode"
-                        placeholder="Enter barcode"
-                        className="flex-1"
-                      />
-                      <Button className="text-white px-4">Generate</Button>
-                    </div>
-                  </div>
-
                   <div className="w-full md:col-span-2 grid gap-2">
                     <Label htmlFor="itemBarcode">
                       Descriptions<span className="text-red-500">*</span>
                     </Label>
                     <div className="flex gap-2 ">
-                      <Editor
+                      <Textarea
+                        placeholder="Enter Your Descriptions"
+                        rows={50}
+                      />
+                      {/* <Editor
                         apiKey="zlfgbxzuirlwvikyarfduoq8l9qb5wxv3hbkkd3t5n358neq"
                         init={{
                           plugins:
@@ -451,7 +379,7 @@ function CreateProduct() {
                             "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
                         }}
                         initialValue="Welcome to TinyMCE!"
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>
@@ -693,12 +621,43 @@ function CreateProduct() {
                                 <Input
                                   placeholder={`Add option for ${attr.name} (e.g. Red)`}
                                   value={tempOptionInputs[attr.id] || ""}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    const value = e.target.value;
                                     setTempOptionInputs((prev) => ({
                                       ...prev,
-                                      [attr.id]: e.target.value,
-                                    }))
-                                  }
+                                      [attr.id]: value,
+                                    }));
+                                    // auto add when comma typed
+                                    if (value.endsWith(",")) {
+                                      const option = value
+                                        .replace(",", "")
+                                        .trim();
+                                      if (option) {
+                                        addOptionToAttribute(attr.id, option);
+                                      }
+
+                                      // clear input
+                                      setTempOptionInputs((prev) => ({
+                                        ...prev,
+                                        [attr.id]: "",
+                                      }));
+                                    }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    // ENTER also adds
+                                    if (e.key === "Enter") {
+                                      e.preventDefault();
+                                      const value =
+                                        tempOptionInputs[attr.id]?.trim();
+                                      if (value) {
+                                        addOptionToAttribute(attr.id, value);
+                                        setTempOptionInputs((prev) => ({
+                                          ...prev,
+                                          [attr.id]: "",
+                                        }));
+                                      }
+                                    }
+                                  }}
                                 />
                                 <Button
                                   onClick={() => {
@@ -823,7 +782,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  <td className="py-2">
+                                  {/* <td className="py-2">
                                     <Input
                                       value={v.sku}
                                       onChange={(e) =>
@@ -835,7 +794,7 @@ function CreateProduct() {
                                       }
                                       className="w-32"
                                     />
-                                  </td>
+                                  </td> */}
 
                                   <td className="py-2">
                                     <Select
@@ -924,6 +883,17 @@ function CreateProduct() {
                                       }
                                       className="w-24"
                                     />
+                                  </td>
+                                  <td className="py-2 align-middle">
+                                    <div className="flex justify-center items-center">
+                                      <Button
+                                        variant="outline"
+                                        className="h-7 w-7 p-0 text-red-500 border-red-400 hover:bg-red-100"
+                                        onClick={() => deleteVariant(v.id)}
+                                      >
+                                        x
+                                      </Button>
+                                    </div>
                                   </td>
                                 </tr>
                               ))}

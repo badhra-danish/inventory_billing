@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { createCategory } from "@/api/ApiClient";
+import { createCategory } from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
 function CategoryPage() {
   const navigate = useNavigate();
@@ -66,10 +66,10 @@ function CategoryPage() {
           setRefresh((prev) => !prev);
           return "Category Created!";
         },
-        // error: (err) => {
-        //   console.error("Error During Create:", err);
-        //   return err.response.data.message;
-        // },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return err.response.data.message;
+        },
       });
       // if (res?.status === 201) {
       //   toast.success(res.data.message);

@@ -30,7 +30,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
-import { createCategory, createSubCategory } from "@/api/ApiClient";
+import {
+  createCategory,
+  createSubCategory,
+} from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
 import { SelectViewport } from "@radix-ui/react-select";
 export interface SubCategory {

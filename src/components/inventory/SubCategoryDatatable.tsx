@@ -62,7 +62,7 @@ import {
   getAllSubCategory,
   updateSubCategory,
   updateSubCategoryImage,
-} from "@/api/ApiClient";
+} from "@/api/Category-subCategory/ApiClient";
 import Loader from "../commen/loader";
 import { Label } from "../ui/label";
 import {
@@ -319,6 +319,7 @@ export default function SubCategoryDatatable({
   const [deleteId, setDeleteId] = React.useState("");
   const { refreshCategories, categories } = useCategory();
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const categoryOptions = [{ name: "All", categoryID: 0 }, ...categories];
 
   const getallSubCategory = async () => {
     try {
@@ -657,50 +658,20 @@ export default function SubCategoryDatatable({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              {[
-                "All",
-                "Wood",
-                "Plywood",
-                "Laminates",
-                "Veneers",
-                "Hardware",
-                "Handles & Locks",
-                "Hinges & Channels",
-                "Screws & Fasteners",
-                "Glass",
-                "Paints & Coatings",
-                "Finishing",
-                "Adhesives",
-                "Plastic Boards",
-                "MDF Boards",
-                "Particle Boards",
-                "Acrylic Sheets",
-                "Cement Sheets",
-                "Doors",
-                "Flooring",
-                "Ceiling Panels",
-                "Edge Banding",
-                "Tools & Accessories",
-                "Electrical Fittings",
-                "Kitchen Fittings",
-                "Bathroom Fittings",
-                "Construction Material",
-                "Safety Equipment",
-                "Decorative Panels",
-                "Sealers & Polishes",
-                "Others",
-              ].map((cat) => (
+              {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
-                  key={cat}
+                  key={cat.categoryID}
                   onClick={() => {
-                    setSelectedCategory(cat);
-                    const categoryColumn = table.getColumn("category");
+                    setSelectedCategory(cat.name);
+                    const categoryColumn = table.getColumn("categoryName");
                     if (categoryColumn) {
-                      categoryColumn.setFilterValue(cat === "All" ? "" : cat);
+                      categoryColumn.setFilterValue(
+                        cat.name === "All" ? "" : cat.name
+                      );
                     }
                   }}
                 >
-                  {cat}
+                  {cat.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

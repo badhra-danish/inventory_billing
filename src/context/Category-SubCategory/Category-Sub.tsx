@@ -5,7 +5,7 @@ import {
   getAllCategory,
   getAllCategoryall,
   getAllSubCategory,
-} from "@/api/ApiClient";
+} from "@/api/Category-subCategory/ApiClient";
 export interface Category {
   categoryID: string;
   name: string;

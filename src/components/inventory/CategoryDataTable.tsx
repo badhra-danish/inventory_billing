@@ -1,4 +1,5 @@
 import * as React from "react";
+// Component
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -9,7 +10,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -27,6 +27,7 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
+  Component,
   Edit,
   Eye,
   Flashlight,
@@ -34,7 +35,6 @@ import {
   Trash,
   TrendingUpDown,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Switch } from "../ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -57,13 +57,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
+
+// Models Of the Api Clinet
 import {
   deleteCategory,
   getAllCategory,
   updateCategory,
-} from "@/api/ApiClient";
+} from "@/api/Category-subCategory/ApiClient";
+import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
 import Loader from "../commen/loader";
 import toast from "react-hot-toast";
+
 //  const data: Category[] = [
 //     {
 //       name: "wood",
@@ -146,6 +150,8 @@ import toast from "react-hot-toast";
 //       status: "active",
 //     },
 //   ];
+
+//Interface
 export type Category = {
   categoryID: string;
   name: string;
@@ -155,8 +161,9 @@ export type Category = {
 type CategoryDataTableProps = {
   refresh: boolean;
 };
+
 export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
-  //const navigate = useNavigate();
+  const { categories } = useCategory();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -181,8 +188,9 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   const [pageMeteData, setPageMetaData] = React.useState({
     totalPages: 0,
   });
+  const categoryOptions = [{ name: "All", categoryID: 0 }, ...categories];
 
-  const getallCategory = async () => {
+  const getallCategory = async (): Promise<void> => {
     try {
       setIsLoading(true);
       const res = await getAllCategory(page, 10);
@@ -196,8 +204,6 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       console.error(error);
     }
   };
-  console.log(pageMeteData);
-
   React.useEffect(() => {
     getallCategory();
   }, [refresh, page]);
@@ -229,8 +235,6 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   };
   const handleDelete = async () => {
     try {
-      //console.log(selectedCetogoryDelete?.categoryID);
-
       if (!selectedCetogoryDelete?.categoryID) {
         toast.error("No category selected!");
         return;
@@ -441,50 +445,20 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              {[
-                "All",
-                "Wood",
-                "Plywood",
-                "Laminates",
-                "Veneers",
-                "Hardware",
-                "Handles & Locks",
-                "Hinges & Channels",
-                "Screws & Fasteners",
-                "Glass",
-                "Paints & Coatings",
-                "Finishing",
-                "Adhesives",
-                "Plastic Boards",
-                "MDF Boards",
-                "Particle Boards",
-                "Acrylic Sheets",
-                "Cement Sheets",
-                "Doors",
-                "Flooring",
-                "Ceiling Panels",
-                "Edge Banding",
-                "Tools & Accessories",
-                "Electrical Fittings",
-                "Kitchen Fittings",
-                "Bathroom Fittings",
-                "Construction Material",
-                "Safety Equipment",
-                "Decorative Panels",
-                "Sealers & Polishes",
-                "Others",
-              ].map((cat) => (
+              {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
-                  key={cat}
+                  key={cat.categoryID}
                   onClick={() => {
-                    setSelectedCategory(cat);
+                    setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("name");
                     if (categoryColumn) {
-                      categoryColumn.setFilterValue(cat === "All" ? "" : cat);
+                      categoryColumn.setFilterValue(
+                        cat.name === "All" ? "" : cat.name
+                      );
                     }
                   }}
                 >
-                  {cat}
+                  {cat.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
