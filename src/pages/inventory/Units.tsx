@@ -19,8 +19,12 @@ import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { createUnit } from "@/api/unit/UnitApiClient";
+import toast from "react-hot-toast";
 function UnitsPage() {
   const navigate = useNavigate();
+  const [refresh, setRefresh] = React.useState(false);
+  const [openAddunit, setOpenUnit] = React.useState(false);
   const [unitFormData, setUnitFormData] = React.useState({
     unitName: "",
     shortName: "",
@@ -38,6 +42,38 @@ function UnitsPage() {
       [name]: value,
     }));
   };
+
+  const handelCreateUnit = async () => {
+    try {
+      const payload = {
+        name: unitFormData.unitName,
+        shortName: unitFormData.shortName,
+        status: unitFormData.status,
+      };
+      const createPromise = createUnit(payload);
+      toast.promise(createPromise, {
+        loading: "Creating Unit..",
+        success: (res) => {
+          setOpenUnit(false);
+          setRefresh(true);
+          setUnitFormData({
+            unitName: "",
+            shortName: "",
+            status: "INACTIVE",
+          });
+          return res.message;
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefresh(false);
+    }
+  };
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">
@@ -55,7 +91,7 @@ function UnitsPage() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog>
+          <Dialog open={openAddunit} onOpenChange={setOpenUnit}>
             <DialogTrigger>
               {" "}
               <Button>
@@ -116,17 +152,13 @@ function UnitsPage() {
                 <DialogClose>
                   <Button variant={"outline"}>Cancel</Button>
                 </DialogClose>
-                <Button>Add Unit</Button>
+                <Button onClick={handelCreateUnit}>Add Unit</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          {/* <Button onClick={() => navigate("/create-product")}>
-            <CirclePlus />
-            Add Product
-          </Button> */}
         </div>
       </div>
-      <UnitsDataTable />
+      <UnitsDataTable refresh={refresh} />
     </>
   );
 }

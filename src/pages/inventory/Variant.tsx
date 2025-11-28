@@ -20,10 +20,14 @@ import { useNavigate } from "react-router-dom";
 import { RefreshCcw, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { createAttribute } from "@/api/VariantAttribute/Attributeclinet";
+import toast from "react-hot-toast";
 function VariantPage() {
   const [values, setValues] = React.useState<string[]>([]);
+  const [variantName, setVariantName] = React.useState("");
   const [currentValue, setCurrentValue] = React.useState("");
-
+  const [refresh, setRefresh] = React.useState(false);
+  const [openAddvariant, setOpenAddVariant] = React.useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     // When user types a comma, create a new chip
@@ -42,6 +46,43 @@ function VariantPage() {
     const updated = values.filter((_, i) => i !== index);
     setValues(updated);
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // avoid form submit
+      const newValue = currentValue.trim();
+      if (newValue && !values.includes(newValue)) {
+        setValues((prev) => [...prev, newValue]);
+      }
+      setCurrentValue("");
+    }
+  };
+  const handleCreateAttribute = () => {
+    try {
+      const payload = {
+        name: variantName,
+        values: values.map((v) => ({ value: v })),
+      };
+      const attributePromise = createAttribute(payload);
+      toast.promise(attributePromise, {
+        loading: "Creating Attribute",
+        success: (res) => {
+          setOpenAddVariant(false);
+          setRefresh(true);
+          setVariantName("");
+          setValues([]);
+          return res.message;
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefresh(false);
+    }
+  };
+
   const navigate = useNavigate();
   return (
     <>
@@ -60,7 +101,7 @@ function VariantPage() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Dialog>
+          <Dialog open={openAddvariant} onOpenChange={setOpenAddVariant}>
             <DialogTrigger>
               {" "}
               <Button>
@@ -78,7 +119,13 @@ function VariantPage() {
                     {" "}
                     Varaint Name <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="category-1" type="text" name="category" />
+                  <Input
+                    id="category-1"
+                    type="text"
+                    // name="attributeName"
+                    value={variantName}
+                    onChange={(e) => setVariantName(e.target.value)}
+                  />
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="category-1">
@@ -110,6 +157,7 @@ function VariantPage() {
                       type="text"
                       value={currentValue}
                       onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
                       placeholder="Type value and press comma"
                       className="flex-grow outline-none bg-transparent text-sm p-1"
                     />
@@ -131,7 +179,7 @@ function VariantPage() {
                 <DialogClose>
                   <Button variant={"outline"}>Cancel</Button>
                 </DialogClose>
-                <Button>Add Unit</Button>
+                <Button onClick={handleCreateAttribute}>Add Unit</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -141,7 +189,7 @@ function VariantPage() {
           </Button> */}
         </div>
       </div>
-      <VariantDataTable />
+      <VariantDataTable refresh={refresh} />
     </>
   );
 }

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Editor } from "@tinymce/tinymce-react";
 import {
   ArrowLeft,
   ChevronDown,
@@ -8,16 +7,10 @@ import {
   Plus,
   Package,
   X,
-  Calendar,
   List,
   PlusCircle,
   Trash,
 } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@radix-ui/react-collapsible";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
@@ -30,18 +23,80 @@ import {
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+
 function CreateProduct() {
   const navigate = useNavigate();
   const [productType, setProductType] = React.useState<
     "single" | "variable" | ""
   >("single");
   const [isOpen, setIsOpen] = React.useState(true);
+  const [productInformation, setProductInformation] = React.useState({
+    productName: "",
+    slugName: "",
+    skuCode: "",
+    sellingType: "",
+    category: "",
+    subCategory: "",
+    brand: "",
+    unit: "",
+    description: "",
+    warranty: "",
+  });
+  const [customFeild, setcustomFeild] = React.useState({
+    warranty: "",
+    manufacturer: "",
+    manufacturedDate: "",
+    expiryDate: "",
+  });
 
-  const handleProductTypeChange = (value: "single" | "variable") => {
+  // accept string from RadioGroup and cast safely
+  const handleProductTypeChange = (value: string) => {
     console.log("Selected product type:", value);
-    setProductType(value);
+    if (value === "single" || value === "variable") {
+      setProductType(value);
+    }
   };
 
+  //dasdasd
+  const handleCustomFeildChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setcustomFeild((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  //sczxcxz
+  const handleProductInfoChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setProductInformation((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  //sadnsadjsn
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const Product = {
+      ...productInformation,
+      ...customFeild,
+      images: images.map((img) => img.file), // only send files
+      attributes: attributes,
+      variants: variants,
+    };
+
+    console.log("Final Product:", Product);
+  };
   interface ImageItem {
     id: string;
     url: string;
@@ -149,8 +204,6 @@ function CreateProduct() {
 
     setVariants(newVariants);
   };
-  console.log("att", attributes);
-  console.log("var", variants);
 
   const updateVariantField = (
     variantId: string,
@@ -162,7 +215,7 @@ function CreateProduct() {
     );
   };
   const deleteVariant = (id: string) => {
-    setVariants((prev) => prev.filter((v) => v.id != id));
+    setVariants((prev) => prev.filter((v) => v.id !== id));
   };
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -174,16 +227,17 @@ function CreateProduct() {
       file,
     }));
 
-    setImages([...images, ...newImages]);
+    setImages((prev) => [...prev, ...newImages]);
   };
 
   const handleRemoveImage = (id: string) => {
-    setImages(images.filter((img) => img.id !== id));
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
+
   return (
     <>
       <div>
-        {/* hearder of the page */}
+        {/* header of the page */}
         <div className="flex items-center justify-between ">
           <div>
             <p className="text-xl font-semibold">Create Product</p>
@@ -206,6 +260,7 @@ function CreateProduct() {
           <button
             onClick={() => setIsOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
+            type="button"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -232,7 +287,12 @@ function CreateProduct() {
                     <Label htmlFor="productName">
                       Product Name <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="productName" placeholder="Enter product name" />
+                    <Input
+                      id="productName"
+                      placeholder="Enter product name"
+                      name="productName"
+                      onChange={handleProductInfoChange}
+                    />
                   </div>
 
                   {/* Slug */}
@@ -240,7 +300,13 @@ function CreateProduct() {
                     <Label htmlFor="slug">
                       Slug <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="slug" placeholder="Enter slug" />
+                    <Input
+                      id="slug"
+                      placeholder="Enter slug"
+                      name="slugName"
+                      value={productInformation?.slugName}
+                      onChange={handleProductInfoChange}
+                    />
                   </div>
 
                   {/* SKU */}
@@ -253,6 +319,9 @@ function CreateProduct() {
                         id="sku"
                         placeholder="Enter SKU"
                         className="flex-1"
+                        name="skuCode"
+                        value={productInformation.skuCode}
+                        onChange={handleProductInfoChange}
                       />
                       <Button type="button" className=" text-white px-4">
                         Generate
@@ -265,7 +334,15 @@ function CreateProduct() {
                     <Label htmlFor="sellingType">
                       Selling Type <span className="text-red-500">*</span>
                     </Label>
-                    <Select>
+                    <Select
+                      value={productInformation.sellingType}
+                      onValueChange={(val) =>
+                        setProductInformation((prev) => ({
+                          ...prev,
+                          sellingType: val,
+                        }))
+                      }
+                    >
                       <SelectTrigger id="sellingType" className="w-full">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -291,7 +368,15 @@ function CreateProduct() {
                         Add New
                       </button>
                     </div>
-                    <Select>
+                    <Select
+                      value={productInformation.category}
+                      onValueChange={(val) =>
+                        setProductInformation((prev) => ({
+                          ...prev,
+                          category: val,
+                        }))
+                      }
+                    >
                       <SelectTrigger id="category" className="w-full">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -308,7 +393,15 @@ function CreateProduct() {
                     <Label htmlFor="subCategory">
                       Sub Category <span className="text-red-500">*</span>
                     </Label>
-                    <Select>
+                    <Select
+                      value={productInformation.subCategory}
+                      onValueChange={(val) =>
+                        setProductInformation((prev) => ({
+                          ...prev,
+                          subCategory: val,
+                        }))
+                      }
+                    >
                       <SelectTrigger id="subCategory" className="w-full">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -331,7 +424,15 @@ function CreateProduct() {
                     <Label htmlFor="brand">
                       Brand <span className="text-red-500">*</span>
                     </Label>
-                    <Select>
+                    <Select
+                      value={productInformation.brand}
+                      onValueChange={(val) =>
+                        setProductInformation((prev) => ({
+                          ...prev,
+                          brand: val,
+                        }))
+                      }
+                    >
                       <SelectTrigger id="brand" className="w-full">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -348,7 +449,15 @@ function CreateProduct() {
                     <Label htmlFor="unit">
                       Unit <span className="text-red-500">*</span>
                     </Label>
-                    <Select>
+                    <Select
+                      value={productInformation.unit}
+                      onValueChange={(val) =>
+                        setProductInformation((prev) => ({
+                          ...prev,
+                          unit: val,
+                        }))
+                      }
+                    >
                       <SelectTrigger id="unit" className="w-full">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -368,18 +477,11 @@ function CreateProduct() {
                     <div className="flex gap-2 ">
                       <Textarea
                         placeholder="Enter Your Descriptions"
-                        rows={50}
+                        rows={6}
+                        value={productInformation.description}
+                        name="description"
+                        onChange={handleProductInfoChange}
                       />
-                      {/* <Editor
-                        apiKey="zlfgbxzuirlwvikyarfduoq8l9qb5wxv3hbkkd3t5n358neq"
-                        init={{
-                          plugins:
-                            "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
-                          toolbar:
-                            "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
-                        }}
-                        initialValue="Welcome to TinyMCE!"
-                      /> */}
                     </div>
                   </div>
                 </div>
@@ -394,6 +496,7 @@ function CreateProduct() {
           <button
             onClick={() => setIsOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
+            type="button"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -421,7 +524,7 @@ function CreateProduct() {
 
                 <RadioGroup
                   className="flex gap-6"
-                  onValueChange={handleProductTypeChange}
+                  onValueChange={(v) => handleProductTypeChange(v)}
                   value={productType}
                 >
                   <div className="flex items-center space-x-2">
@@ -447,7 +550,7 @@ function CreateProduct() {
 
               {/* Row 1: Quantity, Price, Tax Type */}
 
-              {productType == "single" ? (
+              {productType === "single" ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
@@ -685,6 +788,7 @@ function CreateProduct() {
                                     <button
                                       onClick={() => removeOption(attr.id, idx)}
                                       className="text-red-500 text-xs"
+                                      type="button"
                                     >
                                       x
                                     </button>
@@ -735,6 +839,7 @@ function CreateProduct() {
                                 <th className="pb-2">Tax Type</th>
                                 <th className="pb-2">Discount</th>
                                 <th className="pb-2">Qty Alert</th>
+                                <th className="pb-2">Action</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -782,7 +887,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  {/* <td className="py-2">
+                                  <td className="py-2">
                                     <Input
                                       value={v.sku}
                                       onChange={(e) =>
@@ -794,7 +899,7 @@ function CreateProduct() {
                                       }
                                       className="w-32"
                                     />
-                                  </td> */}
+                                  </td>
 
                                   <td className="py-2">
                                     <Select
@@ -909,11 +1014,12 @@ function CreateProduct() {
           )}
         </div>
 
-        {/* iMAGES  */}
+        {/* IMAGES  */}
         <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
           <button
             onClick={() => setIsOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
+            type="button"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -965,6 +1071,7 @@ function CreateProduct() {
                       onClick={() => handleRemoveImage(image.id)}
                       className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all opacity-100 group-hover:scale-110"
                       aria-label="Remove image"
+                      type="button"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -981,12 +1088,13 @@ function CreateProduct() {
           )}
         </div>
 
-        {/* Coustom and Feailds */}
+        {/* Custom and Fields */}
 
         <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
           <button
             onClick={() => setIsOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
+            type="button"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -1014,17 +1122,28 @@ function CreateProduct() {
                     Warranty <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <Select>
-                      <SelectTrigger id="warrantyType" className="w-full">
+                    <Select
+                      value={customFeild.warranty}
+                      onValueChange={(val) =>
+                        setcustomFeild((prev) => ({
+                          ...prev,
+                          warranty: val,
+                        }))
+                      }
+                    >
+                      <SelectTrigger
+                        id="warrantyType"
+                        className="w-full"
+                        name="warranty"
+                      >
                         <SelectValue placeholder="Select Warranty" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="1-year">1-year</SelectItem>
-                        <SelectItem value="2-year">1-year 1-year</SelectItem>
-                        <SelectItem value="3-year">1-year 1-year</SelectItem>
+                        <SelectItem value="2-year">2-year</SelectItem>
+                        <SelectItem value="3-year">3-year</SelectItem>
                       </SelectContent>
                     </Select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
 
@@ -1037,6 +1156,9 @@ function CreateProduct() {
                     type="text"
                     className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Enter manufacturer"
+                    name="manufacturer"
+                    value={customFeild.manufacturer}
+                    onChange={handleCustomFeildChange}
                   />
                 </div>
 
@@ -1045,13 +1167,15 @@ function CreateProduct() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Manufactured Date <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
+                  <div className="">
                     <Input
-                      type="text"
-                      className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
-                      placeholder="DD-MM-YYYY"
+                      type="date"
+                      name="manufacturedDate"
+                      //className="w-full  text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
+                      // placeholder="DD-MM-YYYY"
+                      value={customFeild.manufacturedDate}
+                      onChange={handleCustomFeildChange}
                     />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
 
@@ -1062,11 +1186,14 @@ function CreateProduct() {
                   </label>
                   <div className="relative">
                     <Input
-                      type="text"
-                      className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
-                      placeholder="DD-MM-YYYY"
+                      type="Date"
+                      name="expiryDate"
+                      value={customFeild.expiryDate}
+                      onChange={handleCustomFeildChange}
+
+                      //className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
+                      // placeholder="DD-MM-YYYY"
                     />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -1079,7 +1206,7 @@ function CreateProduct() {
             <Button className="bg-gray border-2 border-blue-500 text-blue-400 hover:text-white">
               Cancel
             </Button>
-            <Button>Add Product</Button>
+            <Button onClick={handleSubmit}>Add Product</Button>
           </div>
         </div>
       </div>
@@ -1088,3 +1215,5 @@ function CreateProduct() {
 }
 
 export default CreateProduct;
+
+// export default CreateProduct;

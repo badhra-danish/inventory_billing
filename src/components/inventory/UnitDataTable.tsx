@@ -26,6 +26,7 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
+  CirclePlus,
   Edit,
   Eye,
   MoreHorizontal,
@@ -53,7 +54,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllUnit } from "@/api/unit/UnitApiClient";
+import { deleteUnit, getAllUnit, updateUnit } from "@/api/unit/UnitApiClient";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import toast from "react-hot-toast";
 // const data: Units[] = [
 //   // {
 //   //   unit: "ton",
@@ -118,13 +122,17 @@ import { getAllUnit } from "@/api/unit/UnitApiClient";
 // ];
 
 export type Units = {
+  unitID: string;
   name: string;
   shortName: string;
   //noOfProduct: number;
   status: "ACTIVE" | "INACTIVE";
 };
+type RefreshDatatable = {
+  refresh: boolean;
+};
 
-export default function UnitsDataTable() {
+export default function UnitsDataTable({ refresh }: RefreshDatatable) {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -139,19 +147,86 @@ export default function UnitsDataTable() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [unitData, setUnitData] = React.useState([]);
-
+  const [pageMeteDate, setPageMetaData] = React.useState<{
+    totalPages: number;
+  }>({
+    totalPages: 1,
+  });
+  const [openAddunitUpdate, setOpenUnitUpdate] = React.useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [selectedUnit, setSelectedUnit] = React.useState<Units>({
+    unitID: "",
+    name: "",
+    shortName: "",
+    status: "ACTIVE",
+  });
   const getallUnit = async () => {
     try {
       const res = await getAllUnit(page, 10);
       if (res.statusCode === 200) {
         setUnitData(res.data || []);
+        setPageMetaData(res.pageMetaData);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
   React.useEffect(() => {
     getallUnit();
-  });
+  }, [refresh, page]);
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setSelectedUnit((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
+  const handleUpdate = () => {
+    try {
+      const payload = {
+        name: selectedUnit.name,
+        shortName: selectedUnit.shortName,
+        status: selectedUnit.status,
+      };
+      const updatePromise = updateUnit(selectedUnit?.unitID, payload);
+      toast.promise(updatePromise, {
+        loading: "Updating Unit",
+        success: (res) => {
+          setOpenUnitUpdate(false);
+          getallUnit();
+          return res.message;
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleDelete = () => {
+    try {
+      const deletePromise = deleteUnit(selectedUnit.unitID);
+      toast.promise(deletePromise, {
+        loading: "Deleting Unit",
+        success: (res) => {
+          setOpenDeleteDialog(false);
+          getallUnit();
+          return "Unit Deleted..";
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const data: Units[] = unitData;
   const columns: ColumnDef<Units>[] = [
     {
@@ -243,44 +318,29 @@ export default function UnitsDataTable() {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        // const product = row.original;
+        const unit = row.original;
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedUnit(unit);
+                setOpenUnitUpdate(true);
+              }}
+            >
               <Edit />
             </Button>
-            {/* <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedUnit(unit);
+                setOpenDeleteDialog(true);
+              }}
+            >
               <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </Button>
           </div>
         );
       },
@@ -448,21 +508,109 @@ export default function UnitsDataTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page == 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMeteDate.totalPages, p + 1))
+            }
+            disabled={page >= pageMeteDate?.totalPages}
           >
             Next
           </Button>
         </div>
       </div>
+
+      {/* updateDialog Box */}
+      <Dialog open={openAddunitUpdate} onOpenChange={setOpenUnitUpdate}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Units </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Unit Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="category-1"
+                type="text"
+                name="name"
+                value={selectedUnit?.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="grid gap-4">
+              <Label htmlFor="category-1">
+                {" "}
+                Short Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="category-1"
+                type="text"
+                name="shortName"
+                value={selectedUnit.shortName}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center justify-between border-b-2 pb-7">
+              <Label htmlFor="category-1">
+                {" "}
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Switch
+                id="status"
+                className=" data-[state=checked]:bg-green-500 transition-colors"
+                checked={selectedUnit?.status == "ACTIVE"}
+                onCheckedChange={(e) => {
+                  setSelectedUnit((prev) => ({
+                    ...prev,
+                    status: e ? "ACTIVE" : "INACTIVE",
+                  }));
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant={"outline"}>Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleUpdate}>Save Change</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* delete Dialog */}
+      <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

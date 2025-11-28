@@ -30,10 +30,12 @@ import {
   Eye,
   MoreHorizontal,
   Trash,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Badge } from "../ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -53,83 +55,56 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Variants[] = [
-  {
-    variant: "material",
-    values: "Cotton, Leather, Synthetic",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "color",
-    values: "Red, Blue, Green, Black, White",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "size",
-    values: "S, M, L, XL, XXL",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "thickness",
-    values: "6mm, 12mm, 18mm, 25mm",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "color",
-    values: "Red, Blue, Green, Black, White",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "size",
-    values: "S, M, L, XL, XXL",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "thickness",
-    values: "6mm, 12mm, 18mm, 25mm",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "finish",
-    values: "Matte, Glossy, Textured",
-    createdDate: "24 Dec 2024",
-    status: "inactive",
-  },
-  {
-    variant: "grade",
-    values: "A, B, C",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-  {
-    variant: "finish",
-    values: "Matte, Glossy, Textured",
-    createdDate: "24 Dec 2024",
-    status: "inactive",
-  },
-  {
-    variant: "grade",
-    values: "A, B, C",
-    createdDate: "24 Dec 2024",
-    status: "active",
-  },
-];
+import { getAllVaariantAttribute } from "@/api/VariantAttribute/Attributeclinet";
+// const data: Variants[] = [
+//   // {
+//   //   variant: "material",
+//   //   values: [
+//   //     {
+//   //       value: "red",
+//   //     },
+//   //     {
+//   //       value: "blue",
+//   //     },
+//   //     {
+//   //       value: "green",
+//   //     },
+//   //   ],
+//   //   createdDate: "24 Dec 2024",
+//   //   status: "active",
+//   // },
+//   // {
+//   //   variant: "color",
+//   //   values: [
+//   //     {
+//   //       value: "red",
+//   //     },
+//   //     {
+//   //       value: "blue",
+//   //     },
+//   //     {
+//   //       value: "green",
+//   //     },
+//   //   ],
+//   //   createdDate: "24 Dec 2024",
+//   //   status: "active",
+//   // },
+// ];
 
 export type Variants = {
-  variant: string;
-  values: string;
+  name: string;
+  values: { value: string }[];
   createdDate: string;
   status: "active" | "inactive";
 };
-
-export default function VariantDataTable() {
+type refreshTable = {
+  refresh: boolean;
+};
+type OldValue = {
+  attributeValueID?: string; // optional because new added values have no ID
+  value: string;
+};
+export default function VariantDataTable({ refresh }: refreshTable) {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -141,7 +116,83 @@ export default function VariantDataTable() {
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [page, setPage] = React.useState(1);
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPages: 0,
+    totalElements: 0,
+    elementCountInCurrentPage: 0,
+    currentPageNumber: 0,
+  });
+
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const [openupdateVarAttribute, setOpenUpdateVarAttribute] =
+    React.useState(false);
+  const [variantData, setVariantData] = React.useState([]);
+  const [oldValues, setOldValues] = React.useState<OldValue[]>([]);
+  const [newValues, setNewValues] = React.useState<string[]>([]);
+  const [deletedValues, setDeletedValues] = React.useState<string[]>([]);
+  const [variantName, setVariantName] = React.useState("");
+  const [currentValue, setCurrentValue] = React.useState("");
+  const getAllVariantAttributeData = async () => {
+    try {
+      const res = await getAllVaariantAttribute(page, 10);
+      if (res.statusCode === 200) {
+        setVariantData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllVariantAttributeData();
+  }, [page, refresh]);
+
+  //  for Upadte
+  const handleUpdateOldValue = (index: number, newText: string) => {
+    setOldValues((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], value: newText };
+      return updated;
+    });
+  };
+  const handleRemoveValue = (item: OldValue | string) => {
+    if (typeof item === "object") {
+      // Old DB value → remove & mark delete
+      setDeletedValues((prev) => [...prev, String(item.attributeValueID)]);
+      setOldValues((prev) =>
+        prev.filter((v) => v.attributeValueID !== item.attributeValueID)
+      );
+    } else {
+      // New value → just remove from newValues
+      setNewValues((prev) => prev.filter((v) => v !== item));
+    }
+  };
+
+  const handleAddNewValue = (v: string) => {
+    if (!v.trim()) return;
+    setNewValues((prev) => [...prev, v]);
+    setCurrentValue(""); // clear input
+  };
+  const handleSubmit = () => {
+    const payload = {
+      name: variantName,
+      attributeValues: [
+        ...oldValues.map((v) => ({
+          attributeValueID: v.attributeValueID,
+          value: v.value,
+        })), // UPDATED
+        ...newValues.map((v) => ({ value: v })), // ADDED
+        ...deletedValues.map((id) => ({ attributeValueID: id })), // DELETED
+      ],
+    };
+
+    console.log(payload);
+    // axios.put("/update", payload)
+  };
+
+  const data: Variants[] = variantData;
   const columns: ColumnDef<Variants>[] = [
     {
       id: "select",
@@ -166,7 +217,7 @@ export default function VariantDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "variant",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -179,7 +230,7 @@ export default function VariantDataTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("variant")}</div>
+        <div className="capitalize font-bold">{row.getValue("name")}</div>
       ),
     },
 
@@ -187,53 +238,66 @@ export default function VariantDataTable() {
       accessorKey: "values",
       header: () => <div className="text-left">Values</div>,
       cell: ({ row }) => {
+        const values = row.getValue("values") as { value: string }[];
         return (
-          <div className="capitalize text-left ">{row.getValue("values")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "createdDate",
-      header: () => <div className="text-left">Created Date</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("createdDate")}
+          <div className="capitalize text-left">
+            {values.map((v) => v.value).join(", ")}
           </div>
         );
       },
     },
-    {
-      accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
-      cell: ({ row }) => {
-        const status: string = row.getValue("status");
+    // {
+    //   accessorKey: "createdDate",
+    //   header: () => <div className="text-left">Created Date</div>,
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="capitalize text-left ">
+    //         {row.getValue("createdDate")}
+    //       </div>
+    //     );
+    //   },
+    // },
+    // {
+    //   accessorKey: "status",
+    //   header: () => <div className="text-left">Status</div>,
+    //   cell: ({ row }) => {
+    //     const status: string = row.getValue("status");
 
-        const colorClass =
-          status === "active"
-            ? "bg-green-400 text-white"
-            : "bg-red-400 text-white";
+    //     const colorClass =
+    //       status === "active"
+    //         ? "bg-green-400 text-white"
+    //         : "bg-red-400 text-white";
 
-        return (
-          <div className="text-left">
-            <span
-              className={`capitalize px-1.5 py-1 rounded-sm text-xs font-normal ${colorClass}`}
-            >
-              {status}
-            </span>
-          </div>
-        );
-      },
-    },
+    //     return (
+    //       <div className="text-left">
+    //         <span
+    //           className={`capitalize px-1.5 py-1 rounded-sm text-xs font-normal ${colorClass}`}
+    //         >
+    //           {status}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // },
 
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        // const product = row.original;
+        const varriantAttribute = row.original;
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenUpdateVarAttribute(true);
+                setVariantName(varriantAttribute.name);
+                setOldValues(varriantAttribute.values);
+                setNewValues([]);
+                setDeletedValues([]);
+              }}
+            >
               <Edit />
             </Button>
             {/* <Button variant="outline" size="sm">
@@ -450,6 +514,85 @@ export default function VariantDataTable() {
           </Button>
         </div>
       </div>
+
+      {/* update Dialog */}
+      <Dialog
+        open={openupdateVarAttribute}
+        onOpenChange={setOpenUpdateVarAttribute}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Attribute</DialogTitle>
+            <DialogDescription>Update, add or remove values</DialogDescription>
+          </DialogHeader>
+
+          {/* Variant Name */}
+          <Input
+            value={variantName}
+            onChange={(e) => setVariantName(e.target.value)}
+            placeholder="Attribute Name"
+            className="mt-2"
+          />
+
+          {/* Editable Values */}
+          <div className="flex flex-wrap gap-2 mt-4 border rounded p-3">
+            {oldValues.map((item, index) => (
+              <Badge
+                key={item.attributeValueID}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
+                <input
+                  value={item.value}
+                  onChange={(e) => handleUpdateOldValue(index, e.target.value)}
+                  className="bg-transparent outline-none text-sm w-8"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveValue(item)}
+                  className="hover:text-red-600"
+                >
+                  <X className="w-2 h-2" />
+                </button>
+              </Badge>
+            ))}
+
+            {newValues.map((item, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
+                {item}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveValue(item)}
+                  className="hover:text-red-600"
+                >
+                  <X className="w-2 h-2" />
+                </button>
+              </Badge>
+            ))}
+
+            <input
+              value={currentValue}
+              onChange={(e) => setCurrentValue(e.target.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && handleAddNewValue(currentValue)
+              }
+              placeholder="Add new value"
+              className="outline-none bg-transparent flex-grow"
+            />
+          </div>
+
+          <DialogFooter className="mt-6">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleSubmit}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
