@@ -1,3 +1,11 @@
+// import React from "react";
+
+// function Invoives() {
+//   return <div>Invoives</div>;
+// }
+
+// export default Invoives;
+
 import { Button } from "@/components/ui/button";
 import { RefreshCcw, X } from "lucide-react";
 import React, { useState } from "react";
@@ -13,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
 type Product = {
   code: string;
   name: string;
@@ -38,14 +47,14 @@ const products: Product[] = [
   { code: "P004", name: "Nail Box", price: 40 },
 ];
 
-export default function AddSalesReturn() {
+export default function AddPurchase() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [filtered, setFiltered] = useState<Product[]>([]);
   const [rows, setRows] = useState<ProductRow[]>([]);
 
   const handleCancel = () => {
-    navigate("/sales");
+    navigate("/purchase");
   };
   // Search logic
   const handleSearch = (value: string) => {
@@ -112,8 +121,8 @@ export default function AddSalesReturn() {
       {" "}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <p className="font-semibold text-xl">Add Sales Return</p>
-          <p>Add Your Sales Return Order</p>
+          <p className="font-semibold text-xl">Add Purchase </p>
+          <p>Add Your Purchase Order</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -128,7 +137,7 @@ export default function AddSalesReturn() {
       <div className="mt-10 grid gap-6 bg-white p-4 rounded-md">
         <div className="flex justify-center gap-3 items-center ">
           <div className="w-full grid gap-3">
-            <Label> Name</Label>
+            <Label>Supplier Name</Label>
 
             <Select>
               <SelectTrigger className="w-full">
@@ -146,8 +155,17 @@ export default function AddSalesReturn() {
             <Input type="date" />
           </div>
           <div className="w-full grid gap-3">
-            <Label>Refrences</Label>
-            <Input type="text" />
+            <Label>Refrence</Label>
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select The Supplier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Jhone">Jhone</SelectItem>
+                <SelectItem value="Alice">Alice</SelectItem>
+                <SelectItem value="Harry">Harry</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="grid gap-4 relative">
@@ -325,11 +343,15 @@ export default function AddSalesReturn() {
                 <SelectValue placeholder="Select " />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="received">Received</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
           </div>
+        </div>
+        <div className="grid gap-4">
+          <Label>Description</Label>
+          <Textarea placeholder="Enter Descriptions..." />
         </div>
         <div className="border-t-1 mt-5">
           <div className="flex gap-3 items-center justify-end mt-5">
