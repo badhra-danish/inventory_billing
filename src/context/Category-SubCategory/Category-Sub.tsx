@@ -58,13 +58,7 @@ export const CategoryProvider = ({
     try {
       const res = await getAllCategoryall();
       if (res?.statusCode === 200) {
-        // append or replace depending on page
         setCategories(res.data || []);
-        // setCategories((prev) =>
-        //   page > 1 ? [...prev, ...(res.data || [])] : res.data || []
-        // );
-        //setCategories((prev) => [...prev, ...res.data]);
-        // setCategoryPageMetaData(res.pageMetaData);
       }
     } catch (error) {
       console.log("Error fetching categories:", error);

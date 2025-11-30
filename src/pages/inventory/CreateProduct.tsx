@@ -1154,7 +1154,6 @@ function CreateProduct() {
                   </label>
                   <Input
                     type="text"
-                    className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Enter manufacturer"
                     name="manufacturer"
                     value={customFeild.manufacturer}
@@ -1171,8 +1170,6 @@ function CreateProduct() {
                     <Input
                       type="date"
                       name="manufacturedDate"
-                      //className="w-full  text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
-                      // placeholder="DD-MM-YYYY"
                       value={customFeild.manufacturedDate}
                       onChange={handleCustomFeildChange}
                     />

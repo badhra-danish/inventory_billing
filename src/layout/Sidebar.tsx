@@ -18,6 +18,14 @@ import {
   BadgeIndianRupee,
   ReceiptIndianRupee,
   Undo2,
+  Handbag,
+  ShoppingBag,
+  Users,
+  UserLock,
+  User,
+  AlignEndHorizontal,
+  FileChartPie,
+  PackageSearch,
 } from "lucide-react";
 import {
   Sidebar,
@@ -123,6 +131,67 @@ const SalesItems = [
     title: "Sales Return",
     url: "sales-return",
     icon: Undo2,
+  },
+];
+const PurchaseItem = [
+  {
+    title: "Purchase",
+    url: "purchase",
+    icon: Handbag,
+  },
+  {
+    title: "Purchase Order",
+    url: "invoices",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Purchase Return",
+    url: "sales-return",
+    icon: Undo2,
+  },
+];
+const PeoplesItem = [
+  {
+    title: "Customer",
+    url: "purchase",
+    icon: Users,
+  },
+  {
+    title: "Supplier",
+    url: "invoices",
+    icon: UserLock,
+  },
+  {
+    title: "Employees",
+    url: "sales-return",
+    icon: User,
+  },
+];
+const ReportsItem = [
+  {
+    title: "Sales Report",
+    url: "purchase",
+    icon: AlignEndHorizontal,
+  },
+  {
+    title: "Purchase Report",
+    url: "invoices",
+    icon: FileChartPie,
+  },
+  {
+    title: "Inventory Report",
+    url: "sales-return",
+    icon: Cone,
+  },
+  {
+    title: "Invoice Report",
+    url: "sales-return",
+    icon: ReceiptIndianRupee,
+  },
+  {
+    title: "Product Report",
+    url: "sales-return",
+    icon: PackageSearch,
   },
 ];
 export default function AppSidebar({
@@ -249,6 +318,90 @@ export default function AppSidebar({
             <SidebarGroupContent>
               <SidebarMenu>
                 {SalesItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="text-base">
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarSeparator />
+          <SidebarGroup>
+            <SidebarGroupLabel>Purchase</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {PurchaseItem.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="text-base">
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarSeparator />
+          <SidebarGroup>
+            <SidebarGroupLabel>Peoples</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {PeoplesItem.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="text-base">
+                      <NavLink
+                        key={item.title}
+                        to={item.url}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                            isActive
+                              ? "bg-muted font-medium"
+                              : "hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarSeparator />
+          <SidebarGroup>
+            <SidebarGroupLabel>Reports</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {ReportsItem.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild className="text-base">
                       <NavLink

@@ -780,7 +780,7 @@ export default function SubCategoryDatatable({
         </Table>
       </div>
 
-      {/* 📄 Pagination + Footer Info */}
+      {/*  Pagination + Footer Info */}
       <div className="flex items-center justify-between py-4 text-sm text-gray-600">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}

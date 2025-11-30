@@ -16,6 +16,7 @@ import WarrantiesPage from "@/pages/inventory/Warranties";
 import StockMangepage from "@/pages/stock/StockMange";
 import Sales from "@/pages/Sales/Sales";
 import AddSales from "@/pages/Sales/AddSales";
+import AddSalesReturn from "@/pages/Sales/AddSalesReturn";
 import SalesReturn from "@/pages/Sales/SalesReturn";
 import Invoives from "@/pages/Sales/Invoives";
 function Approutes() {
@@ -42,6 +43,7 @@ function Approutes() {
             <Route path="/sales" element={<Sales />} />
             <Route path="/sales-return" element={<SalesReturn />} />
             <Route path="/add-sales" element={<AddSales />} />
+            <Route path="/add-sales-return" element={<AddSalesReturn />} />
             <Route path="/invoices" element={<Invoives />} />
             {/* Sales Invoices*/}
           </Route>
