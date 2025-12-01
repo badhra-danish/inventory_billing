@@ -23,9 +23,21 @@ import {
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+import { getAllVaariantAttributeAll } from "@/api/VariantAttribute/Attributeclinet";
 
 function CreateProduct() {
   const navigate = useNavigate();
+  interface VariantAttribute {
+    attributeID: string;
+    name: string;
+    values: { attributeValueID: string; value: string }[];
+    valuesList: { attributeValueID: string; value: string }[];
+  }
+  const [AllAttribute, setAllAttribute] = React.useState<VariantAttribute[]>(
+    []
+  );
+  const [selectedAttribute, setSelectedAttribute] = React.useState<string>("");
+  const [attribute, setAttribute] = React.useState<VariantAttribute[]>([]);
   const [productType, setProductType] = React.useState<
     "single" | "variable" | ""
   >("single");
@@ -48,6 +60,21 @@ function CreateProduct() {
     manufacturedDate: "",
     expiryDate: "",
   });
+
+  const getAllAttribute = async () => {
+    try {
+      const res = await getAllVaariantAttributeAll();
+      if (res.statusCode === 200) {
+        setAllAttribute(res.data || []);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllAttribute();
+  }, []);
+  // console.log(AllAttribute);
 
   // accept string from RadioGroup and cast safely
   const handleProductTypeChange = (value: string) => {
@@ -91,7 +118,7 @@ function CreateProduct() {
       ...productInformation,
       ...customFeild,
       images: images.map((img) => img.file), // only send files
-      attributes: attributes,
+      attributes: attribute,
       variants: variants,
     };
 
@@ -124,6 +151,8 @@ function CreateProduct() {
     discountType?: string;
     discountValue?: number | "";
     quantityAlert?: number | "";
+    imageUrl?: string;
+    image?: File;
   }
 
   const [attributes, setAttributes] = React.useState<Attribute[]>([]);
@@ -133,56 +162,156 @@ function CreateProduct() {
     Record<string, string>
   >({});
 
-  const addAttribute = () => {
-    if (!newAttrName.trim()) return;
-
-    // split by comma
-    const names = newAttrName
-      .split(",")
-      .map((n) => n.trim())
-      .filter(Boolean);
-
-    setAttributes((prev) => [
-      ...prev,
-      ...names.map((name) => ({
-        id: Math.random().toString(36).slice(2, 9),
-        name,
-        options: [],
-      })),
-    ]);
-
-    setNewAttrName("");
+  const addAttribute = (obj: VariantAttribute) => {
+    // if (!newAttrName.trim()) return;
+    // // split by comma
+    // const names = newAttrName
+    //   .split(",")
+    //   .map((n) => n.trim())
+    //   .filter(Boolean);
+    // setAttributes((prev) => [
+    //   ...prev,
+    //   ...names.map((name) => ({
+    //     id: Math.random().toString(36).slice(2, 9),
+    //     name,
+    //     options: [],
+    //   })),
+    // ]);
+    setAttribute((prev) => {
+      const exists = prev.some((a) => a.attributeID === obj.attributeID);
+      if (exists) return prev;
+      return [
+        ...prev,
+        {
+          ...obj,
+          valuesList: [],
+        },
+      ];
+    });
   };
-  const removeAttribute = (id: string) => {
-    setAttributes((prev) => prev.filter((a) => a.id !== id));
-  };
 
-  const addOptionToAttribute = (attrId: string, option: string) => {
-    if (!option.trim()) return;
-    setAttributes((prev) =>
+  // const removeAttribute = (id: string) => {
+  //   setAttributes((prev) => prev.filter((a) => a.id !== id));
+  // };
+  const addValues = (attributeId: string, obj: any) => {
+    setAttribute((prev) =>
       prev.map((a) =>
-        a.id === attrId ? { ...a, options: [...a.options, option.trim()] } : a
-      )
-    );
-  };
-
-  const removeOption = (attrId: string, optionIndex: number) => {
-    setAttributes((prev) =>
-      prev.map((a) =>
-        a.id === attrId
-          ? { ...a, options: a.options.filter((_, i) => i !== optionIndex) }
+        a.attributeID === attributeId
+          ? {
+              ...a,
+              valuesList: [
+                ...(a.valuesList ?? []),
+                { attributeValueID: obj.attributeValueID, value: obj.value },
+              ],
+            }
           : a
       )
     );
   };
+  const removeAttribute = (attributeId: string) => {
+    setAttribute((prev) => prev.filter((a) => a.attributeID !== attributeId));
+  };
 
+  // const addOptionToAttribute = (attrId: string, option: string) => {
+  //   if (!option.trim()) return;
+  //   setAttributes((prev) =>
+  //     prev.map((a) =>
+  //       a.id === attrId ? { ...a, options: [...a.options, option.trim()] } : a
+  //     )
+  //   );
+  // };
+  const removeOption = (attributeId: string, optionId: string) => {
+    setAttribute((prev) =>
+      prev.map((a) =>
+        a.attributeID === attributeId
+          ? {
+              ...a,
+              valuesList: a.valuesList.filter(
+                (o) => o.attributeValueID !== optionId
+              ),
+            }
+          : a
+      )
+    );
+  };
+  // const removeOption = (attrId: string, optionIndex: number) => {
+  //   setAttributes((prev) =>
+  //     prev.map((a) =>
+  //       a.id === attrId
+  //         ? { ...a, options: a.options.filter((_, i) => i !== optionIndex) }
+  //         : a
+  //     )
+  //   );
+  // };
+
+  // const generateVariants = () => {
+  //   if (attributes.length === 0) return;
+  //   const arrays = attributes.map((a) =>
+  //     a.options.map((o) => ({ name: a.name, option: o }))
+  //   );
+  //   // cartesian product
+  //   let combos: Array<Array<{ name: string; option: string }>> = [[]];
+  //   for (const arr of arrays) {
+  //     combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
+  //   }
+
+  //   const newVariants: Variant[] = combos.map((combo) => ({
+  //     id: Math.random().toString(36).slice(2, 9),
+  //     attributes: combo.reduce(
+  //       (acc, cur) => ({ ...acc, [cur.name]: cur.option }),
+  //       {} as Record<string, string>
+  //     ),
+  //     price: "",
+  //     quantity: "",
+  //     sku: "",
+  //     taxType: "",
+  //     discountType: "",
+  //     discountValue: "",
+  //     quantityAlert: "",
+  //   }));
+
+  //   setVariants(newVariants);
+  // };
+  // const generateVariants = () => {
+  //   if (attribute.length === 0) return;
+  //   const arrays = attribute.map((a) =>
+  //     a.valuesList.map((o) => ({ name: a.name, value: o.value }))
+  //   );
+  //   // cartesian product
+  //   let combos: Array<Array<{ name: string; value: string }>> = [[]];
+  //   for (const arr of arrays) {
+  //     combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
+  //   }
+
+  //   const newVariants: Variant[] = combos.map((combo) => ({
+  //     id: Math.random().toString(36).slice(2, 9),
+  //     attributes: combo.reduce(
+  //       (acc, cur) => ({ ...acc, [cur.name]: cur.value }),
+  //       {} as Record<string, string>
+  //     ),
+  //     price: "",
+  //     quantity: "",
+  //     sku: "",
+  //     taxType: "",
+  //     discountType: "",
+  //     discountValue: "",
+  //     quantityAlert: "",
+  //   }));
+
+  //   setVariants(newVariants);
+  // };
   const generateVariants = () => {
-    if (attributes.length === 0) return;
-    const arrays = attributes.map((a) =>
-      a.options.map((o) => ({ name: a.name, option: o }))
+    if (attribute.length === 0) return;
+    const arrays = attribute.map((a) =>
+      a.valuesList.map((o) => ({
+        attributeID: a.attributeID,
+        attributeValueID: o.attributeValueID,
+      }))
     );
     // cartesian product
-    let combos: Array<Array<{ name: string; option: string }>> = [[]];
+    let combos: Array<
+      Array<{ attributeID: string; attributeValueID: string }>
+    > = [[]];
     for (const arr of arrays) {
       combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
     }
@@ -190,7 +319,7 @@ function CreateProduct() {
     const newVariants: Variant[] = combos.map((combo) => ({
       id: Math.random().toString(36).slice(2, 9),
       attributes: combo.reduce(
-        (acc, cur) => ({ ...acc, [cur.name]: cur.option }),
+        (acc, cur) => ({ ...acc, [cur.attributeID]: cur.attributeValueID }),
         {} as Record<string, string>
       ),
       price: "",
@@ -204,7 +333,6 @@ function CreateProduct() {
 
     setVariants(newVariants);
   };
-
   const updateVariantField = (
     variantId: string,
     field: keyof Variant,
@@ -216,6 +344,16 @@ function CreateProduct() {
   };
   const deleteVariant = (id: string) => {
     setVariants((prev) => prev.filter((v) => v.id !== id));
+  };
+
+  const handleVariantImage = (variantId: string, file: File) => {
+    const imageURL = URL.createObjectURL(file); // preview before upload
+
+    setVariants((prev) =>
+      prev.map((v) =>
+        v.id === variantId ? { ...v, image: file, imageUrl: imageURL } : v
+      )
+    );
   };
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -680,12 +818,12 @@ function CreateProduct() {
                 </>
               ) : (
                 <>
-                  <div className="grid  gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                     {/* Attributes manager */}
                     <div className="p-4 border rounded space-y-4">
                       <Label className="text-sm font-medium">Attributes</Label>
                       <div className="flex gap-2">
-                        <Input
+                        {/* <Input
                           placeholder="e.g. Color, Size"
                           value={newAttrName}
                           onChange={(e) => setNewAttrName(e.target.value)}
@@ -693,24 +831,62 @@ function CreateProduct() {
                         <Button onClick={addAttribute}>
                           <PlusCircle />
                           Add
+                        </Button> */}
+                        <Select
+                          value={selectedAttribute}
+                          onValueChange={(value) => setSelectedAttribute(value)}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select Attribute">
+                              Select Attribute
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="w-full">
+                            {AllAttribute.map((attr) => (
+                              <SelectItem
+                                key={attr.attributeID}
+                                value={JSON.stringify(attr)}
+                              >
+                                {attr.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          onClick={() => {
+                            if (!selectedAttribute) return;
+                            const obj = JSON.parse(selectedAttribute);
+                            console.log(obj);
+
+                            addAttribute(obj);
+                            setSelectedAttribute("");
+                          }}
+                        >
+                          <PlusCircle />
+                          Add
                         </Button>
                       </div>
 
                       <div className="space-y-3">
-                        {attributes.length === 0 && (
+                        {attribute.length === 0 && (
                           <p className="text-sm text-gray-500">
                             No attributes added yet. Add an attribute name, then
                             add options.
                           </p>
                         )}
 
-                        {attributes.map((attr) => (
-                          <div key={attr.id} className="border p-3 rounded">
+                        {attribute.map((attr) => (
+                          <div
+                            key={attr.attributeID}
+                            className="border p-3 rounded"
+                          >
                             <div className="flex items-center justify-between">
                               <div className="font-medium">{attr.name}</div>
                               <div className="flex items-center gap-2">
                                 <Button
-                                  onClick={() => removeAttribute(attr.id)}
+                                  onClick={() =>
+                                    removeAttribute(attr.attributeID)
+                                  }
                                   className="bg-red-50  px-2 py-1 border-2 border-red-500"
                                   variant="outline"
                                 >
@@ -721,7 +897,31 @@ function CreateProduct() {
 
                             <div className="mt-3">
                               <div className="flex gap-2">
-                                <Input
+                                <Select
+                                  onValueChange={(value) => {
+                                    const obj = JSON.parse(value);
+                                    console.log(obj);
+
+                                    addValues(attr.attributeID, obj);
+                                  }}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue
+                                      placeholder={`Add Values for ${attr.name} `}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {attr.values?.map((val) => (
+                                      <SelectItem
+                                        key={val.attributeValueID}
+                                        value={JSON.stringify(val)}
+                                      >
+                                        {val.value}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {/* <Input
                                   placeholder={`Add option for ${attr.name} (e.g. Red)`}
                                   value={tempOptionInputs[attr.id] || ""}
                                   onChange={(e) => {
@@ -761,8 +961,8 @@ function CreateProduct() {
                                       }
                                     }
                                   }}
-                                />
-                                <Button
+                                /> */}
+                                {/* <Button
                                   onClick={() => {
                                     const opt = tempOptionInputs[attr.id] || "";
                                     addOptionToAttribute(attr.id, opt);
@@ -775,18 +975,23 @@ function CreateProduct() {
                                   className="border-blue-600"
                                 >
                                   <PlusCircle className="text-blue-600 font-bold" />
-                                </Button>
+                                </Button> */}
                               </div>
 
                               <div className="mt-3 flex flex-wrap gap-2">
-                                {attr.options.map((opt, idx) => (
+                                {attr.valuesList?.map((opt) => (
                                   <div
-                                    key={idx}
+                                    key={opt.attributeValueID}
                                     className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded"
                                   >
-                                    <span className="text-sm">{opt}</span>
+                                    <span className="text-sm">{opt.value}</span>
                                     <button
-                                      onClick={() => removeOption(attr.id, idx)}
+                                      onClick={() =>
+                                        removeOption(
+                                          attr.attributeID,
+                                          opt.attributeValueID
+                                        )
+                                      }
                                       className="text-red-500 text-xs"
                                       type="button"
                                     >
@@ -799,7 +1004,7 @@ function CreateProduct() {
                           </div>
                         ))}
 
-                        {attributes.length > 0 && (
+                        {attribute.length > 0 && (
                           <div className="flex justify-end">
                             <Button onClick={generateVariants}>
                               Generate Variants
@@ -824,36 +1029,41 @@ function CreateProduct() {
                           "Generate Variants".
                         </p>
                       ) : (
-                        <div className="overflow-auto">
-                          <table className="w-full text-sm">
+                        <div className="overflow-x-auto max-w-full max-h-[400px] border rounded p-2">
+                          <table className="min-w-max w-full text-sm table-auto">
                             <thead>
-                              <tr className="text-left">
-                                {attributes.map((a) => (
-                                  <th key={a.id} className="pb-2">
+                              <tr className="text-left bg-gray-200">
+                                {attribute.map((a) => (
+                                  <th key={a.attributeID} className="px-2 py-3">
                                     {a.name}
                                   </th>
                                 ))}
-                                <th className="pb-2">Price</th>
-                                <th className="pb-2">Quantity</th>
-                                <th className="pb-2">SKU</th>
-                                <th className="pb-2">Tax Type</th>
-                                <th className="pb-2">Discount</th>
-                                <th className="pb-2">Qty Alert</th>
-                                <th className="pb-2">Action</th>
+                                <th className="px-2 py-3">Price</th>
+                                <th className="px-2 py-3">Quantity</th>
+                                <th className="px-2 py-3">SKU</th>
+                                <th className="px-2 py-3">Tax Type</th>
+                                <th className="px-2 py-3">Discount</th>
+                                <th className="px-2 py-3">Discount value</th>
+                                <th className="px-2 py-3">Qty Alert</th>
+                                <th className="px-2 py-3">Img</th>
+                                <th className="px-2 py-3">Action</th>
                               </tr>
                             </thead>
                             <tbody>
                               {variants.map((v) => (
-                                <tr key={v.id} className="align-top border-t">
-                                  {attributes.map((a) => (
-                                    <td key={a.id} className="py-3">
+                                <tr key={v.id} className="border-t">
+                                  {attribute.map((a) => (
+                                    <td
+                                      key={a.attributeID}
+                                      className="px-2 py-3 align-middle"
+                                    >
                                       <div className="bg-gray-100 px-2 py-1 rounded text-sm inline-block">
                                         {v.attributes[a.name]}
                                       </div>
                                     </td>
                                   ))}
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-3 align-middle">
                                     <Input
                                       type="number"
                                       value={v.price as any}
@@ -870,7 +1080,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-3 align-middle">
                                     <Input
                                       type="number"
                                       value={v.quantity as any}
@@ -887,7 +1097,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-4 align-middle">
                                     <Input
                                       value={v.sku}
                                       onChange={(e) =>
@@ -901,7 +1111,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-4 align-middle">
                                     <Select
                                       onValueChange={(val) =>
                                         updateVariantField(v.id, "taxType", val)
@@ -926,7 +1136,7 @@ function CreateProduct() {
                                     </Select>
                                   </td>
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-4 align-middle">
                                     <div className="flex gap-2">
                                       <Select
                                         onValueChange={(val) =>
@@ -956,24 +1166,10 @@ function CreateProduct() {
                                           </SelectItem>
                                         </SelectContent>
                                       </Select>
-                                      <Input
-                                        type="number"
-                                        value={v.discountValue as any}
-                                        onChange={(e) =>
-                                          updateVariantField(
-                                            v.id,
-                                            "discountValue",
-                                            e.target.value === ""
-                                              ? ""
-                                              : Number(e.target.value)
-                                          )
-                                        }
-                                        className="w-20"
-                                      />
                                     </div>
                                   </td>
 
-                                  <td className="py-2">
+                                  <td className="px-2 py-4 align-middle">
                                     <Input
                                       type="number"
                                       value={v.quantityAlert as any}
@@ -989,16 +1185,55 @@ function CreateProduct() {
                                       className="w-24"
                                     />
                                   </td>
-                                  <td className="py-2 align-middle">
-                                    <div className="flex justify-center items-center">
-                                      <Button
-                                        variant="outline"
-                                        className="h-7 w-7 p-0 text-red-500 border-red-400 hover:bg-red-100"
-                                        onClick={() => deleteVariant(v.id)}
-                                      >
-                                        x
-                                      </Button>
-                                    </div>
+                                  <td className="px-2 py-4 align-middle">
+                                    <Input
+                                      type="number"
+                                      value={v.quantityAlert as any}
+                                      onChange={(e) =>
+                                        updateVariantField(
+                                          v.id,
+                                          "quantityAlert",
+                                          e.target.value === ""
+                                            ? ""
+                                            : Number(e.target.value)
+                                        )
+                                      }
+                                      className="w-24"
+                                    />
+                                  </td>
+                                  <td className="px-2 py-4 align-middle">
+                                    <label className="cursor-pointer">
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file)
+                                            handleVariantImage(v.id, file);
+                                        }}
+                                      />
+                                      {v.imageUrl ? (
+                                        <img
+                                          src={v.imageUrl}
+                                          className="w-12 h-12 object-cover rounded border"
+                                        />
+                                      ) : (
+                                        <div className="w-15 h-10 border rounded flex items-center justify-center text-xs text-white bg-blue-500">
+                                          Upload
+                                        </div>
+                                      )}
+                                    </label>
+                                  </td>
+
+                                  <td className="px-3 py-4 align-middle">
+                                    <Button
+                                      variant="outline"
+                                      className="h-8 w-8 p-0 text-red-500 border-red-400 hover:bg-red-100"
+                                      onClick={() => deleteVariant(v.id)}
+                                    >
+                                      x
+                                    </Button>
                                   </td>
                                 </tr>
                               ))}

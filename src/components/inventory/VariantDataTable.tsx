@@ -55,7 +55,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllVaariantAttribute } from "@/api/VariantAttribute/Attributeclinet";
+import {
+  deleteAttribute,
+  getAllVaariantAttribute,
+  updateAttribute,
+} from "@/api/VariantAttribute/Attributeclinet";
+import toast from "react-hot-toast";
 // const data: Variants[] = [
 //   // {
 //   //   variant: "material",
@@ -92,6 +97,7 @@ import { getAllVaariantAttribute } from "@/api/VariantAttribute/Attributeclinet"
 // ];
 
 export type Variants = {
+  attributeID: string;
   name: string;
   values: { value: string }[];
   createdDate: string;
@@ -134,6 +140,9 @@ export default function VariantDataTable({ refresh }: refreshTable) {
   const [deletedValues, setDeletedValues] = React.useState<string[]>([]);
   const [variantName, setVariantName] = React.useState("");
   const [currentValue, setCurrentValue] = React.useState("");
+
+  const [openDeleteDilaog, setOpenDeleteDilaog] = React.useState(false);
+  const [AttributeId, setAttributeId] = React.useState("");
   const getAllVariantAttributeData = async () => {
     try {
       const res = await getAllVaariantAttribute(page, 10);
@@ -175,7 +184,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
     setNewValues((prev) => [...prev, v]);
     setCurrentValue(""); // clear input
   };
-  const handleSubmit = () => {
+  const handleUpdateAttribute = () => {
     const payload = {
       name: variantName,
       attributeValues: [
@@ -188,8 +197,28 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       ],
     };
 
+    // const updatePromise = updateAttribute(AttributeId )
     console.log(payload);
     // axios.put("/update", payload)
+  };
+
+  const handleDeleteAttribute = () => {
+    try {
+      const deletePromise = deleteAttribute(AttributeId);
+      toast.promise(deletePromise, {
+        loading: "Deleting Attribute",
+        success: (res) => {
+          setOpenDeleteDilaog(false);
+          getAllVariantAttributeData();
+          return "Attribute Deleted..";
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const data: Variants[] = variantData;
@@ -296,42 +325,21 @@ export default function VariantDataTable({ refresh }: refreshTable) {
                 setOldValues(varriantAttribute.values);
                 setNewValues([]);
                 setDeletedValues([]);
+                setAttributeId(varriantAttribute.attributeID);
               }}
             >
               <Edit />
             </Button>
-            {/* <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenDeleteDilaog(true);
+                setAttributeId(varriantAttribute.attributeID);
+              }}
+            >
               <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </Button>
           </div>
         );
       },
@@ -589,7 +597,34 @@ export default function VariantDataTable({ refresh }: refreshTable) {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleSubmit}>Save changes</Button>
+            <Button onClick={handleUpdateAttribute}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog Box */}
+      <Dialog open={openDeleteDilaog} onOpenChange={setOpenDeleteDilaog}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDeleteAttribute}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
