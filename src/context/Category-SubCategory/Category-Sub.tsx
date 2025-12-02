@@ -5,12 +5,23 @@ import {
   getAllCategory,
   getAllCategoryall,
   getAllSubCategory,
+  getAllSubcategoryByCategory,
 } from "@/api/Category-subCategory/ApiClient";
+import { getAllBrandActive } from "@/api/brand/BrandApiClient";
+import { getAllUnitActive } from "@/api/unit/UnitApiClient";
 export interface Category {
   categoryID: string;
   name: string;
   slug: string;
   status: "ACTIVE" | "INACTIVE";
+}
+export interface Brand {
+  brandID: string;
+  name: string;
+}
+export interface Unit {
+  unitID: string;
+  name: string;
 }
 export interface SubCategory {
   subCategoryID: string;
@@ -23,10 +34,14 @@ export interface SubCategory {
 }
 type CategoryContextType = {
   categories: Category[];
+  brand: Brand[];
   subCategories: SubCategory[];
+  unit: Unit[];
   loading: boolean;
-  refreshCategories: (page: number, pageSize: number) => void;
-  refreshSubCategories: () => void;
+  refreshCategories: () => void;
+  refreshSubCategories: (id: string) => void;
+  refreshBrand: () => void;
+  refreshUnit: () => void;
   categoryPageMetaData: {
     totalPages: number;
     totalElements: number;
@@ -43,7 +58,9 @@ export const CategoryProvider = ({
   children: React.ReactNode;
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brand, SetBrand] = useState<Brand[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [unit, setUnit] = useState<Unit[]>([]);
   const [categoryPageMetaData, setCategoryPageMetaData] = React.useState({
     totalPages: 0,
     totalElements: 0,
@@ -66,14 +83,37 @@ export const CategoryProvider = ({
       setLoading(false);
     }
   };
-
-  const refreshSubCategories = async (
-    page: number = 1,
-    pageSize: number = 10
-  ) => {
+  //Fetch Brand
+  const refreshBrand = async () => {
     setLoading(true);
     try {
-      const res = await getAllSubCategory(page, pageSize);
+      const res = await getAllBrandActive();
+      if (res?.statusCode === 200) {
+        SetBrand(res.data || []);
+      }
+    } catch (error) {
+      console.log("Error fetching Brand:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const refreshUnit = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllUnitActive();
+      if (res?.statusCode === 200) {
+        setUnit(res.data || []);
+      }
+    } catch (error) {
+      console.log("Error fetching Unit:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const refreshSubCategories = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await getAllSubcategoryByCategory(id);
       setSubCategories(res?.data || []);
     } catch (error) {
       console.log("Error fetching categories:", error);
@@ -83,18 +123,23 @@ export const CategoryProvider = ({
   };
 
   useEffect(() => {
-    refreshSubCategories();
+    refreshBrand();
     refreshCategories();
+    refreshUnit;
   }, []);
 
   return (
     <CategoryContext.Provider
       value={{
         categories,
+        brand,
         subCategories,
+        unit,
         categoryPageMetaData,
+        refreshBrand,
         refreshCategories,
         refreshSubCategories,
+        refreshUnit,
         loading,
       }}
     >

@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 function VariantPage() {
   const [values, setValues] = React.useState<string[]>([]);
   const [variantName, setVariantName] = React.useState("");
+  const [status, setStatus] = React.useState(false);
   const [currentValue, setCurrentValue] = React.useState("");
   const [refresh, setRefresh] = React.useState(false);
   const [openAddvariant, setOpenAddVariant] = React.useState(false);
@@ -60,7 +61,8 @@ function VariantPage() {
     try {
       const payload = {
         name: variantName,
-        values: values.map((v) => ({ value: v })),
+        attributeValues: values.map((v) => ({ value: v })),
+        status: status === true ? "ACTIVE" : "INACTIVE",
       };
       const attributePromise = createAttribute(payload);
       toast.promise(attributePromise, {
@@ -76,6 +78,7 @@ function VariantPage() {
           return err.response.data.message;
         },
       });
+      console.log(payload);
     } catch (error) {
       console.error(error);
     } finally {
@@ -172,6 +175,8 @@ function VariantPage() {
                   <Switch
                     id="status"
                     className=" data-[state=checked]:bg-green-500 transition-colors"
+                    checked={status}
+                    onCheckedChange={(checked) => setStatus(checked)}
                   />
                 </div>
               </div>

@@ -63,12 +63,12 @@ const InventoryItems = [
   },
   {
     title: "Expired Product",
-    url: "#",
+    url: "/expired",
     icon: OctagonAlert,
   },
   {
     title: "Low Stock",
-    url: "#",
+    url: "/lowscock",
     icon: TrendingDown,
   },
   {
@@ -93,7 +93,7 @@ const InventoryItems = [
   },
   {
     title: "Varient Attribute",
-    url: "variant ",
+    url: "/variant",
     icon: ClipboardList,
   },
   {
@@ -217,7 +217,9 @@ export default function AppSidebar({
         <SidebarSeparator />
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Main</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              Main
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -231,28 +233,28 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Inventory</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              INVENTORY
+            </SidebarGroupLabel>
 
             <SidebarGroupContent>
               <SidebarMenu>
                 {InventoryItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium text-primary"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
 
@@ -286,27 +288,27 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Stock</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              STOCK
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {StockItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -314,27 +316,27 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Sales</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              SALES
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {SalesItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -342,27 +344,27 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Purchase</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              PURCHASE
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {PurchaseItem.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -370,27 +372,27 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Peoples</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              PEOPLE
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {PeoplesItem.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -398,27 +400,27 @@ export default function AppSidebar({
           </SidebarGroup>
           <SidebarSeparator />
           <SidebarGroup>
-            <SidebarGroupLabel>Reports</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-blue-500 font-bold">
+              REPORTS
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {ReportsItem.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="text-base">
-                      <NavLink
-                        key={item.title}
-                        to={item.url}
-                        className={({ isActive }) =>
-                          `flex items-center gap-2 w-full px-3 py-2 rounded-md ${
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
                             isActive
-                              ? "bg-muted font-medium"
+                              ? "bg-primary font-medium text-white"
                               : "hover:bg-gray-100"
-                          }`
-                        }
-                      >
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

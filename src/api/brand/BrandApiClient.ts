@@ -5,6 +5,7 @@ const brandEndPoint = {
   createBrand: "/v1/brand/create",
   updateBrand: "/v1/brand/update",
   deleteBrand: "/v1/brand/delete",
+  getAllBrandActive: "/v1/brand/all",
 };
 
 export const createBrand = async (payload: object) => {
@@ -33,7 +34,15 @@ export const getAllBrand = async (pageNo: number, pageSize: number) => {
     throw error;
   }
 };
-
+export const getAllBrandActive = async () => {
+  try {
+    const res = axiosClient.get(brandEndPoint.getAllBrandActive);
+    return (await res).data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export const upadateBrand = async (id: string, payload: object) => {
   try {
     const res = await axiosClient.put(

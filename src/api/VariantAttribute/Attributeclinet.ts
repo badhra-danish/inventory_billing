@@ -56,7 +56,7 @@ export const updateAttribute = async (id: string, payload: object) => {
       `${attributeEndPoint.updateAttribute}/${id}`,
       payload
     );
-    return res;
+    return res.data;
   } catch (error) {
     console.error(error);
   }

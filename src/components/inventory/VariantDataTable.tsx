@@ -61,6 +61,8 @@ import {
   updateAttribute,
 } from "@/api/VariantAttribute/Attributeclinet";
 import toast from "react-hot-toast";
+import { Label } from "@radix-ui/react-label";
+import { Switch } from "../ui/switch";
 // const data: Variants[] = [
 //   // {
 //   //   variant: "material",
@@ -101,7 +103,7 @@ export type Variants = {
   name: string;
   values: { value: string }[];
   createdDate: string;
-  status: "active" | "inactive";
+  status: "ACTIVE" | "INACTIVE";
 };
 type refreshTable = {
   refresh: boolean;
@@ -140,7 +142,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
   const [deletedValues, setDeletedValues] = React.useState<string[]>([]);
   const [variantName, setVariantName] = React.useState("");
   const [currentValue, setCurrentValue] = React.useState("");
-
+  const [status, setStatus] = React.useState(false);
   const [openDeleteDilaog, setOpenDeleteDilaog] = React.useState(false);
   const [AttributeId, setAttributeId] = React.useState("");
   const getAllVariantAttributeData = async () => {
@@ -195,11 +197,21 @@ export default function VariantDataTable({ refresh }: refreshTable) {
         ...newValues.map((v) => ({ value: v })), // ADDED
         ...deletedValues.map((id) => ({ attributeValueID: id })), // DELETED
       ],
+      status: status === true ? "ACTIVE" : "INACTIVE",
     };
 
-    // const updatePromise = updateAttribute(AttributeId )
-    console.log(payload);
-    // axios.put("/update", payload)
+    const updatePromise = updateAttribute(AttributeId, payload);
+    toast.promise(updatePromise, {
+      loading: "Updating Attribute",
+      success: (res) => {
+        setOpenUpdateVarAttribute(false);
+        getAllVariantAttributeData();
+        return res?.message;
+      },
+      error: (err) => {
+        return err.response.data.message;
+      },
+    });
   };
 
   const handleDeleteAttribute = () => {
@@ -286,28 +298,28 @@ export default function VariantDataTable({ refresh }: refreshTable) {
     //     );
     //   },
     // },
-    // {
-    //   accessorKey: "status",
-    //   header: () => <div className="text-left">Status</div>,
-    //   cell: ({ row }) => {
-    //     const status: string = row.getValue("status");
+    {
+      accessorKey: "status",
+      header: () => <div className="text-left">Status</div>,
+      cell: ({ row }) => {
+        const status: string = row.getValue("status");
 
-    //     const colorClass =
-    //       status === "active"
-    //         ? "bg-green-400 text-white"
-    //         : "bg-red-400 text-white";
+        const colorClass =
+          status === "ACTIVE"
+            ? "bg-green-400 text-white"
+            : "bg-red-400 text-white";
 
-    //     return (
-    //       <div className="text-left">
-    //         <span
-    //           className={`capitalize px-1.5 py-1 rounded-sm text-xs font-normal ${colorClass}`}
-    //         >
-    //           {status}
-    //         </span>
-    //       </div>
-    //     );
-    //   },
-    // },
+        return (
+          <div className="text-left">
+            <span
+              className={`capitalize px-1.5 py-1 rounded-sm text-xs font-normal ${colorClass}`}
+            >
+              {status}
+            </span>
+          </div>
+        );
+      },
+    },
 
     {
       id: "actions",
@@ -326,6 +338,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
                 setNewValues([]);
                 setDeletedValues([]);
                 setAttributeId(varriantAttribute.attributeID);
+                setStatus(varriantAttribute.status == "ACTIVE");
               }}
             >
               <Edit />
@@ -592,7 +605,18 @@ export default function VariantDataTable({ refresh }: refreshTable) {
               className="outline-none bg-transparent flex-grow"
             />
           </div>
-
+          <div className="flex items-center justify-between border-b-2 pb-7">
+            <Label htmlFor="category-1">
+              {" "}
+              Status <span className="text-red-500">*</span>
+            </Label>
+            <Switch
+              id="status"
+              className=" data-[state=checked]:bg-green-500 transition-colors"
+              checked={status}
+              onCheckedChange={(checked) => setStatus(checked)}
+            />
+          </div>
           <DialogFooter className="mt-6">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>

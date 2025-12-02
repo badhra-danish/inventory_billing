@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ArrowLeft,
   ChevronDown,
@@ -24,9 +24,76 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { getAllVaariantAttributeAll } from "@/api/VariantAttribute/Attributeclinet";
-
+import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { createCategory } from "@/api/Category-subCategory/ApiClient";
+import toast from "react-hot-toast";
 function CreateProduct() {
   const navigate = useNavigate();
+  const [productInformation, setProductInformation] = React.useState({
+    productName: "",
+    slugName: "",
+    skuCode: "",
+    sellingType: "",
+    category: "",
+    subCategory: "",
+    brand: "",
+    unit: "",
+    description: "",
+    warranty: "",
+  });
+
+  const {
+    categories,
+    brand,
+    subCategories,
+    unit,
+    refreshBrand,
+    refreshCategories,
+    refreshSubCategories,
+    refreshUnit,
+  } = useCategory();
+
+  useEffect(() => {
+    refreshBrand();
+    refreshCategories();
+    refreshUnit();
+  }, []);
+
+  useEffect(() => {
+    if (!productInformation.category) return;
+    refreshSubCategories(productInformation.category);
+  }, [productInformation.category]);
+
+  interface VariantAttributeDetail {
+    attributeID: string;
+    attributeName: string;
+    attributeValueID: string;
+    attributeValueName: string;
+  }
+  interface Variant {
+    id: string;
+    attributeDetails?: VariantAttributeDetail[];
+    price?: number | "";
+    quantity?: number | "";
+    sku?: string;
+    taxType?: string;
+    taxValue?: string;
+    discountType?: string;
+    discountValue?: number | "";
+    quantityAlert?: number | "";
+    imageUrl?: string;
+    image?: File;
+  }
   interface VariantAttribute {
     attributeID: string;
     name: string;
@@ -42,25 +109,77 @@ function CreateProduct() {
     "single" | "variable" | ""
   >("single");
   const [isOpen, setIsOpen] = React.useState(true);
-  const [productInformation, setProductInformation] = React.useState({
-    productName: "",
-    slugName: "",
-    skuCode: "",
-    sellingType: "",
-    category: "",
-    subCategory: "",
-    brand: "",
-    unit: "",
-    description: "",
-    warranty: "",
-  });
   const [customFeild, setcustomFeild] = React.useState({
     warranty: "",
     manufacturer: "",
     manufacturedDate: "",
     expiryDate: "",
   });
+  const [singleProductInfo, setSingleProductInfo] = React.useState({
+    quantity: "",
+    price: "",
+    taxType: "",
+    tax: "",
+    discountType: "",
+    discountValue: "",
+    quantityAlert: "",
+    skuCode: "",
+  });
 
+  const [variants, setVariants] = React.useState<Variant[]>([]);
+  const [image, setImage] = React.useState<File>();
+  const [imageUrl, setImageUrl] = React.useState<string>();
+  const [isExpanded, setIsExpanded] = React.useState(true);
+  const [openCreateCategory, setOpenCreateCategory] = React.useState(false);
+  const [categoryFormData, setcategoryFormData] = React.useState({
+    categoryname: "",
+    slugName: "",
+    status: false,
+  });
+  // API Sections
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+
+    setcategoryFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleCreateCategory = async () => {
+    try {
+      const payload = {
+        name: categoryFormData.slugName,
+        slug: categoryFormData.slugName,
+        status: categoryFormData.status ? "ACTIVE" : "INACTIVE",
+      };
+
+      const promise = createCategory(payload);
+
+      await toast.promise(promise, {
+        loading: "Creating category...",
+        success: (res) => {
+          setOpenCreateCategory(false);
+          refreshCategories();
+          return res.message;
+        },
+        error: (err) => {
+          console.error("Error During Create:", err);
+          return err.response.data.message;
+        },
+      });
+    } catch (error: any) {
+      console.error(error);
+      if (error.response?.data) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  };
   const getAllAttribute = async () => {
     try {
       const res = await getAllVaariantAttributeAll();
@@ -75,6 +194,17 @@ function CreateProduct() {
     getAllAttribute();
   }, []);
   // console.log(AllAttribute);
+  const handleSingleProduct = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setSingleProductInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   // accept string from RadioGroup and cast safely
   const handleProductTypeChange = (value: string) => {
@@ -111,72 +241,7 @@ function CreateProduct() {
   };
   //sadnsadjsn
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const Product = {
-      ...productInformation,
-      ...customFeild,
-      images: images.map((img) => img.file), // only send files
-      attributes: attribute,
-      variants: variants,
-    };
-
-    console.log("Final Product:", Product);
-  };
-  interface ImageItem {
-    id: string;
-    url: string;
-    file?: File;
-  }
-
-  const [images, setImages] = React.useState<ImageItem[]>([]);
-
-  const [isExpanded, setIsExpanded] = React.useState(true);
-
-  // Attributes and Variants state for variable products
-  interface Attribute {
-    id: string;
-    name: string;
-    options: string[];
-  }
-
-  interface Variant {
-    id: string;
-    attributes: Record<string, string>;
-    price?: number | "";
-    quantity?: number | "";
-    sku?: string;
-    taxType?: string;
-    discountType?: string;
-    discountValue?: number | "";
-    quantityAlert?: number | "";
-    imageUrl?: string;
-    image?: File;
-  }
-
-  const [attributes, setAttributes] = React.useState<Attribute[]>([]);
-  const [newAttrName, setNewAttrName] = React.useState("");
-  const [variants, setVariants] = React.useState<Variant[]>([]);
-  const [tempOptionInputs, setTempOptionInputs] = React.useState<
-    Record<string, string>
-  >({});
-
   const addAttribute = (obj: VariantAttribute) => {
-    // if (!newAttrName.trim()) return;
-    // // split by comma
-    // const names = newAttrName
-    //   .split(",")
-    //   .map((n) => n.trim())
-    //   .filter(Boolean);
-    // setAttributes((prev) => [
-    //   ...prev,
-    //   ...names.map((name) => ({
-    //     id: Math.random().toString(36).slice(2, 9),
-    //     name,
-    //     options: [],
-    //   })),
-    // ]);
     setAttribute((prev) => {
       const exists = prev.some((a) => a.attributeID === obj.attributeID);
       if (exists) return prev;
@@ -193,33 +258,32 @@ function CreateProduct() {
   // const removeAttribute = (id: string) => {
   //   setAttributes((prev) => prev.filter((a) => a.id !== id));
   // };
+
   const addValues = (attributeId: string, obj: any) => {
     setAttribute((prev) =>
-      prev.map((a) =>
-        a.attributeID === attributeId
-          ? {
-              ...a,
-              valuesList: [
-                ...(a.valuesList ?? []),
-                { attributeValueID: obj.attributeValueID, value: obj.value },
-              ],
-            }
-          : a
-      )
+      prev.map((a) => {
+        if (a.attributeID !== attributeId) return a;
+        // check duplicates
+        const exists = a.valuesList?.some(
+          (v) => v.value.trim().toLowerCase() === obj.value.trim().toLowerCase()
+        );
+        if (exists) return a;
+        // otherwise push new value
+        return {
+          ...a,
+          valuesList: [
+            ...(a.valuesList ?? []),
+            { attributeValueID: obj.attributeValueID, value: obj.value },
+          ],
+        };
+      })
     );
   };
+
   const removeAttribute = (attributeId: string) => {
     setAttribute((prev) => prev.filter((a) => a.attributeID !== attributeId));
   };
 
-  // const addOptionToAttribute = (attrId: string, option: string) => {
-  //   if (!option.trim()) return;
-  //   setAttributes((prev) =>
-  //     prev.map((a) =>
-  //       a.id === attrId ? { ...a, options: [...a.options, option.trim()] } : a
-  //     )
-  //   );
-  // };
   const removeOption = (attributeId: string, optionId: string) => {
     setAttribute((prev) =>
       prev.map((a) =>
@@ -234,94 +298,31 @@ function CreateProduct() {
       )
     );
   };
-  // const removeOption = (attrId: string, optionIndex: number) => {
-  //   setAttributes((prev) =>
-  //     prev.map((a) =>
-  //       a.id === attrId
-  //         ? { ...a, options: a.options.filter((_, i) => i !== optionIndex) }
-  //         : a
-  //     )
-  //   );
-  // };
 
-  // const generateVariants = () => {
-  //   if (attributes.length === 0) return;
-  //   const arrays = attributes.map((a) =>
-  //     a.options.map((o) => ({ name: a.name, option: o }))
-  //   );
-  //   // cartesian product
-  //   let combos: Array<Array<{ name: string; option: string }>> = [[]];
-  //   for (const arr of arrays) {
-  //     combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
-  //   }
-
-  //   const newVariants: Variant[] = combos.map((combo) => ({
-  //     id: Math.random().toString(36).slice(2, 9),
-  //     attributes: combo.reduce(
-  //       (acc, cur) => ({ ...acc, [cur.name]: cur.option }),
-  //       {} as Record<string, string>
-  //     ),
-  //     price: "",
-  //     quantity: "",
-  //     sku: "",
-  //     taxType: "",
-  //     discountType: "",
-  //     discountValue: "",
-  //     quantityAlert: "",
-  //   }));
-
-  //   setVariants(newVariants);
-  // };
-  // const generateVariants = () => {
-  //   if (attribute.length === 0) return;
-  //   const arrays = attribute.map((a) =>
-  //     a.valuesList.map((o) => ({ name: a.name, value: o.value }))
-  //   );
-  //   // cartesian product
-  //   let combos: Array<Array<{ name: string; value: string }>> = [[]];
-  //   for (const arr of arrays) {
-  //     combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
-  //   }
-
-  //   const newVariants: Variant[] = combos.map((combo) => ({
-  //     id: Math.random().toString(36).slice(2, 9),
-  //     attributes: combo.reduce(
-  //       (acc, cur) => ({ ...acc, [cur.name]: cur.value }),
-  //       {} as Record<string, string>
-  //     ),
-  //     price: "",
-  //     quantity: "",
-  //     sku: "",
-  //     taxType: "",
-  //     discountType: "",
-  //     discountValue: "",
-  //     quantityAlert: "",
-  //   }));
-
-  //   setVariants(newVariants);
-  // };
   const generateVariants = () => {
     if (attribute.length === 0) return;
     const arrays = attribute.map((a) =>
       a.valuesList.map((o) => ({
         attributeID: a.attributeID,
+        attributeName: a.name,
         attributeValueID: o.attributeValueID,
+        attributeValueName: o.value,
       }))
     );
     // cartesian product
-    let combos: Array<
-      Array<{ attributeID: string; attributeValueID: string }>
-    > = [[]];
+    let combos: Array<Array<VariantAttributeDetail>> = [[]];
+
     for (const arr of arrays) {
       combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
     }
 
     const newVariants: Variant[] = combos.map((combo) => ({
       id: Math.random().toString(36).slice(2, 9),
-      attributes: combo.reduce(
-        (acc, cur) => ({ ...acc, [cur.attributeID]: cur.attributeValueID }),
-        {} as Record<string, string>
-      ),
+      // attributes: combo.reduce(
+      //   (acc, cur) => ({ ...acc, [cur.attributeID]: cur.attributeValueID }),
+      //   {} as Record<string, string>
+      // ),
+      attributeDetails: combo,
       price: "",
       quantity: "",
       sku: "",
@@ -332,6 +333,61 @@ function CreateProduct() {
     }));
 
     setVariants(newVariants);
+  };
+  const prepareProductPayload = () => {
+    if (productType == "single") {
+      const singlePayload = {
+        name: productInformation.productName,
+        slug: productInformation.slugName,
+        sellingType: productInformation.sellingType,
+        description: productInformation.description,
+        categoryID: productInformation.category,
+        subCategoryID: productInformation.subCategory,
+        brandID: productInformation.brand,
+        unitID: productInformation.unit,
+        productType: productType,
+        quantity: Number(singleProductInfo.quantity),
+        price: Number(singleProductInfo.price),
+        taxType: singleProductInfo.taxType,
+        taxValue: Number(singleProductInfo.tax),
+        discountType: singleProductInfo.discountType,
+        discountValue: Number(singleProductInfo.discountValue),
+        quantityAlert: Number(singleProductInfo.quantityAlert),
+        skuCode: singleProductInfo.skuCode,
+        image: image,
+        ...customFeild,
+      };
+      console.log(singlePayload);
+    } else {
+      const variablePayload = {
+        name: productInformation.productName,
+        slug: productInformation.slugName,
+        sellingType: productInformation.sellingType,
+        description: productInformation.description,
+        categoryID: productInformation.category,
+        subCategoryID: productInformation.subCategory,
+        brandID: productInformation.brand,
+        unitID: productInformation.unit,
+        productType: productType,
+        productVariations: variants.map((v) => ({
+          sku: v.sku,
+          price: Number(v.price),
+          quantity: Number(v.quantity),
+          taxType: v.taxType,
+          taxValue: Number(v.taxValue || 0),
+          discountType: v.discountType,
+          discountValue: Number(v.discountValue || 0),
+          quantityAlert: Number(v.quantityAlert || 0),
+          image: v.image,
+          variationOptionModels: v.attributeDetails?.map((d) => ({
+            attributeID: d.attributeID,
+            attributeValueID: d.attributeValueID,
+          })),
+        })),
+        ...customFeild,
+      };
+      console.log(variablePayload);
+    }
   };
   const updateVariantField = (
     variantId: string,
@@ -355,22 +411,18 @@ function CreateProduct() {
       )
     );
   };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const newImages: ImageItem[] = Array.from(files).map((file) => ({
-      id: Math.random().toString(36).substr(2, 9),
-      url: URL.createObjectURL(file),
-      file,
-    }));
-
-    setImages((prev) => [...prev, ...newImages]);
+    const file = e.target.files?.[0]; // pick only first file
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setImageUrl(url);
+    setImage(file);
   };
 
-  const handleRemoveImage = (id: string) => {
-    setImages((prev) => prev.filter((img) => img.id !== id));
-  };
+  // const handleRemoveImage = (id: string) => {
+  //   setImages((prev) => prev.filter((img) => img.id !== id));
+  // };
 
   return (
     <>
@@ -448,7 +500,7 @@ function CreateProduct() {
                   </div>
 
                   {/* SKU */}
-                  <div className="space-y-2 grid">
+                  {/* <div className="space-y-2 grid">
                     <Label htmlFor="sku">
                       SKU <span className="text-red-500">*</span>
                     </Label>
@@ -465,7 +517,7 @@ function CreateProduct() {
                         Generate
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Selling Type */}
                   <div className="space-y-2 grid">
@@ -500,6 +552,7 @@ function CreateProduct() {
                       </Label>
                       <button
                         type="button"
+                        onClick={() => setOpenCreateCategory(true)}
                         className="flex items-center gap-1 text-sm text-blue-500 hover:text-orange-600"
                       >
                         <Plus className="w-4 h-4" />
@@ -516,12 +569,14 @@ function CreateProduct() {
                       }
                     >
                       <SelectTrigger id="category" className="w-full">
-                        <SelectValue placeholder="Select" />
+                        <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="electronics">Electronics</SelectItem>
-                        <SelectItem value="clothing">Clothing</SelectItem>
-                        <SelectItem value="food">Food & Beverages</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem value={cat.categoryID}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -539,20 +594,27 @@ function CreateProduct() {
                           subCategory: val,
                         }))
                       }
+                      disabled={!productInformation.category}
                     >
                       <SelectTrigger id="subCategory" className="w-full">
-                        <SelectValue placeholder="Select" />
+                        <SelectValue placeholder="Select SubCategory" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="subcategory1">
-                          Sub Category 1
-                        </SelectItem>
-                        <SelectItem value="subcategory2">
-                          Sub Category 2
-                        </SelectItem>
-                        <SelectItem value="subcategory3">
-                          Sub Category 3
-                        </SelectItem>
+                        {subCategories.length > 0 ? (
+                          <>
+                            {subCategories.map((subcat) => (
+                              <SelectItem value={subcat.subCategoryID}>
+                                {subcat.name}
+                              </SelectItem>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            <div className="px-4 py-2 text-sm  text-red-500">
+                              No SubCategory Found
+                            </div>
+                          </>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -575,9 +637,11 @@ function CreateProduct() {
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="brand1">Brand 1</SelectItem>
-                        <SelectItem value="brand2">Brand 2</SelectItem>
-                        <SelectItem value="brand3">Brand 3</SelectItem>
+                        {brand.map((brand) => (
+                          <SelectItem value={brand.brandID}>
+                            {brand.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -600,10 +664,9 @@ function CreateProduct() {
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="piece">Piece</SelectItem>
-                        <SelectItem value="kg">Kilogram</SelectItem>
-                        <SelectItem value="liter">Liter</SelectItem>
-                        <SelectItem value="box">Box</SelectItem>
+                        {unit.map((u) => (
+                          <SelectItem value={u.unitID}>{u.name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -703,6 +766,9 @@ function CreateProduct() {
                         type="number"
                         className="w-full"
                         placeholder=""
+                        name="quantity"
+                        onChange={handleSingleProduct}
+                        value={singleProductInfo.quantity}
                       />
                     </div>
 
@@ -718,6 +784,9 @@ function CreateProduct() {
                         type="number"
                         className="w-full"
                         placeholder=""
+                        name="price"
+                        onChange={handleSingleProduct}
+                        value={singleProductInfo.price}
                       />
                     </div>
 
@@ -728,7 +797,15 @@ function CreateProduct() {
                       >
                         Tax Type <span className="text-red-500">*</span>
                       </Label>
-                      <Select>
+                      <Select
+                        value={singleProductInfo.taxType}
+                        onValueChange={(val) =>
+                          setSingleProductInfo((prev) => ({
+                            ...prev,
+                            taxType: val,
+                          }))
+                        }
+                      >
                         <SelectTrigger id="taxType" className="w-full">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
@@ -750,15 +827,23 @@ function CreateProduct() {
                       >
                         Tax <span className="text-red-500">*</span>
                       </Label>
-                      <Select>
+                      <Select
+                        value={singleProductInfo.tax}
+                        onValueChange={(val) =>
+                          setSingleProductInfo((prev) => ({
+                            ...prev,
+                            tax: val,
+                          }))
+                        }
+                      >
                         <SelectTrigger id="tax" className="w-full">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="gst5">GST 5%</SelectItem>
-                          <SelectItem value="gst12">GST 12%</SelectItem>
-                          <SelectItem value="gst18">GST 18%</SelectItem>
-                          <SelectItem value="gst28">GST 28%</SelectItem>
+                          <SelectItem value="12">GST 5%</SelectItem>
+                          <SelectItem value="12">GST 12%</SelectItem>
+                          <SelectItem value="18">GST 18%</SelectItem>
+                          <SelectItem value="28">GST 28%</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -770,7 +855,15 @@ function CreateProduct() {
                       >
                         Discount Type <span className="text-red-500">*</span>
                       </Label>
-                      <Select>
+                      <Select
+                        value={singleProductInfo.discountType}
+                        onValueChange={(val) =>
+                          setSingleProductInfo((prev) => ({
+                            ...prev,
+                            discountType: val,
+                          }))
+                        }
+                      >
                         <SelectTrigger id="discountType" className="w-full">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
@@ -794,6 +887,9 @@ function CreateProduct() {
                         type="number"
                         className="w-full"
                         placeholder=""
+                        name="discountValue"
+                        onChange={handleSingleProduct}
+                        value={singleProductInfo.discountValue}
                       />
                     </div>
                   </div>
@@ -812,7 +908,31 @@ function CreateProduct() {
                         type="number"
                         className="w-full"
                         placeholder=""
+                        name="quantityAlert"
+                        onChange={handleSingleProduct}
+                        value={singleProductInfo.quantityAlert}
                       />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="sku">
+                        SKU <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="sku"
+                          placeholder="Enter SKU"
+                          name="skuCode"
+                          value={singleProductInfo.skuCode}
+                          onChange={handleSingleProduct}
+                        />
+                        <Button
+                          type="button"
+                          className=" text-white px-3 py-5 size-sm "
+                        >
+                          Generate
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -823,15 +943,6 @@ function CreateProduct() {
                     <div className="p-4 border rounded space-y-4">
                       <Label className="text-sm font-medium">Attributes</Label>
                       <div className="flex gap-2">
-                        {/* <Input
-                          placeholder="e.g. Color, Size"
-                          value={newAttrName}
-                          onChange={(e) => setNewAttrName(e.target.value)}
-                        />
-                        <Button onClick={addAttribute}>
-                          <PlusCircle />
-                          Add
-                        </Button> */}
                         <Select
                           value={selectedAttribute}
                           onValueChange={(value) => setSelectedAttribute(value)}
@@ -887,10 +998,13 @@ function CreateProduct() {
                                   onClick={() =>
                                     removeAttribute(attr.attributeID)
                                   }
-                                  className="bg-red-50  px-2 py-1 border-2 border-red-500"
+                                  className="bg-transparent px-2 py-1 border-0 "
                                   variant="outline"
                                 >
-                                  <Trash className="text-red-500" />
+                                  <Trash
+                                    className="text-red-500 stroke-3"
+                                    size={22}
+                                  />
                                 </Button>
                               </div>
                             </div>
@@ -1058,7 +1172,12 @@ function CreateProduct() {
                                       className="px-2 py-3 align-middle"
                                     >
                                       <div className="bg-gray-100 px-2 py-1 rounded text-sm inline-block">
-                                        {v.attributes[a.name]}
+                                        {
+                                          v.attributeDetails?.find(
+                                            (d) =>
+                                              d.attributeID === a.attributeID
+                                          )?.attributeValueName
+                                        }
                                       </div>
                                     </td>
                                   ))}
@@ -1290,31 +1409,21 @@ function CreateProduct() {
                 </label>
 
                 {/* Image Preview Cards */}
-                {images.map((image) => (
-                  <div
-                    key={image.id}
-                    className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200 group"
-                  >
-                    <img
-                      src={image.url}
-                      alt="Product"
-                      className="w-full h-full object-cover"
-                    />
-
-                    {/* Remove Button */}
-                    <button
-                      onClick={() => handleRemoveImage(image.id)}
-                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all opacity-100 group-hover:scale-110"
-                      aria-label="Remove image"
-                      type="button"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                {image && (
+                  <>
+                    {" "}
+                    <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200 group">
+                      <img
+                        src={imageUrl}
+                        alt="Product"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
-              {images.length === 0 && (
+              {!image && (
                 <p className="text-center text-gray-500 text-sm mt-4">
                   No images uploaded yet
                 </p>
@@ -1438,10 +1547,70 @@ function CreateProduct() {
             <Button className="bg-gray border-2 border-blue-500 text-blue-400 hover:text-white">
               Cancel
             </Button>
-            <Button onClick={handleSubmit}>Add Product</Button>
+            <Button onClick={prepareProductPayload}>Add Product</Button>
           </div>
         </div>
       </div>
+
+      {/* create Category dialog */}
+      <Dialog open={openCreateCategory} onOpenChange={setOpenCreateCategory}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Category</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+            <div className="grid gap-4">
+              <Label htmlFor="category-1">
+                {" "}
+                Category <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="category-1"
+                type="text"
+                name="categoryname"
+                onChange={handleChange}
+                value={categoryFormData.categoryname}
+              />
+            </div>
+            <div className="grid gap-4">
+              <Label htmlFor="category-1">
+                {" "}
+                Slug Category <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="category-1"
+                type="text"
+                name="slugName"
+                onChange={handleChange}
+                value={categoryFormData.slugName}
+              />
+            </div>
+            <div className="flex items-center justify-between border-b-2 pb-7">
+              <Label htmlFor="category-1">
+                {" "}
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Switch
+                id="status"
+                checked={categoryFormData.status}
+                onCheckedChange={(checked) =>
+                  setcategoryFormData((prev) => ({
+                    ...prev,
+                    status: checked,
+                  }))
+                }
+                className=" data-[state=checked]:bg-green-500 transition-colors"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant={"outline"}>Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleCreateCategory}>Add Category</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

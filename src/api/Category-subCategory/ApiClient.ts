@@ -6,6 +6,7 @@ const endPoint = {
   getAllCategorall: "/v1/category/all",
   subCategory: "/v1/sub-category/create",
   getAllSubCategory: "/v1/sub-category/page",
+  getAllSubcategoryByCategory: "/v1/sub-category/all",
   updateCategory: "/v1/category/update",
   updateSubCategory: "/v1/sub-category/update",
   updateSubCategoryImage: "/v1/sub-category/update/image",
@@ -16,7 +17,7 @@ const endPoint = {
 export const createCategory = async (payload: object) => {
   try {
     const res = axiosClient.post(endPoint.createCetogory, payload);
-    return await res;
+    return (await res).data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -80,7 +81,17 @@ export const getAllSubCategory = async (pageNo: number, pageSize: number) => {
     throw error;
   }
 };
-
+export const getAllSubcategoryByCategory = async (id: string) => {
+  try {
+    const res = await axiosClient.get(
+      `${endPoint.getAllSubcategoryByCategory}/${id}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export const updateCategory = async (id: string, payload: object) => {
   try {
     const res = await axiosClient.put(

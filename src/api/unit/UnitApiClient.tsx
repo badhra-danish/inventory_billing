@@ -3,6 +3,7 @@ import { axiosClient } from "..";
 const unitEndpoint = {
   createUnit: "/v1/unit/create",
   getAllUnitPage: "/v1/unit/page",
+  getAllUnitActive: "/v1/unit/all",
   updateUnit: "/v1/unit/update",
   deleteUnit: "/v1/unit/delete",
 };
@@ -25,6 +26,15 @@ export const getAllUnit = async (pageNo: number, pageSize: number) => {
         sortDesc: false,
       },
     });
+    return (await res).data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAllUnitActive = async () => {
+  try {
+    const res = axiosClient.get(unitEndpoint.getAllUnitActive);
     return (await res).data;
   } catch (error) {
     console.error(error);
