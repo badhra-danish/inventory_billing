@@ -53,179 +53,180 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Product[] = [
-  {
-    id: "P001",
-    name: "Plywood Sheet 12mm",
-    category: "Wood & Boards",
-    brand: "GreenPly",
-    unit: "pc",
-    qty: 300,
-    price: 1200,
-    status: "In Stock",
-  },
-  {
-    id: "P002",
-    name: "Laminated Sheet 18mm",
-    category: "Wood & Boards",
-    brand: "Century",
-    unit: "pc",
-    qty: 300,
-    price: 1800,
+import { getAllProductPage } from "@/api/CreateProduct/ProductClinet";
+// const data: Product[] = [
+//   {
+//     id: "P001",
+//     name: "Plywood Sheet 12mm",
+//     category: "Wood & Boards",
+//     brand: "GreenPly",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1200,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P002",
+//     name: "Laminated Sheet 18mm",
+//     category: "Wood & Boards",
+//     brand: "Century",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1800,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P003",
-    name: "Hinges 3-inch",
-    category: "Hardware",
-    brand: "Godrej",
-    unit: "pc",
-    qty: 300,
-    price: 50,
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P003",
+//     name: "Hinges 3-inch",
+//     category: "Hardware",
+//     brand: "Godrej",
+//     unit: "pc",
+//     qty: 300,
+//     price: 50,
 
-    status: "Out of Stock",
-  },
-  {
-    id: "P004",
-    name: "Wood Glue 1L",
-    category: "Adhesives",
-    brand: "Fevicol",
-    unit: "pc",
-    qty: 300,
-    price: 250,
+//     status: "Out of Stock",
+//   },
+//   {
+//     id: "P004",
+//     name: "Wood Glue 1L",
+//     category: "Adhesives",
+//     brand: "Fevicol",
+//     unit: "pc",
+//     qty: 300,
+//     price: 250,
 
-    status: "In Stock",
-  },
-  {
-    id: "P005",
-    name: "Drawer Slide Set",
-    category: "Hardware",
-    brand: "Hettich",
-    unit: "pc",
-    qty: 300,
-    price: 300,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P005",
+//     name: "Drawer Slide Set",
+//     category: "Hardware",
+//     brand: "Hettich",
+//     unit: "pc",
+//     qty: 300,
+//     price: 300,
 
-    status: "In Stock",
-  },
-  {
-    id: "P006",
-    name: "Veneer Sheet 4x8ft",
-    category: "Finishing",
-    brand: "Kitply",
-    unit: "pc",
-    qty: 300,
-    price: 950,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P006",
+//     name: "Veneer Sheet 4x8ft",
+//     category: "Finishing",
+//     brand: "Kitply",
+//     unit: "pc",
+//     qty: 300,
+//     price: 950,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P007",
-    name: "Screw Pack (100pcs)",
-    category: "Fasteners",
-    brand: "Taparia",
-    unit: "pc",
-    qty: 300,
-    price: 120,
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P007",
+//     name: "Screw Pack (100pcs)",
+//     category: "Fasteners",
+//     brand: "Taparia",
+//     unit: "pc",
+//     qty: 300,
+//     price: 120,
 
-    status: "Out of Stock",
-  },
-  {
-    id: "P008",
-    name: "Edge Band Roll",
-    category: "Finishing",
-    brand: "Rehau",
-    unit: "pc",
-    qty: 300,
-    price: 200,
+//     status: "Out of Stock",
+//   },
+//   {
+//     id: "P008",
+//     name: "Edge Band Roll",
+//     category: "Finishing",
+//     brand: "Rehau",
+//     unit: "pc",
+//     qty: 300,
+//     price: 200,
 
-    status: "In Stock",
-  },
-  {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P009",
+//     name: "PVC Sheet 6mm",
+//     category: "Plastic Boards",
+//     brand: "Alstone",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1100,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
-  },
-  {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P010",
+//     name: "Fevicol SR 505 (5L)",
+//     category: "Adhesives",
+//     brand: "Pidilite",
+//     unit: "pc",
+//     qty: 300,
+//     price: 750,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P009",
+//     name: "PVC Sheet 6mm",
+//     category: "Plastic Boards",
+//     brand: "Alstone",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1100,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
-  },
-  {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P010",
+//     name: "Fevicol SR 505 (5L)",
+//     category: "Adhesives",
+//     brand: "Pidilite",
+//     unit: "pc",
+//     qty: 300,
+//     price: 750,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P009",
+//     name: "PVC Sheet 6mm",
+//     category: "Plastic Boards",
+//     brand: "Alstone",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1100,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
-  },
-  {
-    id: "P009",
-    name: "PVC Sheet 6mm",
-    category: "Plastic Boards",
-    brand: "Alstone",
-    unit: "pc",
-    qty: 300,
-    price: 1100,
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P010",
+//     name: "Fevicol SR 505 (5L)",
+//     category: "Adhesives",
+//     brand: "Pidilite",
+//     unit: "pc",
+//     qty: 300,
+//     price: 750,
+//     status: "In Stock",
+//   },
+//   {
+//     id: "P009",
+//     name: "PVC Sheet 6mm",
+//     category: "Plastic Boards",
+//     brand: "Alstone",
+//     unit: "pc",
+//     qty: 300,
+//     price: 1100,
 
-    status: "Low Stock",
-  },
-  {
-    id: "P010",
-    name: "Fevicol SR 505 (5L)",
-    category: "Adhesives",
-    brand: "Pidilite",
-    unit: "pc",
-    qty: 300,
-    price: 750,
-    status: "In Stock",
-  },
-];
+//     status: "Low Stock",
+//   },
+//   {
+//     id: "P010",
+//     name: "Fevicol SR 505 (5L)",
+//     category: "Adhesives",
+//     brand: "Pidilite",
+//     unit: "pc",
+//     qty: 300,
+//     price: 750,
+//     status: "In Stock",
+//   },
+// ];
 
 export type Product = {
   id: string;
@@ -251,6 +252,25 @@ export default function Products() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [productData, setProductData] = React.useState([]);
+  const [selectedProduct, setSelecctedProduct] = React.useState({});
+  const getAllProduct = async () => {
+    try {
+      const res = await getAllProductPage(page, 10);
+      if (res.statusCode === 200) {
+        setProductData(res.data || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllProduct();
+  }, [page]);
+
+  console.log(selectedProduct);
+  const data: Product[] = productData;
   const columns: ColumnDef<Product>[] = [
     {
       id: "select",
@@ -274,15 +294,7 @@ export default function Products() {
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "id",
-      header: () => <div className="text-left">SKU</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">{row.getValue("id")}</div>
-        );
-      },
-    },
+
     {
       accessorKey: "name",
       header: ({ column }) => {
@@ -301,50 +313,38 @@ export default function Products() {
       ),
     },
     {
-      accessorKey: "category",
+      accessorKey: "categoryName",
       header: () => <div className="text-left">Category</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("category")}
+            {row.getValue("categoryName")}
           </div>
         );
       },
     },
     {
-      accessorKey: "brand",
+      accessorKey: "brandName",
       header: () => <div className="text-left">Brand</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("brand")}</div>
+          <div className=" text-left capitalize">
+            {row.getValue("brandName")}
+          </div>
         );
       },
     },
+
     {
-      accessorKey: "qty",
-      header: () => <div className="text-left">Quantity</div>,
-      cell: ({ row }) => {
-        return <div className="lowercase text-left">{row.getValue("qty")}</div>;
-      },
-    },
-    {
-      accessorKey: "price",
-      header: () => <div className="text-left">Price</div>,
+      accessorKey: "createAt",
+      header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
         return (
-          <div className="lowercase text-left">{row.getValue("price")}</div>
+          <div className="lowercase text-left">{row.getValue("createAt")}</div>
         );
       },
     },
-    {
-      accessorKey: "unit",
-      header: () => <div className="text-right">Unit</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="lowercase text-left">{row.getValue("unit")}</div>
-        );
-      },
-    },
+
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
@@ -355,7 +355,10 @@ export default function Products() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate(`/product-detail/${product.id}`)}
+              onClick={() => {
+                navigate(`/product-detail/${product.id}`);
+                setSelecctedProduct(product);
+              }}
             >
               <Eye />
             </Button>

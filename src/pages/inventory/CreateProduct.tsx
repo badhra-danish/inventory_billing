@@ -37,6 +37,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { createCategory } from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
+import { createProduct } from "@/api/CreateProduct/ProductClinet";
 function CreateProduct() {
   const navigate = useNavigate();
   const [productInformation, setProductInformation] = React.useState({
@@ -49,7 +50,6 @@ function CreateProduct() {
     brand: "",
     unit: "",
     description: "",
-    warranty: "",
   });
 
   const {
@@ -103,8 +103,11 @@ function CreateProduct() {
   const [AllAttribute, setAllAttribute] = React.useState<VariantAttribute[]>(
     []
   );
-  const [selectedAttribute, setSelectedAttribute] = React.useState<string>("");
-  const [attribute, setAttribute] = React.useState<VariantAttribute[]>([]);
+  const [selectedAttribute, setSelectedAttribute] =
+    React.useState<VariantAttribute | null>(null);
+  const [attribute, setAttribute] = React.useState<VariantAttribute[] | null>(
+    []
+  );
   const [productType, setProductType] = React.useState<
     "single" | "variable" | ""
   >("single");
@@ -126,9 +129,9 @@ function CreateProduct() {
     skuCode: "",
   });
 
-  const [variants, setVariants] = React.useState<Variant[]>([]);
-  const [image, setImage] = React.useState<File>();
-  const [imageUrl, setImageUrl] = React.useState<string>();
+  const [variants, setVariants] = React.useState<Variant[] | null>([]);
+  const [image, setImage] = React.useState<File[]>([]);
+  const [imageUrls, setImageUrls] = React.useState<string[]>([]);
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [openCreateCategory, setOpenCreateCategory] = React.useState(false);
   const [categoryFormData, setcategoryFormData] = React.useState({
@@ -136,6 +139,7 @@ function CreateProduct() {
     slugName: "",
     status: false,
   });
+
   // API Sections
   const handleChange = (
     e: React.ChangeEvent<
@@ -243,6 +247,7 @@ function CreateProduct() {
 
   const addAttribute = (obj: VariantAttribute) => {
     setAttribute((prev) => {
+      if (!prev) return prev;
       const exists = prev.some((a) => a.attributeID === obj.attributeID);
       if (exists) return prev;
       return [
@@ -260,8 +265,9 @@ function CreateProduct() {
   // };
 
   const addValues = (attributeId: string, obj: any) => {
-    setAttribute((prev) =>
-      prev.map((a) => {
+    setAttribute((prev) => {
+      if (!prev) return prev;
+      return prev.map((a) => {
         if (a.attributeID !== attributeId) return a;
         // check duplicates
         const exists = a.valuesList?.some(
@@ -276,17 +282,21 @@ function CreateProduct() {
             { attributeValueID: obj.attributeValueID, value: obj.value },
           ],
         };
-      })
-    );
+      });
+    });
   };
 
   const removeAttribute = (attributeId: string) => {
-    setAttribute((prev) => prev.filter((a) => a.attributeID !== attributeId));
+    setAttribute((prev) => {
+      if (!prev) return prev;
+      return prev.filter((a) => a.attributeID !== attributeId);
+    });
   };
 
   const removeOption = (attributeId: string, optionId: string) => {
-    setAttribute((prev) =>
-      prev.map((a) =>
+    setAttribute((prev) => {
+      if (!prev) return prev;
+      return prev.map((a) =>
         a.attributeID === attributeId
           ? {
               ...a,
@@ -295,13 +305,13 @@ function CreateProduct() {
               ),
             }
           : a
-      )
-    );
+      );
+    });
   };
 
   const generateVariants = () => {
-    if (attribute.length === 0) return;
-    const arrays = attribute.map((a) =>
+    if (attribute?.length === 0) return;
+    const arrays = attribute?.map((a) =>
       a.valuesList.map((o) => ({
         attributeID: a.attributeID,
         attributeName: a.name,
@@ -312,16 +322,12 @@ function CreateProduct() {
     // cartesian product
     let combos: Array<Array<VariantAttributeDetail>> = [[]];
 
-    for (const arr of arrays) {
+    for (const arr of arrays ?? []) {
       combos = combos.flatMap((prev) => arr.map((item) => [...prev, item]));
     }
 
     const newVariants: Variant[] = combos.map((combo) => ({
       id: Math.random().toString(36).slice(2, 9),
-      // attributes: combo.reduce(
-      //   (acc, cur) => ({ ...acc, [cur.attributeID]: cur.attributeValueID }),
-      //   {} as Record<string, string>
-      // ),
       attributeDetails: combo,
       price: "",
       quantity: "",
@@ -334,59 +340,157 @@ function CreateProduct() {
 
     setVariants(newVariants);
   };
-  const prepareProductPayload = () => {
+  const handleCreateProduct = () => {
     if (productType == "single") {
-      const singlePayload = {
-        name: productInformation.productName,
-        slug: productInformation.slugName,
-        sellingType: productInformation.sellingType,
-        description: productInformation.description,
-        categoryID: productInformation.category,
-        subCategoryID: productInformation.subCategory,
-        brandID: productInformation.brand,
-        unitID: productInformation.unit,
-        productType: productType,
-        quantity: Number(singleProductInfo.quantity),
-        price: Number(singleProductInfo.price),
-        taxType: singleProductInfo.taxType,
-        taxValue: Number(singleProductInfo.tax),
-        discountType: singleProductInfo.discountType,
-        discountValue: Number(singleProductInfo.discountValue),
-        quantityAlert: Number(singleProductInfo.quantityAlert),
-        skuCode: singleProductInfo.skuCode,
-        image: image,
-        ...customFeild,
-      };
-      console.log(singlePayload);
+      try {
+        const singlePayload = {
+          productType: productType,
+          name: productInformation.productName,
+          slug: productInformation.slugName,
+          sellingType: productInformation.sellingType.toUpperCase(),
+          description: productInformation.description,
+          categoryID: productInformation.category,
+          subCategoryID: productInformation.subCategory,
+          brandID: productInformation.brand,
+          unitID: productInformation.unit,
+
+          ...customFeild,
+          productMetaData: {
+            quantity: Number(singleProductInfo.quantity),
+            price: Number(singleProductInfo.price),
+            taxType: singleProductInfo.taxType.toUpperCase(),
+            taxValue: Number(singleProductInfo.tax || 0),
+            discountType: singleProductInfo.discountType.toUpperCase(),
+            discountValue: Number(singleProductInfo.discountValue || 0),
+            quantityAlert: Number(singleProductInfo.quantityAlert || 0),
+            sku: singleProductInfo.skuCode,
+            image: image,
+          },
+        };
+        const formData = new FormData();
+        image.forEach((file) => {
+          formData.append("files", file);
+        });
+        formData.append("product", JSON.stringify(singlePayload));
+
+        const productPromise = createProduct(formData);
+        toast.promise(productPromise, {
+          loading: "Creating Product..",
+          success: (res) => {
+            setProductInformation({
+              productName: "",
+              slugName: "",
+              skuCode: "",
+              sellingType: "",
+              category: "",
+              subCategory: "",
+              brand: "",
+              unit: "",
+              description: "",
+            });
+            setcustomFeild({
+              warranty: "",
+              manufacturer: "",
+              manufacturedDate: "",
+              expiryDate: "",
+            });
+            setImage([]);
+            setSingleProductInfo({
+              quantity: "",
+              price: "",
+              taxType: "",
+              tax: "",
+              discountType: "",
+              discountValue: "",
+              quantityAlert: "",
+              skuCode: "",
+            });
+            return res.message;
+          },
+          error: (err) => {
+            return err.response.data.message;
+          },
+        });
+      } catch (error: any) {
+        if (error.response?.data) {
+          console.log(error);
+        } else {
+          toast.error("Something Went Wrong");
+        }
+      }
     } else {
-      const variablePayload = {
-        name: productInformation.productName,
-        slug: productInformation.slugName,
-        sellingType: productInformation.sellingType,
-        description: productInformation.description,
-        categoryID: productInformation.category,
-        subCategoryID: productInformation.subCategory,
-        brandID: productInformation.brand,
-        unitID: productInformation.unit,
-        productType: productType,
-        productVariations: variants.map((v) => ({
-          sku: v.sku,
-          price: Number(v.price),
-          quantity: Number(v.quantity),
-          taxType: v.taxType,
-          taxValue: Number(v.taxValue || 0),
-          discountType: v.discountType,
-          discountValue: Number(v.discountValue || 0),
-          quantityAlert: Number(v.quantityAlert || 0),
-          image: v.image,
-          variationOptionModels: v.attributeDetails?.map((d) => ({
-            attributeID: d.attributeID,
-            attributeValueID: d.attributeValueID,
+      try {
+        const variablePayload = {
+          productType: productType,
+          name: productInformation.productName,
+          slug: productInformation.slugName,
+          sellingType: productInformation.sellingType.toUpperCase(),
+          description: productInformation.description,
+          categoryID: productInformation.category,
+          subCategoryID: productInformation.subCategory,
+          brandID: productInformation.brand,
+          unitID: productInformation.unit,
+          productVariations: variants?.map((v) => ({
+            productMetaData: {
+              sku: v.sku,
+              price: Number(v.price),
+              quantity: Number(v.quantity),
+              taxType: v.taxType?.toUpperCase(),
+              taxValue: Number(v.taxValue || 0),
+              discountType: v.discountType?.toUpperCase(),
+              discountValue: Number(v.discountValue || 0),
+              quantityAlert: Number(v.quantityAlert || 0),
+              //image: v.image,
+            },
+            variationOptions: v.attributeDetails?.map((d) => ({
+              attributeID: d.attributeID,
+              attributeValueID: d.attributeValueID,
+            })),
           })),
-        })),
-        ...customFeild,
-      };
-      console.log(variablePayload);
+          ...customFeild,
+        };
+        const formData = new FormData();
+        image.forEach((file) => {
+          formData.append("files", file);
+        });
+        formData.append("product", JSON.stringify(variablePayload));
+        const productPromise = createProduct(formData);
+        toast.promise(productPromise, {
+          loading: "Creating Product..",
+          success: (res) => {
+            setProductInformation({
+              productName: "",
+              slugName: "",
+              skuCode: "",
+              sellingType: "",
+              category: "",
+              subCategory: "",
+              brand: "",
+              unit: "",
+              description: "",
+            });
+            setcustomFeild({
+              warranty: "",
+              manufacturer: "",
+              manufacturedDate: "",
+              expiryDate: "",
+            });
+            setAttribute(null);
+            setVariants(null);
+            return res.message;
+          },
+          error: (err) => {
+            return err.response.data.message;
+          },
+        });
+        //console.log(variablePayload);
+      } catch (error: any) {
+        if (error.response?.data) {
+          console.log(error);
+        } else {
+          toast.error("Something Went Wrong");
+        }
+      }
     }
   };
   const updateVariantField = (
@@ -394,32 +498,45 @@ function CreateProduct() {
     field: keyof Variant,
     value: any
   ) => {
-    setVariants((prev) =>
-      prev.map((v) => (v.id === variantId ? { ...v, [field]: value } : v))
-    );
+    setVariants((prev) => {
+      if (!prev) return prev; // or return [] if you want to reset instead
+      return prev.map((v) =>
+        v.id === variantId ? { ...v, [field]: value } : v
+      );
+    });
   };
   const deleteVariant = (id: string) => {
-    setVariants((prev) => prev.filter((v) => v.id !== id));
+    setVariants((prev) => {
+      if (!prev) return prev;
+      return prev.filter((v) => v.id !== id);
+    });
   };
 
   const handleVariantImage = (variantId: string, file: File) => {
     const imageURL = URL.createObjectURL(file); // preview before upload
 
-    setVariants((prev) =>
-      prev.map((v) =>
+    setVariants((prev) => {
+      if (!prev) return prev;
+      return prev.map((v) =>
         v.id === variantId ? { ...v, image: file, imageUrl: imageURL } : v
-      )
-    );
+      );
+    });
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; // pick only first file
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    setImage(file);
-  };
+    const files = e.target.files;
+    if (!files) return;
 
+    const selectedFiles = Array.from(files);
+    const urls = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    setImageUrls((prev) => [...prev, ...urls]);
+    setImage((prev) => [...prev, ...selectedFiles]);
+  };
+  const removeImage = (index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+    setImage((prev) => prev.filter((_, i) => i !== index));
+  };
   // const handleRemoveImage = (id: string) => {
   //   setImages((prev) => prev.filter((img) => img.id !== id));
   // };
@@ -840,7 +957,7 @@ function CreateProduct() {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="12">GST 5%</SelectItem>
+                          <SelectItem value="10">GST 5%</SelectItem>
                           <SelectItem value="12">GST 12%</SelectItem>
                           <SelectItem value="18">GST 18%</SelectItem>
                           <SelectItem value="28">GST 28%</SelectItem>
@@ -870,7 +987,9 @@ function CreateProduct() {
                         <SelectContent>
                           <SelectItem value="percentage">Percentage</SelectItem>
                           <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="none">No Discount</SelectItem>
+                          <SelectItem value="NO_DISCOUNT">
+                            No Discount
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -944,13 +1063,20 @@ function CreateProduct() {
                       <Label className="text-sm font-medium">Attributes</Label>
                       <div className="flex gap-2">
                         <Select
-                          value={selectedAttribute}
-                          onValueChange={(value) => setSelectedAttribute(value)}
+                          value={
+                            selectedAttribute
+                              ? JSON.stringify(selectedAttribute)
+                              : ""
+                          }
+                          // onValueChange={(value) => setSelectedAttribute(value)}
+                          onValueChange={(value) => {
+                            const attrObj = JSON.parse(value); // convert string back to object
+                            setSelectedAttribute(attrObj);
+                            console.log("sfldmflds", selectedAttribute);
+                          }}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Attribute">
-                              Select Attribute
-                            </SelectValue>
+                            <SelectValue placeholder="Select Attribute" />
                           </SelectTrigger>
                           <SelectContent className="w-full">
                             {AllAttribute.map((attr) => (
@@ -966,11 +1092,11 @@ function CreateProduct() {
                         <Button
                           onClick={() => {
                             if (!selectedAttribute) return;
-                            const obj = JSON.parse(selectedAttribute);
-                            console.log(obj);
+                            // const obj = selectedAttribute;
+                            // console.log(obj);
 
-                            addAttribute(obj);
-                            setSelectedAttribute("");
+                            addAttribute(selectedAttribute);
+                            setSelectedAttribute(null);
                           }}
                         >
                           <PlusCircle />
@@ -979,14 +1105,14 @@ function CreateProduct() {
                       </div>
 
                       <div className="space-y-3">
-                        {attribute.length === 0 && (
+                        {attribute?.length === 0 && (
                           <p className="text-sm text-gray-500">
                             No attributes added yet. Add an attribute name, then
                             add options.
                           </p>
                         )}
 
-                        {attribute.map((attr) => (
+                        {attribute?.map((attr) => (
                           <div
                             key={attr.attributeID}
                             className="border p-3 rounded"
@@ -1022,7 +1148,9 @@ function CreateProduct() {
                                   <SelectTrigger className="w-full">
                                     <SelectValue
                                       placeholder={`Add Values for ${attr.name} `}
-                                    />
+                                    >
+                                      Select The Values
+                                    </SelectValue>
                                   </SelectTrigger>
                                   <SelectContent>
                                     {attr.values?.map((val) => (
@@ -1035,61 +1163,6 @@ function CreateProduct() {
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                {/* <Input
-                                  placeholder={`Add option for ${attr.name} (e.g. Red)`}
-                                  value={tempOptionInputs[attr.id] || ""}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    setTempOptionInputs((prev) => ({
-                                      ...prev,
-                                      [attr.id]: value,
-                                    }));
-                                    // auto add when comma typed
-                                    if (value.endsWith(",")) {
-                                      const option = value
-                                        .replace(",", "")
-                                        .trim();
-                                      if (option) {
-                                        addOptionToAttribute(attr.id, option);
-                                      }
-
-                                      // clear input
-                                      setTempOptionInputs((prev) => ({
-                                        ...prev,
-                                        [attr.id]: "",
-                                      }));
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    // ENTER also adds
-                                    if (e.key === "Enter") {
-                                      e.preventDefault();
-                                      const value =
-                                        tempOptionInputs[attr.id]?.trim();
-                                      if (value) {
-                                        addOptionToAttribute(attr.id, value);
-                                        setTempOptionInputs((prev) => ({
-                                          ...prev,
-                                          [attr.id]: "",
-                                        }));
-                                      }
-                                    }
-                                  }}
-                                /> */}
-                                {/* <Button
-                                  onClick={() => {
-                                    const opt = tempOptionInputs[attr.id] || "";
-                                    addOptionToAttribute(attr.id, opt);
-                                    setTempOptionInputs((prev) => ({
-                                      ...prev,
-                                      [attr.id]: "",
-                                    }));
-                                  }}
-                                  variant="outline"
-                                  className="border-blue-600"
-                                >
-                                  <PlusCircle className="text-blue-600 font-bold" />
-                                </Button> */}
                               </div>
 
                               <div className="mt-3 flex flex-wrap gap-2">
@@ -1118,7 +1191,7 @@ function CreateProduct() {
                           </div>
                         ))}
 
-                        {attribute.length > 0 && (
+                        {attribute && attribute?.length > 0 && (
                           <div className="flex justify-end">
                             <Button onClick={generateVariants}>
                               Generate Variants
@@ -1133,11 +1206,11 @@ function CreateProduct() {
                       <div className="flex items-center justify-between mb-3">
                         <Label className="text-sm font-medium">Variants</Label>
                         <div className="text-sm text-gray-500">
-                          {variants.length} variants
+                          {variants?.length} variants
                         </div>
                       </div>
 
-                      {variants.length === 0 ? (
+                      {variants?.length === 0 ? (
                         <p className="text-sm text-gray-500">
                           No variants generated. Add attributes and click
                           "Generate Variants".
@@ -1147,7 +1220,7 @@ function CreateProduct() {
                           <table className="min-w-max w-full text-sm table-auto">
                             <thead>
                               <tr className="text-left bg-gray-200">
-                                {attribute.map((a) => (
+                                {attribute?.map((a) => (
                                   <th key={a.attributeID} className="px-2 py-3">
                                     {a.name}
                                   </th>
@@ -1164,9 +1237,9 @@ function CreateProduct() {
                               </tr>
                             </thead>
                             <tbody>
-                              {variants.map((v) => (
+                              {variants?.map((v) => (
                                 <tr key={v.id} className="border-t">
-                                  {attribute.map((a) => (
+                                  {attribute?.map((a) => (
                                     <td
                                       key={a.attributeID}
                                       className="px-2 py-3 align-middle"
@@ -1185,7 +1258,7 @@ function CreateProduct() {
                                   <td className="px-2 py-3 align-middle">
                                     <Input
                                       type="number"
-                                      value={v.price as any}
+                                      value={v.price}
                                       onChange={(e) =>
                                         updateVariantField(
                                           v.id,
@@ -1202,7 +1275,7 @@ function CreateProduct() {
                                   <td className="px-2 py-3 align-middle">
                                     <Input
                                       type="number"
-                                      value={v.quantity as any}
+                                      value={v.quantity}
                                       onChange={(e) =>
                                         updateVariantField(
                                           v.id,
@@ -1291,11 +1364,11 @@ function CreateProduct() {
                                   <td className="px-2 py-4 align-middle">
                                     <Input
                                       type="number"
-                                      value={v.quantityAlert as any}
+                                      value={v.discountValue}
                                       onChange={(e) =>
                                         updateVariantField(
                                           v.id,
-                                          "quantityAlert",
+                                          "discountValue",
                                           e.target.value === ""
                                             ? ""
                                             : Number(e.target.value)
@@ -1307,7 +1380,7 @@ function CreateProduct() {
                                   <td className="px-2 py-4 align-middle">
                                     <Input
                                       type="number"
-                                      value={v.quantityAlert as any}
+                                      value={v.quantityAlert}
                                       onChange={(e) =>
                                         updateVariantField(
                                           v.id,
@@ -1412,13 +1485,25 @@ function CreateProduct() {
                 {image && (
                   <>
                     {" "}
-                    <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200 group">
-                      <img
-                        src={imageUrl}
-                        alt="Product"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    {imageUrls.map((img, i) => (
+                      <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200 group">
+                        <img
+                          src={img}
+                          alt="Product"
+                          className="w-full h-full object-cover"
+                        />
+
+                        {/* delete button */}
+                        <button
+                          onClick={() => removeImage(i)}
+                          className="absolute top-1 right-1 bg-black/60 text-white w-6 h-6 rounded-full
+               flex items-center justify-center text-sm opacity-0 group-hover:opacity-100
+               transition duration-200 hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </>
                 )}
               </div>
@@ -1547,7 +1632,7 @@ function CreateProduct() {
             <Button className="bg-gray border-2 border-blue-500 text-blue-400 hover:text-white">
               Cancel
             </Button>
-            <Button onClick={prepareProductPayload}>Add Product</Button>
+            <Button onClick={handleCreateProduct}>Add Product</Button>
           </div>
         </div>
       </div>
