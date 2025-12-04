@@ -229,6 +229,7 @@ import { getAllProductPage } from "@/api/CreateProduct/ProductClinet";
 // ];
 
 export type Product = {
+  productID: string;
   id: string;
   name: string;
   category: string;
@@ -336,11 +337,11 @@ export default function Products() {
     },
 
     {
-      accessorKey: "createAt",
+      accessorKey: "createdAt",
       header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
         return (
-          <div className="lowercase text-left">{row.getValue("createAt")}</div>
+          <div className="lowercase text-left">{row.getValue("createdAt")}</div>
         );
       },
     },
@@ -356,7 +357,7 @@ export default function Products() {
               variant="outline"
               size="sm"
               onClick={() => {
-                navigate(`/product-detail/${product.id}`);
+                navigate(`/product-detail/${product.productID}`);
                 setSelecctedProduct(product);
               }}
             >

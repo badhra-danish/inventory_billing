@@ -454,6 +454,7 @@ function CreateProduct() {
           formData.append("files", file);
         });
         formData.append("product", JSON.stringify(variablePayload));
+
         const productPromise = createProduct(formData);
         toast.promise(productPromise, {
           loading: "Creating Product..",
@@ -483,7 +484,7 @@ function CreateProduct() {
             return err.response.data.message;
           },
         });
-        //console.log(variablePayload);
+        console.log(variablePayload);
       } catch (error: any) {
         if (error.response?.data) {
           console.log(error);
@@ -987,9 +988,7 @@ function CreateProduct() {
                         <SelectContent>
                           <SelectItem value="percentage">Percentage</SelectItem>
                           <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="NO_DISCOUNT">
-                            No Discount
-                          </SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1229,10 +1228,10 @@ function CreateProduct() {
                                 <th className="px-2 py-3">Quantity</th>
                                 <th className="px-2 py-3">SKU</th>
                                 <th className="px-2 py-3">Tax Type</th>
+                                <th className="px-2 py-3">Tax Value</th>
                                 <th className="px-2 py-3">Discount</th>
                                 <th className="px-2 py-3">Discount value</th>
                                 <th className="px-2 py-3">Qty Alert</th>
-                                <th className="px-2 py-3">Img</th>
                                 <th className="px-2 py-3">Action</th>
                               </tr>
                             </thead>
@@ -1327,7 +1326,23 @@ function CreateProduct() {
                                       </SelectContent>
                                     </Select>
                                   </td>
-
+                                  <td className="px-2 py-4 align-middle">
+                                    <Input
+                                      type="number"
+                                      value={v.taxValue}
+                                      onChange={(e) =>
+                                        updateVariantField(
+                                          v.id,
+                                          "taxValue",
+                                          e.target.value === ""
+                                            ? ""
+                                            : Number(e.target.value)
+                                        )
+                                      }
+                                      className="w-24"
+                                      disabled={v.taxType === "none"}
+                                    />
+                                  </td>
                                   <td className="px-2 py-4 align-middle">
                                     <div className="flex gap-2">
                                       <Select
@@ -1375,6 +1390,7 @@ function CreateProduct() {
                                         )
                                       }
                                       className="w-24"
+                                      disabled={v.discountType === "none"}
                                     />
                                   </td>
                                   <td className="px-2 py-4 align-middle">
@@ -1392,30 +1408,6 @@ function CreateProduct() {
                                       }
                                       className="w-24"
                                     />
-                                  </td>
-                                  <td className="px-2 py-4 align-middle">
-                                    <label className="cursor-pointer">
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                          const file = e.target.files?.[0];
-                                          if (file)
-                                            handleVariantImage(v.id, file);
-                                        }}
-                                      />
-                                      {v.imageUrl ? (
-                                        <img
-                                          src={v.imageUrl}
-                                          className="w-12 h-12 object-cover rounded border"
-                                        />
-                                      ) : (
-                                        <div className="w-15 h-10 border rounded flex items-center justify-center text-xs text-white bg-blue-500">
-                                          Upload
-                                        </div>
-                                      )}
-                                    </label>
                                   </td>
 
                                   <td className="px-3 py-4 align-middle">
