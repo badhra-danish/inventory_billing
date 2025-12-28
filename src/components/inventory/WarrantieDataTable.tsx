@@ -53,71 +53,92 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-const data: Warranty[] = [
-  {
-    warranty: "Water Damage Warranty",
-    description: "Coverage for water-related issues",
-    duration: "6 Months",
-    status: "active",
-  },
-  {
-    warranty: "Screen Replacement Warranty",
-    description: "Free screen replacement within warranty period",
-    duration: "12 Months",
-    status: "active",
-  },
-  {
-    warranty: "Battery Warranty",
-    description: "Covers battery performance issues and replacements",
-    duration: "9 Months",
-    status: "inactive",
-  },
-  {
-    warranty: "Manufacturing Defect Warranty",
-    description: "Covers defects due to manufacturing faults",
-    duration: "1 Year",
-    status: "active",
-  },
-  {
-    warranty: "Screen Replacement Warranty",
-    description: "Free screen replacement within warranty period",
-    duration: "12 Months",
-    status: "active",
-  },
-  {
-    warranty: "Battery Warranty",
-    description: "Covers battery performance issues and replacements",
-    duration: "9 Months",
-    status: "inactive",
-  },
-  {
-    warranty: "Manufacturing Defect Warranty",
-    description: "Covers defects due to manufacturing faults",
-    duration: "1 Year",
-    status: "active",
-  },
-  {
-    warranty: "Accidental Damage Warranty",
-    description: "Protection against accidental physical damage",
-    duration: "6 Months",
-    status: "inactive",
-  },
-  {
-    warranty: "Accidental Damage Warranty",
-    description: "Protection against accidental physical damage",
-    duration: "6 Months",
-    status: "inactive",
-  },
-];
+import {
+  deleteWarranty,
+  getAllWarrantyPage,
+  updateWarranty,
+} from "@/api/Warranty/Warranty";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Value } from "@radix-ui/react-select";
+import { Textarea } from "../ui/textarea";
+import toast from "react-hot-toast";
+// const data: Warranty[] = [
+//   {
+//     warranty: "Water Damage Warranty",
+//     description: "Coverage for water-related issues",
+//     duration: "6 Months",
+//     status: "active",
+//   },
+//   {
+//     warranty: "Screen Replacement Warranty",
+//     description: "Free screen replacement within warranty period",
+//     duration: "12 Months",
+//     status: "active",
+//   },
+//   {
+//     warranty: "Battery Warranty",
+//     description: "Covers battery performance issues and replacements",
+//     duration: "9 Months",
+//     status: "inactive",
+//   },
+//   {
+//     warranty: "Manufacturing Defect Warranty",
+//     description: "Covers defects due to manufacturing faults",
+//     duration: "1 Year",
+//     status: "active",
+//   },
+//   {
+//     warranty: "Screen Replacement Warranty",
+//     description: "Free screen replacement within warranty period",
+//     duration: "12 Months",
+//     status: "active",
+//   },
+//   {
+//     warranty: "Battery Warranty",
+//     description: "Covers battery performance issues and replacements",
+//     duration: "9 Months",
+//     status: "inactive",
+//   },
+//   {
+//     warranty: "Manufacturing Defect Warranty",
+//     description: "Covers defects due to manufacturing faults",
+//     duration: "1 Year",
+//     status: "active",
+//   },
+//   {
+//     warranty: "Accidental Damage Warranty",
+//     description: "Protection against accidental physical damage",
+//     duration: "6 Months",
+//     status: "inactive",
+//   },
+//   {
+//     warranty: "Accidental Damage Warranty",
+//     description: "Protection against accidental physical damage",
+//     duration: "6 Months",
+//     status: "inactive",
+//   },
+// ];
 
 export type Warranty = {
-  warranty: string;
+  warrantyID: string;
+  name: string;
   description: string;
   duration: string;
-  status: "active" | "inactive";
+  warrantyPeriod: string;
+  status: "ACTIVE" | "INACTIVE";
 };
-
-export default function WarrantiesDataTable() {
+type refreshType = {
+  refresh: boolean;
+};
+export default function WarrantiesDataTable({ refresh }: refreshType) {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -130,6 +151,95 @@ export default function WarrantiesDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [pageMeteData, setPageMetaData] = React.useState({
+    totalPages: 0,
+  });
+  const [warrantyData, setWarrantyData] = React.useState<Warranty[]>([]);
+  const [openUpdateWarranty, setOpenUpdateWarranty] = React.useState(false);
+  const [selectedWarranty, setSelectedWarranty] =
+    React.useState<Warranty | null>(null);
+  const [openDelete, setOpenDelete] = React.useState(false);
+
+  const handleUpdateChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setSelectedWarranty((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+  const getAllWarranty = async () => {
+    try {
+      const res = await getAllWarrantyPage(page, 10);
+      if (res.statusCode == 200) {
+        setWarrantyData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllWarranty();
+  }, [refresh, page]);
+  console.log(selectedWarranty);
+
+  const handleUpdate = () => {
+    try {
+      const payload = {
+        name: selectedWarranty?.name,
+        description: selectedWarranty?.description,
+        warrantyPeriod: selectedWarranty?.warrantyPeriod,
+        durations: Number(selectedWarranty?.duration),
+        status: selectedWarranty?.status,
+      };
+      const id = selectedWarranty?.warrantyID;
+      if (!id) return;
+      const updatePromise = updateWarranty(id, payload);
+      toast.promise(updatePromise, {
+        loading: "Updating Warranty",
+        success: (res) => {
+          setOpenUpdateWarranty(false);
+          getAllWarranty();
+          return res.message;
+        },
+        error: (err) => {
+          return err.response.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something Went Wrong");
+    }
+  };
+
+  const handleDelete = () => {
+    try {
+      const id = selectedWarranty?.warrantyID;
+      if (!id) return;
+      const deletePromise = deleteWarranty(id);
+      toast.promise(deletePromise, {
+        loading: "Deleting Warranty",
+        success: () => {
+          setOpenDelete(false);
+          getAllWarranty();
+          return "Warranty Deleted";
+        },
+        error: (err) => {
+          return err.res.data.message;
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something Went Wrong");
+    }
+  };
+  const data: Warranty[] = warrantyData;
   const columns: ColumnDef<Warranty>[] = [
     {
       id: "select",
@@ -154,7 +264,7 @@ export default function WarrantiesDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "warranty",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -167,7 +277,7 @@ export default function WarrantiesDataTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("warranty")}</div>
+        <div className="capitalize font-bold">{row.getValue("name")}</div>
       ),
     },
 
@@ -184,11 +294,14 @@ export default function WarrantiesDataTable() {
     },
     {
       accessorKey: "duration",
-      header: () => <div className="text-left">Durations</div>,
+      header: () => <div className="text-left">Duration</div>,
       cell: ({ row }) => {
+        const duration = row.original.duration;
+        const period = row.original.warrantyPeriod;
+
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("duration")}
+          <div className="capitalize text-left">
+            {duration} {period?.toLowerCase()}
           </div>
         );
       },
@@ -200,7 +313,7 @@ export default function WarrantiesDataTable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "active"
+          status === "ACTIVE"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -223,41 +336,26 @@ export default function WarrantiesDataTable() {
         // const product = row.original;
         return (
           <div className="flex gap-1">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedWarranty(row.original);
+                setOpenUpdateWarranty(true);
+              }}
+            >
               <Edit />
             </Button>
-            {/* <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOpenDelete(true);
+                setSelectedWarranty(row.original);
+              }}
+            >
               <Trash />
-            </Button> */}
-            <Dialog>
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button variant="destructive">Delete</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            </Button>
           </div>
         );
       },
@@ -425,21 +523,152 @@ export default function WarrantiesDataTable() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page == 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+            }
+            disabled={page >= pageMeteData?.totalPages}
           >
             Next
           </Button>
         </div>
       </div>
+
+      {/* updateDialog Box */}
+      <Dialog open={openUpdateWarranty} onOpenChange={setOpenUpdateWarranty}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Warranty</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-5 pt-5 mt-3 border-t-2">
+            {/* Warranty Name */}
+            <div className="grid gap-2">
+              <Label>
+                Warranty <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                name="name"
+                value={selectedWarranty?.name}
+                onChange={handleUpdateChange}
+              />
+            </div>
+
+            {/* Duration + Period */}
+            <div className="flex gap-4">
+              <div className="grid gap-2 w-full">
+                <Label>
+                  Duration <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  name="duration"
+                  value={selectedWarranty?.duration}
+                  onChange={handleUpdateChange}
+                />
+              </div>
+
+              <div className="grid gap-2 w-full">
+                <Label>
+                  Period <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={selectedWarranty?.warrantyPeriod}
+                  onValueChange={(value) =>
+                    setSelectedWarranty((prev) => {
+                      if (!prev) return prev;
+                      return {
+                        ...prev,
+                        warrantyPeriod: value,
+                      };
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MONTH">Month</SelectItem>
+                    <SelectItem value="YEAR">Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="grid gap-2">
+              <Label>
+                Description <span className="text-red-500">*</span>
+              </Label>
+              <Textarea
+                name="description"
+                value={selectedWarranty?.description}
+                onChange={handleUpdateChange}
+              />
+            </div>
+
+            {/* Status */}
+            <div className="flex justify-between items-center border-b-2 pb-5">
+              <Label>
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Switch
+                checked={selectedWarranty?.status === "ACTIVE"}
+                onCheckedChange={(checked) =>
+                  setSelectedWarranty((prev) => {
+                    if (!prev) return prev;
+                    return {
+                      ...prev,
+                      status: checked ? "ACTIVE" : "INACTIVE",
+                    };
+                  })
+                }
+                className=" data-[state=checked]:bg-green-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleUpdate}>Update Warranty</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* for the Delete */}
+      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

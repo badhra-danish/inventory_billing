@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -15,14 +14,12 @@ import BrandDataTable from "@/components/inventory/BrandDatatable";
 import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { createBrand } from "@/api/brand/BrandApiClient";
 import toast from "react-hot-toast";
 function BrandPage() {
-  const navigate = useNavigate();
   type BrandStatus = "ACTIVE" | "INACTIVE";
   const [openAddBrand, setOpenAddBrand] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);

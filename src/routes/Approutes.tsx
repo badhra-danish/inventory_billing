@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Router, Route, BrowserRouter, Routes } from "react-router-dom";
 import AppSidebar from "@/layout/Sidebar";
 import Navbar from "@/layout/Navbar";
+import Dashboard from "@/pages/Dashbord/Dashboard";
 import CreateProduct from "@/pages/inventory/CreateProduct";
 import OutletLayout from "@/layout/outlet";
 import ProductDataTablepage from "@/pages/inventory/Product";
@@ -21,6 +22,8 @@ import SalesReturn from "@/pages/Sales/SalesReturn";
 import Invoives from "@/pages/Sales/Invoives";
 import { Purchase } from "@/pages/Purchase/purchase";
 import AddPurchase from "@/pages/Purchase/AddPurchase";
+import { Customer } from "@/pages/People/Customer";
+import { Suppliers } from "@/pages/People/Supplier";
 
 function Approutes() {
   return (
@@ -28,6 +31,7 @@ function Approutes() {
       <main>
         <Routes>
           <Route path="/" element={<OutletLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create-product" element={<CreateProduct />} />
             <Route path="/products" element={<ProductDataTablepage />} />
             <Route
@@ -52,6 +56,10 @@ function Approutes() {
             {/* Purchase , order , return*/}
             <Route path="/purchase" element={<Purchase />} />
             <Route path="/add-purchase" element={<AddPurchase />} />
+
+            {/* Customer  ,supplier ,Employees*/}
+            <Route path="/customer" element={<Customer />} />
+            <Route path="/supplier" element={<Suppliers />} />
           </Route>
         </Routes>
       </main>

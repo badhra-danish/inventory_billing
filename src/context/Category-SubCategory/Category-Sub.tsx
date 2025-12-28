@@ -2,9 +2,7 @@ import React from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  getAllCategory,
   getAllCategoryall,
-  getAllSubCategory,
   getAllSubcategoryByCategory,
 } from "@/api/Category-subCategory/ApiClient";
 import { getAllBrandActive } from "@/api/brand/BrandApiClient";
@@ -25,7 +23,7 @@ export interface Unit {
 }
 export interface SubCategory {
   subCategoryID: string;
-  imageUrl: string;
+
   name: string;
   code: string;
   description: string;
@@ -42,12 +40,12 @@ type CategoryContextType = {
   refreshSubCategories: (id: string) => void;
   refreshBrand: () => void;
   refreshUnit: () => void;
-  categoryPageMetaData: {
-    totalPages: number;
-    totalElements: number;
-    elementCountInCurrentPage: number;
-    currentPageNumber: number;
-  };
+  // categoryPageMetaData: {
+  //   totalPages: number;
+  //   totalElements: number;
+  //   elementCountInCurrentPage: number;
+  //   currentPageNumber: number;
+  // };
 };
 
 const CategoryContext = createContext<CategoryContextType | null>(null);
@@ -61,12 +59,12 @@ export const CategoryProvider = ({
   const [brand, SetBrand] = useState<Brand[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [unit, setUnit] = useState<Unit[]>([]);
-  const [categoryPageMetaData, setCategoryPageMetaData] = React.useState({
-    totalPages: 0,
-    totalElements: 0,
-    elementCountInCurrentPage: 0,
-    currentPageNumber: 0,
-  });
+  // const [categoryPageMetaData, setCategoryPageMetaData] = React.useState({
+  //   totalPages: 0,
+  //   totalElements: 0,
+  //   elementCountInCurrentPage: 0,
+  //   currentPageNumber: 0,
+  // });
   const [loading, setLoading] = useState(false);
 
   // Fetch categories
@@ -135,7 +133,7 @@ export const CategoryProvider = ({
         brand,
         subCategories,
         unit,
-        categoryPageMetaData,
+        // categoryPageMetaData,
         refreshBrand,
         refreshCategories,
         refreshSubCategories,

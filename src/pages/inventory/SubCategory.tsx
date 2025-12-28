@@ -91,19 +91,14 @@ function SubCategorypage() {
         status: subCateFormData.status ? "ACTIVE" : "INACTIVE",
       };
 
-      const formData = new FormData();
-      if (!file) return;
-      formData.append("file", file);
-      formData.append("subCategory", JSON.stringify(payLoad));
-
-      const promise = createSubCategory(formData);
+      const promise = createSubCategory(payLoad);
 
       toast.promise(promise, {
         loading: "Creating Subcategory...",
         success: (res) => {
           setOpen(false);
           setRefresh((prev) => !prev);
-          return "Subcategory Created Successfully!";
+          return res.message;
         },
         error: (err) => {
           console.error("Error During Create:", err);
@@ -147,47 +142,6 @@ function SubCategorypage() {
                 <DialogTitle>Add Sub Category</DialogTitle>
               </DialogHeader>
               <div className="grid gap-8 pt-5 mt-3 border-t-2">
-                <div className="flex items-center gap-5">
-                  <div>
-                    {imageUrl ? (
-                      <>
-                        <div className="w-32 h-32 border-2 overflow-hidden flex items-center justify-center bg-gray-50 rounded-lg object-contain">
-                          <img
-                            src={imageUrl}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {" "}
-                        <div className="w-30 h-30 border-2 rounded-lg flex items-center justify-center flex-col text-gray-500">
-                          <CirclePlus />
-                          <p className="text-gray-500  text-sm">Add Image</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="flex items-center flex-col">
-                    <label htmlFor="image-upload">
-                      <Button asChild>
-                        <span>Upload Image</span>
-                      </Button>
-                    </label>
-
-                    {/* Hidden input field */}
-                    <Input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                    {file ? file.name : <p>JPEG, PNG up to 2 MB</p>}
-                  </div>
-                </div>
-
                 <div className="grid gap-4">
                   <Label>
                     {" "}

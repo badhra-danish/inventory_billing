@@ -23,14 +23,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, Edit, Eye, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -54,6 +47,7 @@ import {
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
 import { getAllProductPage } from "@/api/CreateProduct/ProductClinet";
+import Loader from "../commen/loader";
 // const data: Product[] = [
 //   {
 //     id: "P001",
@@ -256,14 +250,25 @@ export default function Products() {
   const [page, setPage] = React.useState(1);
   const [productData, setProductData] = React.useState([]);
   const [selectedProduct, setSelecctedProduct] = React.useState({});
+  const [pageMeteData, setPageMetaData] = React.useState({
+    totalPages: 0,
+  });
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const getAllProduct = async () => {
     try {
+      setIsLoading(true);
       const res = await getAllProductPage(page, 10);
       if (res.statusCode === 200) {
         setProductData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+        setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
   React.useEffect(() => {
@@ -426,7 +431,7 @@ export default function Products() {
 
   return (
     <div className="w-full bg-white rounded-md shadow-md p-4">
-      {/* 🔍 Top Toolbar */}
+      {/*  Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search....."
@@ -547,7 +552,7 @@ export default function Products() {
         </div>
       </div>
 
-      {/* 🧾 Data Table */}
+      {/*  Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
           <TableHeader className="bg-gray-100">
@@ -571,41 +576,55 @@ export default function Products() {
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-gray-50 transition-colors capitalize"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="px-4 py-3 text-sm text-gray-700 capitalize"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+            {isLoading ? (
+              <>
+                {" "}
+                <TableRow>
+                  <TableCell colSpan={columns.length}>
+                    <Loader />
+                  </TableCell>
                 </TableRow>
-              ))
+              </>
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-gray-500 capitalize"
-                >
-                  No results found.
-                </TableCell>
-              </TableRow>
+              <>
+                {" "}
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className="hover:bg-gray-50 transition-colors capitalize"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className="px-4 py-3 text-sm text-gray-700 capitalize"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center text-gray-500 capitalize"
+                    >
+                      No results found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             )}
           </TableBody>
         </Table>
       </div>
 
-      {/* 📄 Pagination + Footer Info */}
+      {/*  Pagination + Footer Info */}
       <div className="flex items-center justify-between py-4 text-sm text-gray-600">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
@@ -615,16 +634,18 @@ export default function Products() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page == 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+            }
+            disabled={page >= pageMeteData?.totalPages}
           >
             Next
           </Button>

@@ -6,23 +6,20 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import CategoryDataTable from "@/components/inventory/CategoryDataTable";
-import { CirclePlus, MapPinCheckInside } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { createCategory } from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
 function CategoryPage() {
-  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
   const [categoryFormData, setcategoryFormData] = React.useState({
@@ -43,12 +40,7 @@ function CategoryPage() {
       [name]: value,
     }));
   };
-  // const handleSwithchecked = () => {
-  //   setcategoryFormData((prev) => ({
-  //     ...prev,
-  //     status: checked ? "ACTIVE" : "INACTIVE",
-  //   }));
-  // };
+
   const handlesubmit = async () => {
     try {
       const payload = {
@@ -61,7 +53,7 @@ function CategoryPage() {
 
       await toast.promise(promise, {
         loading: "Creating category...",
-        success: (res) => {
+        success: () => {
           setOpen(false);
           setRefresh((prev) => !prev);
           return "Category Created!";
@@ -71,11 +63,6 @@ function CategoryPage() {
           return err.response.data.message;
         },
       });
-      // if (res?.status === 201) {
-      //   toast.success(res.data.message);
-      //   setOpen(false);
-      //   setRefresh((prev) => !prev);
-      // }
     } catch (error: any) {
       console.error(error);
       if (error.response?.data) {
@@ -85,8 +72,6 @@ function CategoryPage() {
       }
     }
   };
-
-  console.log(categoryFormData);
 
   return (
     <>

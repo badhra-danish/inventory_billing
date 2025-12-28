@@ -51,13 +51,9 @@ export const getAllCategoryall = async () => {
   }
 };
 
-export const createSubCategory = async (formData: FormData) => {
+export const createSubCategory = async (payload: object) => {
   try {
-    const res = axiosClient.post(endPoint.subCategory, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const res = axiosClient.post(endPoint.subCategory, payload);
     return (await res).data;
   } catch (error) {
     console.error(error);

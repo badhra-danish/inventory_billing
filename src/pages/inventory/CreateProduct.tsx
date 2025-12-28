@@ -32,7 +32,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { createCategory } from "@/api/Category-subCategory/ApiClient";
@@ -131,8 +130,8 @@ function CreateProduct() {
 
   const [variants, setVariants] = React.useState<Variant[] | null>([]);
   const [image, setImage] = React.useState<File[]>([]);
-  const [imageUrls, setImageUrls] = React.useState<string[]>([]);
-  const [isExpanded, setIsExpanded] = React.useState(true);
+  const [isPriceOpen, setIsPriceOpen] = React.useState(true);
+  const [isCustomOpen, setIsCustomOpen] = React.useState(true);
   const [openCreateCategory, setOpenCreateCategory] = React.useState(false);
   const [categoryFormData, setcategoryFormData] = React.useState({
     categoryname: "",
@@ -367,13 +366,8 @@ function CreateProduct() {
             image: image,
           },
         };
-        const formData = new FormData();
-        image.forEach((file) => {
-          formData.append("files", file);
-        });
-        formData.append("product", JSON.stringify(singlePayload));
 
-        const productPromise = createProduct(formData);
+        const productPromise = createProduct(singlePayload);
         toast.promise(productPromise, {
           loading: "Creating Product..",
           success: (res) => {
@@ -440,7 +434,6 @@ function CreateProduct() {
               discountType: v.discountType?.toUpperCase(),
               discountValue: Number(v.discountValue || 0),
               quantityAlert: Number(v.quantityAlert || 0),
-              //image: v.image,
             },
             variationOptions: v.attributeDetails?.map((d) => ({
               attributeID: d.attributeID,
@@ -449,13 +442,8 @@ function CreateProduct() {
           })),
           ...customFeild,
         };
-        const formData = new FormData();
-        image.forEach((file) => {
-          formData.append("files", file);
-        });
-        formData.append("product", JSON.stringify(variablePayload));
 
-        const productPromise = createProduct(formData);
+        const productPromise = createProduct(variablePayload);
         toast.promise(productPromise, {
           loading: "Creating Product..",
           success: (res) => {
@@ -513,31 +501,31 @@ function CreateProduct() {
     });
   };
 
-  const handleVariantImage = (variantId: string, file: File) => {
-    const imageURL = URL.createObjectURL(file); // preview before upload
+  // const handleVariantImage = (variantId: string, file: File) => {
+  //   const imageURL = URL.createObjectURL(file); // preview before upload
 
-    setVariants((prev) => {
-      if (!prev) return prev;
-      return prev.map((v) =>
-        v.id === variantId ? { ...v, image: file, imageUrl: imageURL } : v
-      );
-    });
-  };
+  //   setVariants((prev) => {
+  //     if (!prev) return prev;
+  //     return prev.map((v) =>
+  //       v.id === variantId ? { ...v, image: file, imageUrl: imageURL } : v
+  //     );
+  //   });
+  // };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+  // const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (!files) return;
 
-    const selectedFiles = Array.from(files);
-    const urls = selectedFiles.map((file) => URL.createObjectURL(file));
+  //   const selectedFiles = Array.from(files);
+  //   const urls = selectedFiles.map((file) => URL.createObjectURL(file));
 
-    setImageUrls((prev) => [...prev, ...urls]);
-    setImage((prev) => [...prev, ...selectedFiles]);
-  };
-  const removeImage = (index: number) => {
-    setImageUrls((prev) => prev.filter((_, i) => i !== index));
-    setImage((prev) => prev.filter((_, i) => i !== index));
-  };
+  //   setImageUrls((prev) => [...prev, ...urls]);
+  //   setImage((prev) => [...prev, ...selectedFiles]);
+  // };
+  // const removeImage = (index: number) => {
+  //   setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  //   setImage((prev) => prev.filter((_, i) => i !== index));
+  // };
   // const handleRemoveImage = (id: string) => {
   //   setImages((prev) => prev.filter((img) => img.id !== id));
   // };
@@ -813,7 +801,7 @@ function CreateProduct() {
 
         <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
           <button
-            onClick={() => setIsOpen((o) => !o)}
+            onClick={() => setIsPriceOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
             type="button"
           >
@@ -827,13 +815,13 @@ function CreateProduct() {
             </div>
             <ChevronDown
               className={`w-5 h-5 text-gray-400 transition-transform ${
-                isOpen ? "transform rotate-180" : ""
+                isPriceOpen ? "transform rotate-180" : ""
               }`}
             />
           </button>
 
           {/* Form Content */}
-          {isOpen && (
+          {isPriceOpen && (
             <div className="space-y-6 border-t pt-6">
               {/* Product Type */}
               <div>
@@ -1434,86 +1422,12 @@ function CreateProduct() {
         </div>
 
         {/* IMAGES  */}
-        <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
-          <button
-            onClick={() => setIsOpen((o) => !o)}
-            className="flex items-center justify-between w-full mb-6 group"
-            type="button"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Package className="w-4 h-4 text-blue-500" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-900">Images</h2>
-            </div>
-            <ChevronDown
-              className={`w-5 h-5 text-gray-400 transition-transform ${
-                isOpen ? "transform rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {isExpanded && (
-            <div className="p-6 pt-2 border-t border-gray-100">
-              <div className="flex flex-wrap gap-4">
-                {/* Add Images Button */}
-                <label className="relative w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors cursor-pointer group">
-                  <Input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 group-hover:text-blue-500">
-                    <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center mb-2">
-                      <Plus />
-                    </div>
-                    <span className="text-sm font-medium">Add Images</span>
-                  </div>
-                </label>
-
-                {/* Image Preview Cards */}
-                {image && (
-                  <>
-                    {" "}
-                    {imageUrls.map((img, i) => (
-                      <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-gray-200 group">
-                        <img
-                          src={img}
-                          alt="Product"
-                          className="w-full h-full object-cover"
-                        />
-
-                        {/* delete button */}
-                        <button
-                          onClick={() => removeImage(i)}
-                          className="absolute top-1 right-1 bg-black/60 text-white w-6 h-6 rounded-full
-               flex items-center justify-center text-sm opacity-0 group-hover:opacity-100
-               transition duration-200 hover:bg-red-600"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
-
-              {!image && (
-                <p className="text-center text-gray-500 text-sm mt-4">
-                  No images uploaded yet
-                </p>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Custom and Fields */}
 
         <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
           <button
-            onClick={() => setIsOpen((o) => !o)}
+            onClick={() => setIsCustomOpen((o) => !o)}
             className="flex items-center justify-between w-full mb-6 group"
             type="button"
           >
@@ -1527,95 +1441,98 @@ function CreateProduct() {
             </div>
             <ChevronDown
               className={`w-5 h-5 text-gray-400 transition-transform ${
-                isOpen ? "transform rotate-180" : ""
+                isCustomOpen ? "transform rotate-180" : ""
               }`}
             />
           </button>
-          {isExpanded && (
-            <div className="p-6 pt-2 border-t border-gray-100">
-              {/* Tabs */}
+          {isCustomOpen && (
+            <>
+              {" "}
+              <div className="p-6 pt-2 border-t border-gray-100">
+                {/* Tabs */}
 
-              {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Warranty Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Warranty <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Select
-                      value={customFeild.warranty}
-                      onValueChange={(val) =>
-                        setcustomFeild((prev) => ({
-                          ...prev,
-                          warranty: val,
-                        }))
-                      }
-                    >
-                      <SelectTrigger
-                        id="warrantyType"
-                        className="w-full"
-                        name="warranty"
+                {/* Form Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Warranty Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Warranty <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Select
+                        value={customFeild.warranty}
+                        onValueChange={(val) =>
+                          setcustomFeild((prev) => ({
+                            ...prev,
+                            warranty: val,
+                          }))
+                        }
                       >
-                        <SelectValue placeholder="Select Warranty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1-year">1-year</SelectItem>
-                        <SelectItem value="2-year">2-year</SelectItem>
-                        <SelectItem value="3-year">3-year</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        <SelectTrigger
+                          id="warrantyType"
+                          className="w-full"
+                          name="warranty"
+                        >
+                          <SelectValue placeholder="Select Warranty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1-year">1-year</SelectItem>
+                          <SelectItem value="2-year">2-year</SelectItem>
+                          <SelectItem value="3-year">3-year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
 
-                {/* Manufacturer Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Manufacturer <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter manufacturer"
-                    name="manufacturer"
-                    value={customFeild.manufacturer}
-                    onChange={handleCustomFeildChange}
-                  />
-                </div>
-
-                {/* Manufactured Date Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Manufactured Date <span className="text-red-500">*</span>
-                  </label>
-                  <div className="">
+                  {/* Manufacturer Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Manufacturer <span className="text-red-500">*</span>
+                    </label>
                     <Input
-                      type="date"
-                      name="manufacturedDate"
-                      value={customFeild.manufacturedDate}
+                      type="text"
+                      placeholder="Enter manufacturer"
+                      name="manufacturer"
+                      value={customFeild.manufacturer}
                       onChange={handleCustomFeildChange}
                     />
                   </div>
-                </div>
 
-                {/* Expiry Date Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expiry On <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type="Date"
-                      name="expiryDate"
-                      value={customFeild.expiryDate}
-                      onChange={handleCustomFeildChange}
+                  {/* Manufactured Date Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Manufactured Date <span className="text-red-500">*</span>
+                    </label>
+                    <div className="">
+                      <Input
+                        type="date"
+                        name="manufacturedDate"
+                        value={customFeild.manufacturedDate}
+                        onChange={handleCustomFeildChange}
+                      />
+                    </div>
+                  </div>
 
-                      //className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
-                      // placeholder="DD-MM-YYYY"
-                    />
+                  {/* Expiry Date Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Expiry On <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="Date"
+                        name="expiryDate"
+                        value={customFeild.expiryDate}
+                        onChange={handleCustomFeildChange}
+
+                        //className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
+                        // placeholder="DD-MM-YYYY"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 

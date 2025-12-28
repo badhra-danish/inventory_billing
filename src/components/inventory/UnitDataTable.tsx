@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -23,16 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  CirclePlus,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -133,13 +123,11 @@ type RefreshDatatable = {
 };
 
 export default function UnitsDataTable({ refresh }: RefreshDatatable) {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =
@@ -214,7 +202,7 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
       const deletePromise = deleteUnit(selectedUnit.unitID);
       toast.promise(deletePromise, {
         loading: "Deleting Unit",
-        success: (res) => {
+        success: () => {
           setOpenDeleteDialog(false);
           getallUnit();
           return "Unit Deleted..";

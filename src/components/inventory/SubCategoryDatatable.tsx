@@ -24,17 +24,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  CirclePlus,
-  Edit,
-  Eye,
-  Import,
-  MoreHorizontal,
-  Rows,
-  Trash,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -61,7 +51,6 @@ import {
   deleteSubCategory,
   getAllSubCategory,
   updateSubCategory,
-  updateSubCategoryImage,
 } from "@/api/Category-subCategory/ApiClient";
 import Loader from "../commen/loader";
 import { Label } from "../ui/label";
@@ -74,7 +63,7 @@ import {
 } from "../ui/select";
 import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
 import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch"; // const data: SubCategory[] = [
+import { Switch } from "../ui/switch";
 import toast from "react-hot-toast";
 //   {
 //     image: Img,
@@ -266,7 +255,6 @@ import toast from "react-hot-toast";
 
 export type SubCategory = {
   subCategoryID: string;
-  imageUrl: string;
   name: string;
   categoryName: string;
   categoryID: string;
@@ -280,7 +268,6 @@ type SubCategoryDataTableProps = {
 export default function SubCategoryDatatable({
   refresh,
 }: SubCategoryDataTableProps) {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -298,7 +285,6 @@ export default function SubCategoryDatatable({
   const [selectesSubcategoryUpdate, setSelectesSubcategoryUpdate] =
     React.useState<SubCategory | null>({
       subCategoryID: "",
-      imageUrl: "",
       name: "",
       code: "",
       description: "",
@@ -310,15 +296,10 @@ export default function SubCategoryDatatable({
   const [pageMeteData, setPageMetaData] = React.useState({
     totalPages: 0,
   });
-  const [openImageDialog, setOpenImageDialog] = React.useState(false);
-  const [selectedImage, setSelectedImage] = React.useState({
-    imageurl: "",
-    subCategoryId: "",
-  });
+
   const [openDelete, setOpenDelete] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState("");
   const { refreshCategories, categories } = useCategory();
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const categoryOptions = [{ name: "All", categoryID: 0 }, ...categories];
 
   const getallSubCategory = async () => {
@@ -336,10 +317,9 @@ export default function SubCategoryDatatable({
     }
   };
 
-  //console.log(selectesSubcategoryUpdate);
   React.useEffect(() => {
     getallSubCategory();
-    refreshCategories(1, 10);
+    refreshCategories();
   }, [refresh, page]);
 
   const handleChange = (
@@ -376,40 +356,40 @@ export default function SubCategoryDatatable({
     }
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    console.log(file);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const uploadPromise = updateSubCategoryImage(
-        selectedImage.subCategoryId,
-        formData
-      );
-      toast.promise(uploadPromise, {
-        loading: "Updating image...",
-        success: (res) => {
-          setOpenImageDialog(false);
-          getallSubCategory();
-          return "Image Updated!";
-        },
-        error: "Failed to update image",
-      });
-      const res = await uploadPromise;
+  // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
+  //   console.log(file);
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+  //     const uploadPromise = updateSubCategoryImage(
+  //       selectedImage.subCategoryId,
+  //       formData
+  //     );
+  //     toast.promise(uploadPromise, {
+  //       loading: "Updating image...",
+  //       success: (res) => {
+  //         setOpenImageDialog(false);
+  //         getallSubCategory();
+  //         return "Image Updated!";
+  //       },
+  //       error: "Failed to update image",
+  //     });
+  //     const res = await uploadPromise;
 
-      e.target.value = "";
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     e.target.value = "";
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleDeleteCategory = async () => {
     try {
       const deletePromise = deleteSubCategory(deleteId);
 
       toast.promise(deletePromise, {
         loading: "Deleting SubCategory...",
-        success: (res) => {
+        success: () => {
           setOpenDelete(false);
           getallSubCategory();
           return "Deleted Successfully!";
@@ -445,33 +425,34 @@ export default function SubCategoryDatatable({
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "imageUrl",
-      header: () => <div className="text-left">Image</div>,
-      cell: ({ row }) => {
-        const imageUrl = row.getValue("imageUrl") as string;
-        const subCategoryId = row.original;
-        return (
-          <div
-            className="flex justify-left"
-            onClick={() => {
-              setOpenImageDialog((prev) => !prev);
+    // {
+    //   accessorKey: "imageUrl",
+    //   header: () => <div className="text-left">Image</div>,
+    //   cell: ({ row }) => {
+    //     const imageUrl = row.getValue("imageUrl") as string;
+    //     const subCategoryId = row.original;
+    //     return (
+    //       <div
+    //         className="flex justify-left"
+    //         onClick={() => {
+    //           setOpenImageDialog((prev) => !prev);
 
-              setSelectedImage({
-                imageurl: imageUrl,
-                subCategoryId: subCategoryId.subCategoryID,
-              });
-            }}
-          >
-            <img
-              src={imageUrl}
-              alt="category"
-              className="w-8 h-8 rounded-md object-cover border"
-            />
-          </div>
-        );
-      },
-    },
+    //           setSelectedImage({
+    //             imageurl: imageUrl,
+    //             subCategoryId: subCategoryId.subCategoryID,
+    //           });
+    //         }}
+    //       >
+    //         <img
+    //           src={imageUrl}
+    //           alt="category"
+    //           className="w-8 h-8 rounded-md object-cover border"
+    //         />
+    //       </div>
+    //     );
+    //   },
+    // },
+
     {
       accessorKey: "name",
       header: ({ column }) => {
@@ -916,37 +897,6 @@ export default function SubCategoryDatatable({
               <Button variant={"outline"}>Cancel</Button>
             </DialogClose>
             <Button onClick={handleUpdateCategory}>Update Category</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={openImageDialog} onOpenChange={setOpenImageDialog}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
-          {selectedImage && (
-            <div className="w-full flex justify-center mb-4">
-              <img
-                src={selectedImage.imageurl}
-                alt="Preview"
-                className="max-h-[70vh] rounded-lg object-contain border"
-              />
-            </div>
-          )}
-          <DialogFooter>
-            <DialogClose>
-              <div className="flex gap-3">
-                <Button variant={"outline"}>Cancel</Button>
-              </div>
-            </DialogClose>
-            <Button onClick={() => fileInputRef.current?.click()} type="button">
-              Change Image
-              <Input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

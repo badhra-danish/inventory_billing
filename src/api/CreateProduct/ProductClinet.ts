@@ -6,16 +6,12 @@ const ProductEndPoint = {
   getProductById: "/v1/products",
 };
 
-export const createProduct = async (formdata: FormData) => {
+export const createProduct = async (payload: object) => {
   try {
     const res = await axiosClient.post(
       ProductEndPoint.createProduct,
-      formdata,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      payload,
+      {}
     );
     return res.data;
   } catch (error) {

@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -23,16 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-  X,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Edit, Trash, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "../ui/badge";
@@ -113,13 +103,12 @@ type OldValue = {
   value: string;
 };
 export default function VariantDataTable({ refresh }: refreshTable) {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
+
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =
@@ -219,7 +208,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       const deletePromise = deleteAttribute(AttributeId);
       toast.promise(deletePromise, {
         loading: "Deleting Attribute",
-        success: (res) => {
+        success: () => {
           setOpenDeleteDilaog(false);
           getAllVariantAttributeData();
           return "Attribute Deleted..";
@@ -323,7 +312,6 @@ export default function VariantDataTable({ refresh }: refreshTable) {
 
     {
       id: "actions",
-      // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
         const varriantAttribute = row.original;
         return (
@@ -381,7 +369,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
 
   return (
     <div className="w-full bg-white rounded-md shadow-md p-4">
-      {/* 🔍 Top Toolbar */}
+      {/* Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search....."
@@ -510,7 +498,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
         </Table>
       </div>
 
-      {/* 📄 Pagination + Footer Info */}
+      {/*  Pagination + Footer Info */}
       <div className="flex items-center justify-between py-4 text-sm text-gray-600">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
@@ -520,16 +508,18 @@ export default function VariantDataTable({ refresh }: refreshTable) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page == 1}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData.totalPages, p + 1))
+            }
+            disabled={page >= pageMetaData?.totalPages}
           >
             Next
           </Button>

@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -23,16 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  CirclePlus,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,18 +52,6 @@ import {
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import toast from "react-hot-toast";
-// const data: Brand[] = [
-//   { brand: "greenply", status: "active" },
-//   { brand: "Century", status: "inactive" },
-//   { brand: "Kitply", status: "active" },
-//   { brand: "Archidply", status: "active" },
-//   { brand: "Austin", status: "inactive" },
-//   { brand: "RoyalTouch", status: "active" },
-//   { brand: "Merino", status: "active" },
-//   { brand: "Alishan", status: "inactive" },
-//   { brand: "ActionTesa", status: "active" },
-//   { brand: "Durian", status: "active" },
-// ];
 
 export type Brand = {
   brandID: string;
@@ -85,13 +63,12 @@ type brandDatatable = {
   refresh: boolean;
 };
 export default function BrandDataTable({ refresh }: brandDatatable) {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
+  //const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =

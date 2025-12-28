@@ -50,6 +50,14 @@ import {
 } from "@/components/ui/collapsible";
 
 // Menu items.
+const DashboardItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
+];
+
 const InventoryItems = [
   {
     title: "Product",
@@ -153,12 +161,12 @@ const PurchaseItem = [
 const PeoplesItem = [
   {
     title: "Customer",
-    url: "purchase",
+    url: "/customer",
     icon: Users,
   },
   {
     title: "Supplier",
-    url: "invoices",
+    url: "/supplier",
     icon: UserLock,
   },
   {
@@ -222,12 +230,24 @@ export default function AppSidebar({
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="text-base">
-                    <LayoutDashboard />
-                    Dashboard
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {DashboardItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <NavLink to={item.url}>
+                      {({ isActive }) => (
+                        <SidebarMenuButton
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md h-9 text-base ${
+                            isActive
+                              ? "bg-primary font-medium text-white"
+                              : "hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      )}
+                    </NavLink>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
