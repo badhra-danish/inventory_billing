@@ -6,16 +6,6 @@ import type {
   VisibilityState,
 } from "@tanstack/react-table";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-  DialogHeader,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -23,29 +13,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-  EllipsisVertical,
-  ReceiptIndianRupee,
-  ReceiptIndianRupeeIcon,
-  BadgeIndianRupee,
-  CirclePlus,
-} from "lucide-react";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Eye, Trash } from "lucide-react";
+
+// import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,8 +36,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import trashImg from "../../assets/images/trash.jpg";
-import custImg from "../../assets/images/customer.jpg";
+// import trashImg from "../../assets/images/trash.jpg";
+// import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
 const data: InvoiceDetails[] = [
   {
@@ -164,13 +134,13 @@ export type InvoiceDetails = {
 };
 
 export default function InvoiceDataTable() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
+  // const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =
@@ -225,7 +195,7 @@ export default function InvoiceDataTable() {
         );
       },
       cell: ({ row }) => {
-        const sales = row.original;
+        // const sales = row.original;
         return (
           <div className="flex items-center gap-3">
             {/* Customer Image */}
@@ -307,8 +277,8 @@ export default function InvoiceDataTable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: ({ row }) => {
-        const product = row.original;
+      cell: () => {
+        // const product = row.original;
         return (
           <div className="flex gap-2">
             <Button variant="outline" size="sm">

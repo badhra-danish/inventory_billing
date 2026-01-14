@@ -56,11 +56,7 @@ import {
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
 import { Badge } from "../ui/badge";
-import {
-  deleteCustomer,
-  getAllCustomertPage,
-  updateCustomer,
-} from "@/api/Coustomer/CustomerClient";
+
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";

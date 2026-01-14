@@ -1,27 +1,22 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ChevronsLeft,
   Search,
-  Plus,
-  CreditCard,
-  Maximize2,
   Mail,
   Bell,
   Settings,
-  User,
-  ChevronDown,
-  ShoppingBag,
+  Moon,
+  Sun,
 } from "lucide-react";
-
+import { useTheme } from "@/context/DarkthemProvider";
 export default function ERPNavbar({
   toggleSidebar,
 }: {
   toggleSidebar: () => void;
 }) {
-  const [isCompanyOpen, setIsCompanyOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
+  // const [isCompanyOpen, setIsCompanyOpen] = useState(false);
+  // const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm h-18 w-full">
       <div className="px-4 sm:px-3 h-18">
@@ -55,6 +50,12 @@ export default function ERPNavbar({
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-600"
+            >
+              {theme === "light" ? <Moon /> : <Sun />}
+            </button>
             {/* Mail */}
             <button className="relative p-2 rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
               <Mail size={20} />

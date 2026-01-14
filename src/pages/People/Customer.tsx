@@ -12,17 +12,9 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useNavigate } from "react-router-dom";
 import CustomerDataTable from "@/components/People/CustomerDataTable";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -41,7 +33,6 @@ export const Customer = () => {
     postalCode: string;
     status: "ACTIVE" | "INACTIVE";
   }
-  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
   const [customerFormData, setCustomerFormData] = React.useState<Customer>({

@@ -33,7 +33,7 @@ function BrandPage() {
   const handleCreateBrand = async () => {
     try {
       const payload = {
-        name: brandFormData.brandName,
+        brandName: brandFormData.brandName,
         status: brandFormData.status,
       };
       const brandPromise = createBrand(payload);

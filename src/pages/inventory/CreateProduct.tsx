@@ -6,7 +6,6 @@ import {
   CircleAlert,
   Plus,
   Package,
-  X,
   List,
   PlusCircle,
   Trash,
@@ -37,6 +36,7 @@ import { Switch } from "@/components/ui/switch";
 import { createCategory } from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
 import { createProduct } from "@/api/CreateProduct/ProductClinet";
+
 function CreateProduct() {
   const navigate = useNavigate();
   const [productInformation, setProductInformation] = React.useState({
@@ -56,14 +56,17 @@ function CreateProduct() {
     brand,
     subCategories,
     unit,
+    warranty,
     refreshBrand,
     refreshCategories,
+    refreshWarranty,
     refreshSubCategories,
     refreshUnit,
   } = useCategory();
 
   useEffect(() => {
     refreshBrand();
+    refreshWarranty();
     refreshCategories();
     refreshUnit();
   }, []);
@@ -74,9 +77,9 @@ function CreateProduct() {
   }, [productInformation.category]);
 
   interface VariantAttributeDetail {
-    attributeID: string;
+    attribute_id: string;
     attributeName: string;
-    attributeValueID: string;
+    attribute_value_id: string;
     attributeValueName: string;
   }
   interface Variant {
@@ -94,10 +97,10 @@ function CreateProduct() {
     image?: File;
   }
   interface VariantAttribute {
-    attributeID: string;
-    name: string;
-    values: { attributeValueID: string; value: string }[];
-    valuesList: { attributeValueID: string; value: string }[];
+    attribute_id: string;
+    attributeName: string;
+    attributeValues: { attribute_value_id: string; value: string }[];
+    valuesList: { attribute_value_id: string; value: string }[];
   }
   const [AllAttribute, setAllAttribute] = React.useState<VariantAttribute[]>(
     []
@@ -108,14 +111,14 @@ function CreateProduct() {
     []
   );
   const [productType, setProductType] = React.useState<
-    "single" | "variable" | ""
-  >("single");
+    "SINGLE" | "VARIABLE" | ""
+  >("SINGLE");
   const [isOpen, setIsOpen] = React.useState(true);
   const [customFeild, setcustomFeild] = React.useState({
-    warranty: "",
+    warranty_id: "",
     manufacturer: "",
-    manufacturedDate: "",
-    expiryDate: "",
+    manufacturer_date: "",
+    expiry_date: "",
   });
   const [singleProductInfo, setSingleProductInfo] = React.useState({
     quantity: "",
@@ -186,7 +189,7 @@ function CreateProduct() {
   const getAllAttribute = async () => {
     try {
       const res = await getAllVaariantAttributeAll();
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setAllAttribute(res.data || []);
       }
     } catch (error) {
@@ -196,6 +199,8 @@ function CreateProduct() {
   React.useEffect(() => {
     getAllAttribute();
   }, []);
+  console.log(AllAttribute);
+
   // console.log(AllAttribute);
   const handleSingleProduct = (
     e: React.ChangeEvent<
@@ -212,7 +217,7 @@ function CreateProduct() {
   // accept string from RadioGroup and cast safely
   const handleProductTypeChange = (value: string) => {
     console.log("Selected product type:", value);
-    if (value === "single" || value === "variable") {
+    if (value === "SINGLE" || value === "VARIABLE") {
       setProductType(value);
     }
   };
@@ -247,7 +252,7 @@ function CreateProduct() {
   const addAttribute = (obj: VariantAttribute) => {
     setAttribute((prev) => {
       if (!prev) return prev;
-      const exists = prev.some((a) => a.attributeID === obj.attributeID);
+      const exists = prev.some((a) => a.attribute_id === obj.attribute_id);
       if (exists) return prev;
       return [
         ...prev,
@@ -267,7 +272,7 @@ function CreateProduct() {
     setAttribute((prev) => {
       if (!prev) return prev;
       return prev.map((a) => {
-        if (a.attributeID !== attributeId) return a;
+        if (a.attribute_id !== attributeId) return a;
         // check duplicates
         const exists = a.valuesList?.some(
           (v) => v.value.trim().toLowerCase() === obj.value.trim().toLowerCase()
@@ -278,7 +283,7 @@ function CreateProduct() {
           ...a,
           valuesList: [
             ...(a.valuesList ?? []),
-            { attributeValueID: obj.attributeValueID, value: obj.value },
+            { attribute_value_id: obj.attribute_value_id, value: obj.value },
           ],
         };
       });
@@ -288,7 +293,7 @@ function CreateProduct() {
   const removeAttribute = (attributeId: string) => {
     setAttribute((prev) => {
       if (!prev) return prev;
-      return prev.filter((a) => a.attributeID !== attributeId);
+      return prev.filter((a) => a.attribute_id !== attributeId);
     });
   };
 
@@ -296,11 +301,11 @@ function CreateProduct() {
     setAttribute((prev) => {
       if (!prev) return prev;
       return prev.map((a) =>
-        a.attributeID === attributeId
+        a.attribute_id === attributeId
           ? {
               ...a,
               valuesList: a.valuesList.filter(
-                (o) => o.attributeValueID !== optionId
+                (o) => o.attribute_value_id !== optionId
               ),
             }
           : a
@@ -312,9 +317,9 @@ function CreateProduct() {
     if (attribute?.length === 0) return;
     const arrays = attribute?.map((a) =>
       a.valuesList.map((o) => ({
-        attributeID: a.attributeID,
-        attributeName: a.name,
-        attributeValueID: o.attributeValueID,
+        attribute_id: a.attribute_id,
+        attributeName: a.attributeName,
+        attribute_value_id: o.attribute_value_id,
         attributeValueName: o.value,
       }))
     );
@@ -340,10 +345,10 @@ function CreateProduct() {
     setVariants(newVariants);
   };
   const handleCreateProduct = () => {
-    if (productType == "single") {
+    if (productType == "SINGLE") {
       try {
         const singlePayload = {
-          productType: productType,
+          productType: productType.toUpperCase(),
           name: productInformation.productName,
           slug: productInformation.slugName,
           sellingType: productInformation.sellingType.toUpperCase(),
@@ -367,44 +372,44 @@ function CreateProduct() {
           },
         };
 
-        const productPromise = createProduct(singlePayload);
-        toast.promise(productPromise, {
-          loading: "Creating Product..",
-          success: (res) => {
-            setProductInformation({
-              productName: "",
-              slugName: "",
-              skuCode: "",
-              sellingType: "",
-              category: "",
-              subCategory: "",
-              brand: "",
-              unit: "",
-              description: "",
-            });
-            setcustomFeild({
-              warranty: "",
-              manufacturer: "",
-              manufacturedDate: "",
-              expiryDate: "",
-            });
-            setImage([]);
-            setSingleProductInfo({
-              quantity: "",
-              price: "",
-              taxType: "",
-              tax: "",
-              discountType: "",
-              discountValue: "",
-              quantityAlert: "",
-              skuCode: "",
-            });
-            return res.message;
-          },
-          error: (err) => {
-            return err.response.data.message;
-          },
-        });
+        // const productPromise = createProduct(singlePayload);
+        // toast.promise(productPromise, {
+        //   loading: "Creating Product..",
+        //   success: (res) => {
+        //     setProductInformation({
+        //       productName: "",
+        //       slugName: "",
+        //       skuCode: "",
+        //       sellingType: "",
+        //       category: "",
+        //       subCategory: "",
+        //       brand: "",
+        //       unit: "",
+        //       description: "",
+        //     });
+        //     setcustomFeild({
+        //       warrantyID: "",
+        //       manufacturer: "",
+        //       manufacturedDate: "",
+        //       expiryDate: "",
+        //     });
+        //     setImage([]);
+        //     setSingleProductInfo({
+        //       quantity: "",
+        //       price: "",
+        //       taxType: "",
+        //       tax: "",
+        //       discountType: "",
+        //       discountValue: "",
+        //       quantityAlert: "",
+        //       skuCode: "",
+        //     });
+        //     return res.message;
+        //   },
+        //   error: (err) => {
+        //     return err.response.data.message;
+        //   },
+        // });
       } catch (error: any) {
         if (error.response?.data) {
           console.log(error);
@@ -415,33 +420,34 @@ function CreateProduct() {
     } else {
       try {
         const variablePayload = {
-          productType: productType,
-          name: productInformation.productName,
-          slug: productInformation.slugName,
-          sellingType: productInformation.sellingType.toUpperCase(),
-          description: productInformation.description,
-          categoryID: productInformation.category,
-          subCategoryID: productInformation.subCategory,
-          brandID: productInformation.brand,
-          unitID: productInformation.unit,
-          productVariations: variants?.map((v) => ({
-            productMetaData: {
-              sku: v.sku,
-              price: Number(v.price),
-              quantity: Number(v.quantity),
-              taxType: v.taxType?.toUpperCase(),
-              taxValue: Number(v.taxValue || 0),
-              discountType: v.discountType?.toUpperCase(),
-              discountValue: Number(v.discountValue || 0),
-              quantityAlert: Number(v.quantityAlert || 0),
-            },
-            variationOptions: v.attributeDetails?.map((d) => ({
-              attributeID: d.attributeID,
-              attributeValueID: d.attributeValueID,
-            })),
+          product: {
+            product_type: productType.toUpperCase(),
+            productName: productInformation.productName,
+            slugName: productInformation.slugName,
+            selling_type: productInformation.sellingType.toUpperCase(),
+            description: productInformation.description,
+            category_id: productInformation.category,
+            subcategory_id: productInformation.subCategory,
+            brand_id: productInformation.brand,
+            unit_id: productInformation.unit,
+            ...customFeild,
+          },
+          productVariants: variants?.map((v) => ({
+            skuCode: v.sku,
+            price: Number(v.price),
+            // quantity: Number(v.quantity),
+            tax_type: v.taxType?.toUpperCase(),
+            tax_value: Number(v.taxValue || 0),
+            discount_type: v.discountType?.toUpperCase(),
+            discount_value: Number(v.discountValue || 0),
+            //  quantityAlert: Number(v.quantityAlert || 0),
+
+            attribute_value_ids: v.attributeDetails?.map(
+              (d) => d.attribute_value_id
+            ),
           })),
-          ...customFeild,
         };
+        console.log(variablePayload);
 
         const productPromise = createProduct(variablePayload);
         toast.promise(productPromise, {
@@ -459,10 +465,10 @@ function CreateProduct() {
               description: "",
             });
             setcustomFeild({
-              warranty: "",
+              warranty_id: "",
               manufacturer: "",
-              manufacturedDate: "",
-              expiryDate: "",
+              manufacturer_date: "",
+              expiry_date: "",
             });
             setAttribute(null);
             setVariants(null);
@@ -679,7 +685,7 @@ function CreateProduct() {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
-                          <SelectItem value={cat.categoryID}>
+                          <SelectItem value={cat.category_id}>
                             {cat.name}
                           </SelectItem>
                         ))}
@@ -709,8 +715,8 @@ function CreateProduct() {
                         {subCategories.length > 0 ? (
                           <>
                             {subCategories.map((subcat) => (
-                              <SelectItem value={subcat.subCategoryID}>
-                                {subcat.name}
+                              <SelectItem value={subcat.subCategory_id}>
+                                {subcat.subCategoryName}
                               </SelectItem>
                             ))}
                           </>
@@ -744,8 +750,8 @@ function CreateProduct() {
                       </SelectTrigger>
                       <SelectContent>
                         {brand.map((brand) => (
-                          <SelectItem value={brand.brandID}>
-                            {brand.name}
+                          <SelectItem value={brand.brand_id}>
+                            {brand.brandName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -771,7 +777,9 @@ function CreateProduct() {
                       </SelectTrigger>
                       <SelectContent>
                         {unit.map((u) => (
-                          <SelectItem value={u.unitID}>{u.name}</SelectItem>
+                          <SelectItem value={u.unit_id}>
+                            {u.unitName}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -835,7 +843,7 @@ function CreateProduct() {
                   value={productType}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="single" id="single" />
+                    <RadioGroupItem value="SINGLE" id="single" />
                     <Label
                       htmlFor="single"
                       className="font-normal cursor-pointer"
@@ -844,7 +852,7 @@ function CreateProduct() {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="variable" id="variable" />
+                    <RadioGroupItem value="VARIABLE" id="variable" />
                     <Label
                       htmlFor="variable"
                       className="font-normal cursor-pointer"
@@ -857,7 +865,7 @@ function CreateProduct() {
 
               {/* Row 1: Quantity, Price, Tax Type */}
 
-              {productType === "single" ? (
+              {productType === "SINGLE" ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
@@ -1068,10 +1076,10 @@ function CreateProduct() {
                           <SelectContent className="w-full">
                             {AllAttribute.map((attr) => (
                               <SelectItem
-                                key={attr.attributeID}
+                                key={attr.attribute_id}
                                 value={JSON.stringify(attr)}
                               >
-                                {attr.name}
+                                {attr.attributeName}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -1101,15 +1109,17 @@ function CreateProduct() {
 
                         {attribute?.map((attr) => (
                           <div
-                            key={attr.attributeID}
+                            key={attr.attribute_id}
                             className="border p-3 rounded"
                           >
                             <div className="flex items-center justify-between">
-                              <div className="font-medium">{attr.name}</div>
+                              <div className="font-medium">
+                                {attr.attributeName}
+                              </div>
                               <div className="flex items-center gap-2">
                                 <Button
                                   onClick={() =>
-                                    removeAttribute(attr.attributeID)
+                                    removeAttribute(attr.attribute_id)
                                   }
                                   className="bg-transparent px-2 py-1 border-0 "
                                   variant="outline"
@@ -1129,20 +1139,20 @@ function CreateProduct() {
                                     const obj = JSON.parse(value);
                                     console.log(obj);
 
-                                    addValues(attr.attributeID, obj);
+                                    addValues(attr.attribute_id, obj);
                                   }}
                                 >
                                   <SelectTrigger className="w-full">
                                     <SelectValue
-                                      placeholder={`Add Values for ${attr.name} `}
+                                      placeholder={`Add Values for ${attr.attributeName} `}
                                     >
                                       Select The Values
                                     </SelectValue>
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {attr.values?.map((val) => (
+                                    {attr.attributeValues?.map((val) => (
                                       <SelectItem
-                                        key={val.attributeValueID}
+                                        key={val.attribute_value_id}
                                         value={JSON.stringify(val)}
                                       >
                                         {val.value}
@@ -1155,15 +1165,15 @@ function CreateProduct() {
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {attr.valuesList?.map((opt) => (
                                   <div
-                                    key={opt.attributeValueID}
+                                    key={opt.attribute_value_id}
                                     className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded"
                                   >
                                     <span className="text-sm">{opt.value}</span>
                                     <button
                                       onClick={() =>
                                         removeOption(
-                                          attr.attributeID,
-                                          opt.attributeValueID
+                                          attr.attribute_id,
+                                          opt.attribute_value_id
                                         )
                                       }
                                       className="text-red-500 text-xs"
@@ -1208,18 +1218,19 @@ function CreateProduct() {
                             <thead>
                               <tr className="text-left bg-gray-200">
                                 {attribute?.map((a) => (
-                                  <th key={a.attributeID} className="px-2 py-3">
-                                    {a.name}
+                                  <th
+                                    key={a.attribute_id}
+                                    className="px-2 py-3"
+                                  >
+                                    {a.attributeName}
                                   </th>
                                 ))}
                                 <th className="px-2 py-3">Price</th>
-                                <th className="px-2 py-3">Quantity</th>
                                 <th className="px-2 py-3">SKU</th>
                                 <th className="px-2 py-3">Tax Type</th>
                                 <th className="px-2 py-3">Tax Value</th>
                                 <th className="px-2 py-3">Discount</th>
                                 <th className="px-2 py-3">Discount value</th>
-                                <th className="px-2 py-3">Qty Alert</th>
                                 <th className="px-2 py-3">Action</th>
                               </tr>
                             </thead>
@@ -1228,14 +1239,14 @@ function CreateProduct() {
                                 <tr key={v.id} className="border-t">
                                   {attribute?.map((a) => (
                                     <td
-                                      key={a.attributeID}
+                                      key={a.attribute_id}
                                       className="px-2 py-3 align-middle"
                                     >
                                       <div className="bg-gray-100 px-2 py-1 rounded text-sm inline-block">
                                         {
                                           v.attributeDetails?.find(
                                             (d) =>
-                                              d.attributeID === a.attributeID
+                                              d.attribute_id === a.attribute_id
                                           )?.attributeValueName
                                         }
                                       </div>
@@ -1259,7 +1270,7 @@ function CreateProduct() {
                                     />
                                   </td>
 
-                                  <td className="px-2 py-3 align-middle">
+                                  {/* <td className="px-2 py-3 align-middle">
                                     <Input
                                       type="number"
                                       value={v.quantity}
@@ -1274,7 +1285,7 @@ function CreateProduct() {
                                       }
                                       className="w-24"
                                     />
-                                  </td>
+                                  </td> */}
 
                                   <td className="px-2 py-4 align-middle">
                                     <Input
@@ -1381,7 +1392,7 @@ function CreateProduct() {
                                       disabled={v.discountType === "none"}
                                     />
                                   </td>
-                                  <td className="px-2 py-4 align-middle">
+                                  {/* <td className="px-2 py-4 align-middle">
                                     <Input
                                       type="number"
                                       value={v.quantityAlert}
@@ -1396,7 +1407,7 @@ function CreateProduct() {
                                       }
                                       className="w-24"
                                     />
-                                  </td>
+                                  </td> */}
 
                                   <td className="px-3 py-4 align-middle">
                                     <Button
@@ -1404,7 +1415,7 @@ function CreateProduct() {
                                       className="h-8 w-8 p-0 text-red-500 border-red-400 hover:bg-red-100"
                                       onClick={() => deleteVariant(v.id)}
                                     >
-                                      x
+                                      <Trash />
                                     </Button>
                                   </td>
                                 </tr>
@@ -1460,11 +1471,11 @@ function CreateProduct() {
                     </label>
                     <div className="relative">
                       <Select
-                        value={customFeild.warranty}
+                        value={customFeild.warranty_id}
                         onValueChange={(val) =>
                           setcustomFeild((prev) => ({
                             ...prev,
-                            warranty: val,
+                            warranty_id: val,
                           }))
                         }
                       >
@@ -1476,9 +1487,11 @@ function CreateProduct() {
                           <SelectValue placeholder="Select Warranty" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1-year">1-year</SelectItem>
-                          <SelectItem value="2-year">2-year</SelectItem>
-                          <SelectItem value="3-year">3-year</SelectItem>
+                          {warranty?.map((war) => (
+                            <SelectItem value={war.warranty_id}>
+                              {war.warrantyName}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -1506,8 +1519,8 @@ function CreateProduct() {
                     <div className="">
                       <Input
                         type="date"
-                        name="manufacturedDate"
-                        value={customFeild.manufacturedDate}
+                        name="manufacturer_date"
+                        value={customFeild.manufacturer_date}
                         onChange={handleCustomFeildChange}
                       />
                     </div>
@@ -1521,8 +1534,8 @@ function CreateProduct() {
                     <div className="relative">
                       <Input
                         type="Date"
-                        name="expiryDate"
-                        value={customFeild.expiryDate}
+                        name="expiry_date"
+                        value={customFeild.expiry_date}
                         onChange={handleCustomFeildChange}
 
                         //className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"

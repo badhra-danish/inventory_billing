@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -27,14 +26,12 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
-  CirclePlus,
   Edit,
   Eye,
   Layers,
-  MoreHorizontal,
   Trash,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,7 +57,6 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectGroup,
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
@@ -172,7 +168,7 @@ export type StockProduct = {
 };
 
 export default function StockMangeDatatable() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -337,7 +333,7 @@ export default function StockMangeDatatable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: ({ row }) => {
+      cell: () => {
         // const product = row.original;
         return (
           <div className="flex gap-1">
@@ -378,7 +374,7 @@ export default function StockMangeDatatable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: ({ row }) => {
+      cell: () => {
         // const product = row.original;
         return (
           <div className="flex gap-1">

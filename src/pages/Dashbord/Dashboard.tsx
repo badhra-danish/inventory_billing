@@ -1,11 +1,8 @@
-import React from "react";
 import { StatCard } from "@/components/utils/StateCard";
 import { SummaryCard } from "@/components/utils/SummaryCard";
 import {
-  ArrowBigDownDash,
   ArrowDownFromLine,
   ArrowUpFromLine,
-  Baby,
   BadgeIndianRupee,
   ReceiptText,
   ScrollText,

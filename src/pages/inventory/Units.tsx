@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -15,14 +14,14 @@ import UnitsDataTable from "@/components/inventory/UnitDataTable";
 import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { createUnit } from "@/api/unit/UnitApiClient";
 import toast from "react-hot-toast";
 function UnitsPage() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [refresh, setRefresh] = React.useState(false);
   const [openAddunit, setOpenUnit] = React.useState(false);
   const [unitFormData, setUnitFormData] = React.useState({
@@ -46,8 +45,8 @@ function UnitsPage() {
   const handelCreateUnit = async () => {
     try {
       const payload = {
-        name: unitFormData.unitName,
-        shortName: unitFormData.shortName,
+        unitName: unitFormData.unitName,
+        unitShortName: unitFormData.shortName,
         status: unitFormData.status,
       };
       const createPromise = createUnit(payload);

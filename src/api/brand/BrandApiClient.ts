@@ -1,11 +1,11 @@
 import { axiosClient } from "..";
 
 const brandEndPoint = {
-  getAllbrand: "/v1/brand/page",
+  getAllbrand: "/v1/brand/getbrandpage",
   createBrand: "/v1/brand/create",
   updateBrand: "/v1/brand/update",
   deleteBrand: "/v1/brand/delete",
-  getAllBrandActive: "/v1/brand/all",
+  getAllBrandActive: "/v1/brand/getbrandpage",
 };
 
 export const createBrand = async (payload: object) => {

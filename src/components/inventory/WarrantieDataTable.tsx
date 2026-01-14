@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -23,15 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -67,7 +58,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Value } from "@radix-ui/react-select";
 import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
 // const data: Warranty[] = [
@@ -128,24 +118,23 @@ import toast from "react-hot-toast";
 // ];
 
 export type Warranty = {
-  warrantyID: string;
-  name: string;
+  warranty_id: string;
+  warrantyName: string;
   description: string;
   duration: string;
-  warrantyPeriod: string;
+  period: string;
   status: "ACTIVE" | "INACTIVE";
 };
 type refreshType = {
   refresh: boolean;
 };
 export default function WarrantiesDataTable({ refresh }: refreshType) {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
+  // const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
 
   const [columnVisibility, setColumnVisibility] =
@@ -153,7 +142,12 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [pageMeteData, setPageMetaData] = React.useState({
-    totalPages: 0,
+    totalPage: 2,
+    currentPage: 1,
+    totalItems: 13,
+    pageSize: 10,
+    hasnextPage: true,
+    hasPrevPage: false,
   });
   const [warrantyData, setWarrantyData] = React.useState<Warranty[]>([]);
   const [openUpdateWarranty, setOpenUpdateWarranty] = React.useState(false);
@@ -176,7 +170,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
   const getAllWarranty = async () => {
     try {
       const res = await getAllWarrantyPage(page, 10);
-      if (res.statusCode == 200) {
+      if (res.status == "OK") {
         setWarrantyData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
@@ -192,13 +186,13 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
   const handleUpdate = () => {
     try {
       const payload = {
-        name: selectedWarranty?.name,
+        warrantyName: selectedWarranty?.warrantyName,
         description: selectedWarranty?.description,
-        warrantyPeriod: selectedWarranty?.warrantyPeriod,
-        durations: Number(selectedWarranty?.duration),
+        period: selectedWarranty?.period,
+        duration: Number(selectedWarranty?.duration),
         status: selectedWarranty?.status,
       };
-      const id = selectedWarranty?.warrantyID;
+      const id = selectedWarranty?.warranty_id;
       if (!id) return;
       const updatePromise = updateWarranty(id, payload);
       toast.promise(updatePromise, {
@@ -220,7 +214,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
 
   const handleDelete = () => {
     try {
-      const id = selectedWarranty?.warrantyID;
+      const id = selectedWarranty?.warranty_id;
       if (!id) return;
       const deletePromise = deleteWarranty(id);
       toast.promise(deletePromise, {
@@ -264,7 +258,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "warrantyName",
       header: ({ column }) => {
         return (
           <Button
@@ -277,7 +271,9 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">
+          {row.getValue("warrantyName")}
+        </div>
       ),
     },
 
@@ -297,7 +293,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
       header: () => <div className="text-left">Duration</div>,
       cell: ({ row }) => {
         const duration = row.original.duration;
-        const period = row.original.warrantyPeriod;
+        const period = row.original.period;
 
         return (
           <div className="capitalize text-left">
@@ -524,7 +520,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page == 1}
+            disabled={pageMeteData.hasPrevPage == false}
           >
             Previous
           </Button>
@@ -532,9 +528,9 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
             variant="outline"
             size="sm"
             onClick={() =>
-              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+              setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
-            disabled={page >= pageMeteData?.totalPages}
+            disabled={pageMeteData.hasnextPage == false}
           >
             Next
           </Button>
@@ -555,8 +551,8 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
                 Warranty <span className="text-red-500">*</span>
               </Label>
               <Input
-                name="name"
-                value={selectedWarranty?.name}
+                name="warrantyName"
+                value={selectedWarranty?.warrantyName}
                 onChange={handleUpdateChange}
               />
             </div>
@@ -579,7 +575,7 @@ export default function WarrantiesDataTable({ refresh }: refreshType) {
                   Period <span className="text-red-500">*</span>
                 </Label>
                 <Select
-                  value={selectedWarranty?.warrantyPeriod}
+                  value={selectedWarranty?.period}
                   onValueChange={(value) =>
                     setSelectedWarranty((prev) => {
                       if (!prev) return prev;

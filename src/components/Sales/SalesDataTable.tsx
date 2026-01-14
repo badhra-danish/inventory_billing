@@ -5,16 +5,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-  DialogHeader,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -42,10 +33,9 @@ import {
   MenubarItem,
   MenubarMenu,
   MenubarSeparator,
-  MenubarShortcut,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +56,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import trashImg from "../../assets/images/trash.jpg";
+//import trashImg from "../../assets/images/trash.jpg";
 import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
 const data: SalesDetail[] = [
@@ -283,7 +273,7 @@ export type SalesDetail = {
 };
 
 export default function SalesDataTable() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -457,8 +447,8 @@ export default function SalesDataTable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: ({ row }) => {
-        const product = row.original;
+      cell: () => {
+        //const product = row.original;
         return (
           <div>
             <Menubar className="border-0 bg-transparent shadow-none">

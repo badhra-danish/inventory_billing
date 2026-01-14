@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -16,7 +15,7 @@ import VariantDataTable from "@/components/inventory/VariantDataTable";
 import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { RefreshCcw, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -60,10 +59,12 @@ function VariantPage() {
   const handleCreateAttribute = () => {
     try {
       const payload = {
-        name: variantName,
+        attributeName: variantName,
         attributeValues: values.map((v) => ({ value: v })),
         status: status === true ? "ACTIVE" : "INACTIVE",
       };
+      console.log(payload);
+
       const attributePromise = createAttribute(payload);
       toast.promise(attributePromise, {
         loading: "Creating Attribute",
@@ -86,7 +87,7 @@ function VariantPage() {
     }
   };
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   return (
     <>
       <div className="flex items-center justify-between mb-5">

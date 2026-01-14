@@ -89,9 +89,9 @@ import { Switch } from "../ui/switch";
 // ];
 
 export type Variants = {
-  attributeID: string;
-  name: string;
-  values: { value: string }[];
+  attribute_id: string;
+  attributeName: string;
+  attributeValues: { value: string }[];
   createdDate: string;
   status: "ACTIVE" | "INACTIVE";
 };
@@ -99,7 +99,7 @@ type refreshTable = {
   refresh: boolean;
 };
 type OldValue = {
-  attributeValueID?: string; // optional because new added values have no ID
+  attribute_value_id?: string; // optional because new added values have no ID
   value: string;
 };
 export default function VariantDataTable({ refresh }: refreshTable) {
@@ -137,10 +137,11 @@ export default function VariantDataTable({ refresh }: refreshTable) {
   const getAllVariantAttributeData = async () => {
     try {
       const res = await getAllVaariantAttribute(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setVariantData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
+      console.log(res);
     } catch (error) {
       console.error(error);
     }
@@ -160,9 +161,9 @@ export default function VariantDataTable({ refresh }: refreshTable) {
   const handleRemoveValue = (item: OldValue | string) => {
     if (typeof item === "object") {
       // Old DB value → remove & mark delete
-      setDeletedValues((prev) => [...prev, String(item.attributeValueID)]);
+      setDeletedValues((prev) => [...prev, String(item.attribute_value_id)]);
       setOldValues((prev) =>
-        prev.filter((v) => v.attributeValueID !== item.attributeValueID)
+        prev.filter((v) => v.attribute_value_id !== item.attribute_value_id)
       );
     } else {
       // New value → just remove from newValues
@@ -177,17 +178,21 @@ export default function VariantDataTable({ refresh }: refreshTable) {
   };
   const handleUpdateAttribute = () => {
     const payload = {
-      name: variantName,
+      attributeName: variantName,
       attributeValues: [
         ...oldValues.map((v) => ({
-          attributeValueID: v.attributeValueID,
+          attribute_value_id: v.attribute_value_id,
           value: v.value,
         })), // UPDATED
         ...newValues.map((v) => ({ value: v })), // ADDED
-        ...deletedValues.map((id) => ({ attributeValueID: id })), // DELETED
+        ...deletedValues.map((id) => ({
+          attribute_value_id: id,
+          delete: true,
+        })), // DELETED
       ],
       status: status === true ? "ACTIVE" : "INACTIVE",
     };
+    console.log(payload);
 
     const updatePromise = updateAttribute(AttributeId, payload);
     toast.promise(updatePromise, {
@@ -247,7 +252,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "attributeName",
       header: ({ column }) => {
         return (
           <Button
@@ -260,15 +265,17 @@ export default function VariantDataTable({ refresh }: refreshTable) {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">
+          {row.getValue("attributeName")}
+        </div>
       ),
     },
 
     {
-      accessorKey: "values",
-      header: () => <div className="text-left">Values</div>,
+      accessorKey: "attributeValues",
+      header: () => <div className="text-left">Attribute-Values</div>,
       cell: ({ row }) => {
-        const values = row.getValue("values") as { value: string }[];
+        const values = row.getValue("attributeValues") as { value: string }[];
         return (
           <div className="capitalize text-left">
             {values.map((v) => v.value).join(", ")}
@@ -321,11 +328,11 @@ export default function VariantDataTable({ refresh }: refreshTable) {
               size="sm"
               onClick={() => {
                 setOpenUpdateVarAttribute(true);
-                setVariantName(varriantAttribute.name);
-                setOldValues(varriantAttribute.values);
+                setVariantName(varriantAttribute.attributeName);
+                setOldValues(varriantAttribute.attributeValues);
                 setNewValues([]);
                 setDeletedValues([]);
-                setAttributeId(varriantAttribute.attributeID);
+                setAttributeId(varriantAttribute.attribute_id);
                 setStatus(varriantAttribute.status == "ACTIVE");
               }}
             >
@@ -336,7 +343,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
               size="sm"
               onClick={() => {
                 setOpenDeleteDilaog(true);
-                setAttributeId(varriantAttribute.attributeID);
+                setAttributeId(varriantAttribute.attribute_id);
               }}
             >
               <Trash />
@@ -549,7 +556,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
           <div className="flex flex-wrap gap-2 mt-4 border rounded p-3">
             {oldValues.map((item, index) => (
               <Badge
-                key={item.attributeValueID}
+                key={item.attribute_value_id}
                 variant="secondary"
                 className="flex items-center gap-1"
               >

@@ -1,8 +1,5 @@
-import React, { useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Router, Route, BrowserRouter, Routes } from "react-router-dom";
-import AppSidebar from "@/layout/Sidebar";
-import Navbar from "@/layout/Navbar";
+import { Route, BrowserRouter, Routes } from "react-router-dom";
+
 import Dashboard from "@/pages/Dashbord/Dashboard";
 import CreateProduct from "@/pages/inventory/CreateProduct";
 import OutletLayout from "@/layout/outlet";

@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, X } from "lucide-react";
-import React, { useState } from "react";
-import pdfImg from "../../assets/images/pdf.jpg";
-import xslImg from "../../assets/images/xls.png";
+import { X } from "lucide-react";
+import { useState } from "react";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {

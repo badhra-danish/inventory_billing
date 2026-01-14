@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,25 +5,19 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { Switch } from "@/components/ui/switch";
-import { CirclePlus, Plus } from "lucide-react";
+// import { Switch } from "@/components/ui/switch";
+import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import StockMangeDatatable from "@/components/stock/StockDataTable";
-import {
-  DropdownMenu,
-  DropdownMenuArrow,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+
 import {
   Select,
   SelectContent,
@@ -32,23 +25,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 function StockMangepage() {
-  const [fileName, setFileName] = useState("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  // const [fileName, setFileName] = useState("");
+  // const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setFileName(file.name);
 
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-    }
-  };
+  //     const url = URL.createObjectURL(file);
+  //     setImageUrl(url);
+  //   }
+  // };
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   return (
     <>
       <div className="flex items-center justify-between mb-5">

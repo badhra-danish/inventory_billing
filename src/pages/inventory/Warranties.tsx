@@ -60,9 +60,9 @@ function WarrantiesPage() {
   const handleCreatewarranty = () => {
     try {
       const payload = {
-        name: formData.warranty,
+        warrantyName: formData.warranty,
         description: formData.descriptions,
-        warrantyPeriod: formData.period,
+        period: formData.period,
         duration: Number(formData.duration),
         status: formData.status,
       };
@@ -72,6 +72,13 @@ function WarrantiesPage() {
         success: (res) => {
           setOpenWarranty(false);
           setRefresh(true);
+          setFormData({
+            warranty: "",
+            duration: "",
+            period: "",
+            descriptions: "",
+            status: "INACTIVE",
+          });
           return res.message;
         },
         error: (err) => {
@@ -82,6 +89,8 @@ function WarrantiesPage() {
       console.error(error);
     }
   };
+  console.log(formData);
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">

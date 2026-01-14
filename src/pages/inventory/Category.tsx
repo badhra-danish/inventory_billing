@@ -56,6 +56,11 @@ function CategoryPage() {
         success: () => {
           setOpen(false);
           setRefresh((prev) => !prev);
+          setcategoryFormData({
+            categoryname: "",
+            slugName: "",
+            status: false,
+          });
           return "Category Created!";
         },
         error: (err) => {

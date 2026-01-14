@@ -1,5 +1,4 @@
 import * as React from "react";
-import Img from "../../assets/images/xls.png";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -25,7 +24,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -254,11 +252,11 @@ import toast from "react-hot-toast";
 // ];
 
 export type SubCategory = {
-  subCategoryID: string;
-  name: string;
+  subCategory_id: string;
+  subCategoryName: string;
   categoryName: string;
-  categoryID: string;
-  code: string;
+  category_id: string;
+  categoryCode: string;
   description: string;
   status: "ACTIVE" | "INACTIVE";
 };
@@ -284,29 +282,34 @@ export default function SubCategoryDatatable({
   const [openEdit, setOpenEdit] = React.useState(false);
   const [selectesSubcategoryUpdate, setSelectesSubcategoryUpdate] =
     React.useState<SubCategory | null>({
-      subCategoryID: "",
-      name: "",
-      code: "",
+      subCategory_id: "",
+      subCategoryName: "",
+      categoryCode: "",
       description: "",
       categoryName: "",
-      categoryID: "",
+      category_id: "",
       status: "ACTIVE",
     });
   const [page, setPage] = React.useState(1);
   const [pageMeteData, setPageMetaData] = React.useState({
-    totalPages: 0,
+    totalPage: 1,
+    currentPage: 1,
+    totalItems: 7,
+    pageSize: 10,
+    hasnextPage: false,
+    hasPrevPage: false,
   });
 
   const [openDelete, setOpenDelete] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState("");
   const { refreshCategories, categories } = useCategory();
-  const categoryOptions = [{ name: "All", categoryID: 0 }, ...categories];
+  const categoryOptions = [{ name: "All", category_id: 0 }, ...categories];
 
   const getallSubCategory = async () => {
     try {
       setIsLoading(true);
       const res = await getAllSubCategory(page, 10);
-      if (res?.statusCode === 200) {
+      if (res?.status === "OK") {
         setsubCategoryData(res.data);
         setPageMetaData(res.pageMetaData);
         setIsLoading(false);
@@ -336,14 +339,14 @@ export default function SubCategoryDatatable({
   const handleUpdateCategory = async () => {
     try {
       const payload = {
-        categoryID: selectesSubcategoryUpdate?.categoryID,
-        name: selectesSubcategoryUpdate?.name,
-        code: selectesSubcategoryUpdate?.code,
+        category_id: selectesSubcategoryUpdate?.category_id,
+        categoryName: selectesSubcategoryUpdate?.categoryName,
+        categoryCode: selectesSubcategoryUpdate?.categoryCode,
         description: selectesSubcategoryUpdate?.description,
         status: selectesSubcategoryUpdate?.status,
       };
       const res = await updateSubCategory(
-        selectesSubcategoryUpdate?.subCategoryID ?? "",
+        selectesSubcategoryUpdate?.subCategory_id ?? "",
         payload
       );
       if (res.statusCode === 200) {
@@ -454,7 +457,7 @@ export default function SubCategoryDatatable({
     // },
 
     {
-      accessorKey: "name",
+      accessorKey: "subCategoryName",
       header: ({ column }) => {
         return (
           <Button
@@ -467,7 +470,9 @@ export default function SubCategoryDatatable({
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">
+          {row.getValue("subCategoryName")}
+        </div>
       ),
     },
 
@@ -483,11 +488,13 @@ export default function SubCategoryDatatable({
       },
     },
     {
-      accessorKey: "code",
+      accessorKey: "categoryCode",
       header: () => <div className="text-left">Category Code</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("code")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("categoryCode")}
+          </div>
         );
       },
     },
@@ -551,7 +558,7 @@ export default function SubCategoryDatatable({
               size="sm"
               onClick={() => {
                 setOpenDelete(true);
-                setDeleteId(subCategory.subCategoryID);
+                setDeleteId(subCategory.subCategory_id);
               }}
             >
               <Trash />
@@ -641,7 +648,7 @@ export default function SubCategoryDatatable({
 
               {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
-                  key={cat.categoryID}
+                  key={cat.category_id}
                   onClick={() => {
                     setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("categoryName");
@@ -773,7 +780,7 @@ export default function SubCategoryDatatable({
             size="sm"
             // onClick={() => table.previousPage()}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
+            disabled={pageMeteData.hasPrevPage == false}
           >
             Previous
           </Button>
@@ -781,10 +788,10 @@ export default function SubCategoryDatatable({
             variant="outline"
             size="sm"
             onClick={() =>
-              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+              setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
             // onClick={() => table.nextPage()}
-            disabled={pageMeteData.totalPages <= page}
+            disabled={pageMeteData.hasnextPage == false}
           >
             Next
           </Button>
@@ -814,14 +821,14 @@ export default function SubCategoryDatatable({
                   })
                 }
                 name="categoryID"
-                value={selectesSubcategoryUpdate?.categoryID}
+                value={selectesSubcategoryUpdate?.category_id}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories?.map((cat) => (
-                    <SelectItem value={cat?.categoryID}>
+                    <SelectItem value={cat?.category_id}>
                       {" "}
                       {cat?.name}{" "}
                     </SelectItem>
@@ -837,8 +844,8 @@ export default function SubCategoryDatatable({
               </Label>
               <Input
                 type="text"
-                name="name"
-                value={selectesSubcategoryUpdate?.name}
+                name="subCategoryName"
+                value={selectesSubcategoryUpdate?.subCategoryName}
                 onChange={handleChange}
               />
             </div>
@@ -850,8 +857,8 @@ export default function SubCategoryDatatable({
               </Label>
               <Input
                 type="text"
-                name="code"
-                value={selectesSubcategoryUpdate?.code}
+                name="categoryCode"
+                value={selectesSubcategoryUpdate?.categoryCode}
                 onChange={handleChange}
               />
             </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,17 +6,16 @@ import {
   DialogContent,
   DialogTrigger,
   DialogHeader,
-  DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 // react-window list removed; using direct mapping for SelectItem
 import { Switch } from "@/components/ui/switch";
 import SubCategoryDatatable from "@/components/inventory/SubCategoryDatatable";
-import { CirclePlus, Plus } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import { useNavigate } from "react-router-dom";
+
 import { RefreshCcw } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -30,10 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
-import {
-  createCategory,
-  createSubCategory,
-} from "@/api/Category-subCategory/ApiClient";
+import { createSubCategory } from "@/api/Category-subCategory/ApiClient";
 import toast from "react-hot-toast";
 import { SelectViewport } from "@radix-ui/react-select";
 export interface SubCategory {
@@ -44,14 +40,13 @@ export interface SubCategory {
   status: boolean;
 }
 function SubCategorypage() {
-  const [file, setFile] = useState<File | null>();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  // const [file, setFile] = useState<File | null>();
+  // const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const { categoryPageMetaData, refreshCategories, categories, loading } =
-    useCategory();
+  //const [page, setPage] = useState(1);
+  //const [totalPages, setTotalPages] = useState(1);
+  const { categories } = useCategory();
   const [subCateFormData, setSubCategoryFormData] = React.useState<SubCategory>(
     {
       name: "",
@@ -62,14 +57,14 @@ function SubCategorypage() {
     }
   );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-    }
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setFile(file);
+  //     const url = URL.createObjectURL(file);
+  //     setImageUrl(url);
+  //   }
+  // };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -84,10 +79,10 @@ function SubCategorypage() {
   const handleSubmit = async () => {
     try {
       const payLoad = {
-        name: subCateFormData.name,
-        code: subCateFormData.code,
+        subCategoryName: subCateFormData.name,
+        categoryCode: subCateFormData.code,
         description: subCateFormData.description,
-        categoryID: subCateFormData.categoryID,
+        category_id: subCateFormData.categoryID,
         status: subCateFormData.status ? "ACTIVE" : "INACTIVE",
       };
 
@@ -98,6 +93,13 @@ function SubCategorypage() {
         success: (res) => {
           setOpen(false);
           setRefresh((prev) => !prev);
+          setSubCategoryFormData({
+            name: "",
+            code: "",
+            description: "",
+            categoryID: "",
+            status: false,
+          });
           return res.message;
         },
         error: (err) => {
@@ -109,7 +111,6 @@ function SubCategorypage() {
       console.error("Error During the create Category", error);
     }
   };
-  console.log(page);
 
   //const navigate = useNavigate();
   return (
@@ -165,8 +166,8 @@ function SubCategorypage() {
                         {categories?.length ? (
                           categories.map((cat) => (
                             <SelectItem
-                              key={cat.categoryID}
-                              value={cat.categoryID}
+                              key={cat.category_id}
+                              value={cat.category_id}
                             >
                               {cat.name}
                             </SelectItem>

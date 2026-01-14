@@ -2,8 +2,8 @@ import { axiosClient } from "..";
 
 const unitEndpoint = {
   createUnit: "/v1/unit/create",
-  getAllUnitPage: "/v1/unit/page",
-  getAllUnitActive: "/v1/unit/all",
+  getAllUnitPage: "/v1/unit/getunitpage",
+  getAllUnitActive: "/v1/unit/getunitpage",
   updateUnit: "/v1/unit/update",
   deleteUnit: "/v1/unit/delete",
 };

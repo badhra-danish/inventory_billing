@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import Products from "@/components/inventory/ProductDataTable";
 import { CirclePlus } from "lucide-react";

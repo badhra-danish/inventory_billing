@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Box,
   PackagePlus,
@@ -11,7 +11,6 @@ import {
   Boxes,
   ClipboardList,
   ShieldCheck,
-  Menu,
   LayoutDashboard,
   Layers,
   SquareActivity,
@@ -37,17 +36,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
   SidebarSeparator,
-  SidebarMenuAction,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 
 // Menu items.
 const DashboardItems = [
@@ -209,7 +200,7 @@ export default function AppSidebar({
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
       <Sidebar>

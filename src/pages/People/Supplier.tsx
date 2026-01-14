@@ -12,20 +12,10 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { createCustomer } from "@/api/Coustomer/CustomerClient";
 import toast from "react-hot-toast";
 import SupplierDataTable from "@/components/People/SupplierDataTable";
 import { createSupplier } from "@/api/Supplier/SupplierClient";
@@ -41,7 +31,6 @@ export const Suppliers = () => {
     postalCode: string;
     status: "ACTIVE" | "INACTIVE";
   }
-  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(false);
   const [supplierFormData, setSupplierFormData] = React.useState<Supplier>({

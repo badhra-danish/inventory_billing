@@ -54,8 +54,8 @@ import { Switch } from "../ui/switch";
 import toast from "react-hot-toast";
 
 export type Brand = {
-  brandID: string;
-  name: string;
+  brand_id: string;
+  brandName: string;
   createdAt: string;
   status: "ACTIVE" | "INACTIVE";
 };
@@ -88,7 +88,7 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
   const getallBrandPage = async () => {
     try {
       const res = await getAllBrand(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setBrandData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
@@ -101,6 +101,7 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
   React.useEffect(() => {
     getallBrandPage();
   }, [page, refresh]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -119,14 +120,16 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
   const handleUpdate = () => {
     try {
       const payload = {
-        name: selectedBrand?.name,
+        brandName: selectedBrand?.brandName,
         status: selectedBrand?.status,
       };
-      if (!selectedBrand?.brandID) {
+      if (!selectedBrand?.brand_id) {
         console.error("Brand ID is undefined");
         return;
       }
-      const updatePomise = upadateBrand(selectedBrand.brandID, payload);
+      console.log(payload);
+
+      const updatePomise = upadateBrand(selectedBrand.brand_id, payload);
       toast.promise(updatePomise, {
         loading: "Updating Brand..",
         success: (res) => {
@@ -145,8 +148,8 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
   };
   const handleDelete = () => {
     try {
-      if (selectedBrand?.brandID) {
-        const deletePromise = deleteBrand(selectedBrand.brandID);
+      if (selectedBrand?.brand_id) {
+        const deletePromise = deleteBrand(selectedBrand.brand_id);
         toast.promise(deletePromise, {
           loading: "Deleting Brand",
           success: () => {
@@ -192,7 +195,7 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "brandName",
       header: ({ column }) => {
         return (
           <Button
@@ -205,7 +208,7 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">{row.getValue("brandName")}</div>
       ),
     },
 
@@ -213,10 +216,9 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
       accessorKey: "createdAt",
       header: () => <div className="text-left">Created At</div>,
       cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"));
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("createdAt")}
-          </div>
+          <div className="capitalize text-left "> {date.toDateString()}</div>
         );
       },
     },
@@ -472,8 +474,8 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
               <Input
                 id="brand-1"
                 type="text"
-                name="name"
-                value={selectedBrand?.name}
+                name="brandName"
+                value={selectedBrand?.brandName}
                 onChange={handleChange}
               />
             </div>
@@ -493,8 +495,8 @@ export default function BrandDataTable({ refresh }: brandDatatable) {
                     return {
                       ...prev,
                       status: checked ? "ACTIVE" : "INACTIVE",
-                      brandID: prev.brandID,
-                      name: prev.name,
+                      brandID: prev.brand_id,
+                      name: prev.brandName,
                       createdAt: prev.createdAt,
                     };
                   })

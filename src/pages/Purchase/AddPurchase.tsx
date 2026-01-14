@@ -7,10 +7,9 @@
 // export default Invoives;
 
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, X } from "lucide-react";
-import React, { useState } from "react";
-import pdfImg from "../../assets/images/pdf.jpg";
-import xslImg from "../../assets/images/xls.png";
+import { useState } from "react";
+// import pdfImg from "../../assets/images/pdf.jpg";
+// import xslImg from "../../assets/images/xls.png";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+import { X } from "lucide-react";
 type Product = {
   code: string;
   name: string;

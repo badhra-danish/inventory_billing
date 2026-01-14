@@ -5,16 +5,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-  DialogHeader,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -23,29 +14,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Trash,
-  EllipsisVertical,
-  ReceiptIndianRupee,
-  ReceiptIndianRupeeIcon,
-  BadgeIndianRupee,
-  CirclePlus,
-} from "lucide-react";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
-import { useNavigate } from "react-router-dom";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import trashImg from "../../assets/images/trash.jpg";
+//import trashImg from "../../assets/images/trash.jpg";
 import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
 const data: SalesReturnDetail[] = [
@@ -302,7 +272,7 @@ export type SalesReturnDetail = {
 };
 
 export default function SalesReturnDataTable() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -371,7 +341,7 @@ export default function SalesReturnDataTable() {
       accessorKey: "customer",
       header: () => <div className="text-left"> Customer Name </div>,
       cell: ({ row }) => {
-        const sales = row.original;
+        // const sales = row.original;
         return (
           <div className="flex items-center gap-3">
             {/* Customer Image */}
@@ -490,8 +460,8 @@ export default function SalesReturnDataTable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: ({ row }) => {
-        const product = row.original;
+      cell: () => {
+        // const product = row.original;
         return (
           <div className="flex gap-2">
             {" "}

@@ -17,7 +17,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <div
-      className={` bg-white shadow-sm rounded-md p-6 flex items-center gap-5`}
+      className={` bg-white shadow-sm  rounded-md p-6 flex items-center gap-5`}
     >
       <div className={`${bg} ${bgText} p-3 rounded-full text-xl`}>{icon}</div>
 

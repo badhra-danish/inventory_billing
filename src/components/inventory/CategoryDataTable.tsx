@@ -153,7 +153,7 @@ import toast from "react-hot-toast";
 
 //Interface
 export type Category = {
-  categoryID: string;
+  category_id: string;
   name: string;
   slug: string;
   status: "ACTIVE" | "INACTIVE";
@@ -186,15 +186,20 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
 
   const [page, setPage] = React.useState(1);
   const [pageMeteData, setPageMetaData] = React.useState({
-    totalPages: 0,
+    totalPage: 0,
+    currentPage: 1,
+    totalItems: 0,
+    pageSize: 10,
+    hasnextPage: false,
+    hasPrevPage: false,
   });
-  const categoryOptions = [{ name: "All", categoryID: 0 }, ...categories];
+  const categoryOptions = [{ name: "All", category_id: 0 }, ...categories];
 
   const getallCategory = async (): Promise<void> => {
     try {
       setIsLoading(true);
       const res = await getAllCategory(page, 10);
-      if (res?.statusCode === 200) {
+      if (res?.status === "OK") {
         setCategoryData(res.data);
         setPageMetaData(res.pageMetaData);
         setIsLoading(false);
@@ -215,16 +220,16 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
         slug: selectedCategoryUpdate?.slug,
         status: selectedCategoryUpdate?.status,
       };
-      if (!selectedCategoryUpdate?.categoryID) {
+      if (!selectedCategoryUpdate?.category_id) {
         toast.error("No category selected!");
         return;
       }
 
       const res = await updateCategory(
-        selectedCategoryUpdate?.categoryID,
+        selectedCategoryUpdate?.category_id,
         payload
       );
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         toast.success(res.message);
         setOpenEdit(false);
         getallCategory();
@@ -235,12 +240,12 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   };
   const handleDelete = async () => {
     try {
-      if (!selectedCetogoryDelete?.categoryID) {
+      if (!selectedCetogoryDelete?.category_id) {
         toast.error("No category selected!");
         return;
       }
-      const res = await deleteCategory(selectedCetogoryDelete.categoryID);
-      if (res?.status == 204) {
+      const res = await deleteCategory(selectedCetogoryDelete.category_id);
+      if (res?.status === 200) {
         toast.success("Category Deleted..");
         setOpenDelete(false);
         getallCategory();
@@ -301,11 +306,11 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
     {
       accessorKey: "createdAt",
       header: () => <div className="text-left">Created At</div>,
+
       cell: ({ row }) => {
+        const date = new Date(row.getValue("createdAt"));
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("createdAt")}
-          </div>
+          <div className="capitalize text-left ">{date.toDateString()}</div>
         );
       },
     },
@@ -447,7 +452,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
 
               {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
-                  key={cat.categoryID}
+                  key={cat.category_id}
                   onClick={() => {
                     setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("name");
@@ -677,8 +682,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
             size="sm"
             //onClick={() => table.previousPage()}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page == 1}
-            //  disabled={!table.getCanPreviousPage()}
+            disabled={pageMeteData.hasPrevPage == false}
           >
             Previous
           </Button>
@@ -687,10 +691,9 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
             size="sm"
             // onClick={() => table.nextPage()}
             onClick={() =>
-              setPage((p) => Math.min(pageMeteData.totalPages, p + 1))
+              setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
-            disabled={page >= pageMeteData?.totalPages}
-            //  disabled={!table.getCanNextPage()}
+            disabled={pageMeteData.hasnextPage == false}
           >
             Next
           </Button>

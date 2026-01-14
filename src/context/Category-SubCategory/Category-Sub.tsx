@@ -7,27 +7,37 @@ import {
 } from "@/api/Category-subCategory/ApiClient";
 import { getAllBrandActive } from "@/api/brand/BrandApiClient";
 import { getAllUnitActive } from "@/api/unit/UnitApiClient";
+import type { Warranty } from "@/components/inventory/WarrantieDataTable";
+import { getAllWarranties } from "@/api/Warranty/Warranty";
 export interface Category {
-  categoryID: string;
+  category_id: string;
   name: string;
   slug: string;
   status: "ACTIVE" | "INACTIVE";
 }
 export interface Brand {
-  brandID: string;
-  name: string;
+  brand_id: string;
+  brandName: string;
 }
 export interface Unit {
-  unitID: string;
-  name: string;
+  unit_id: string;
+  unitName: string;
 }
-export interface SubCategory {
-  subCategoryID: string;
 
-  name: string;
-  code: string;
+export interface SubCategory {
+  subCategory_id: string;
+  subCategoryName: string;
+  categoryCode: string;
   description: string;
   categoryName: string;
+  status: "ACTIVE" | "INACTIVE";
+}
+export interface Wrranty {
+  warranty_id: string;
+  warrantyName: string;
+  desription: string;
+  period: "YEAR" | "MONTH";
+  duration: number;
   status: "ACTIVE" | "INACTIVE";
 }
 type CategoryContextType = {
@@ -35,11 +45,15 @@ type CategoryContextType = {
   brand: Brand[];
   subCategories: SubCategory[];
   unit: Unit[];
+  warranty: Warranty[];
   loading: boolean;
+
   refreshCategories: () => void;
   refreshSubCategories: (id: string) => void;
   refreshBrand: () => void;
   refreshUnit: () => void;
+  refreshWarranty: () => void;
+  // refreshWarranty: () => void;
   // categoryPageMetaData: {
   //   totalPages: number;
   //   totalElements: number;
@@ -59,6 +73,7 @@ export const CategoryProvider = ({
   const [brand, SetBrand] = useState<Brand[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [unit, setUnit] = useState<Unit[]>([]);
+  const [warranty, setWarranty] = useState<Warranty[]>([]);
   // const [categoryPageMetaData, setCategoryPageMetaData] = React.useState({
   //   totalPages: 0,
   //   totalElements: 0,
@@ -72,7 +87,7 @@ export const CategoryProvider = ({
     setLoading(true);
     try {
       const res = await getAllCategoryall();
-      if (res?.statusCode === 200) {
+      if (res?.status === "OK") {
         setCategories(res.data || []);
       }
     } catch (error) {
@@ -86,7 +101,7 @@ export const CategoryProvider = ({
     setLoading(true);
     try {
       const res = await getAllBrandActive();
-      if (res?.statusCode === 200) {
+      if (res?.status === "OK") {
         SetBrand(res.data || []);
       }
     } catch (error) {
@@ -99,7 +114,7 @@ export const CategoryProvider = ({
     setLoading(true);
     try {
       const res = await getAllUnitActive();
-      if (res?.statusCode === 200) {
+      if (res?.status === "OK") {
         setUnit(res.data || []);
       }
     } catch (error) {
@@ -113,6 +128,17 @@ export const CategoryProvider = ({
     try {
       const res = await getAllSubcategoryByCategory(id);
       setSubCategories(res?.data || []);
+    } catch (error) {
+      console.log("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const refreshWarranty = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllWarranties();
+      setWarranty(res?.data || []);
     } catch (error) {
       console.log("Error fetching categories:", error);
     } finally {
@@ -133,8 +159,10 @@ export const CategoryProvider = ({
         brand,
         subCategories,
         unit,
+        warranty,
         // categoryPageMetaData,
         refreshBrand,
+        refreshWarranty,
         refreshCategories,
         refreshSubCategories,
         refreshUnit,

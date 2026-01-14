@@ -112,10 +112,9 @@ import toast from "react-hot-toast";
 // ];
 
 export type Units = {
-  unitID: string;
-  name: string;
-  shortName: string;
-  //noOfProduct: number;
+  unit_id: string;
+  unitName: string;
+  unitShortName: string;
   status: "ACTIVE" | "INACTIVE";
 };
 type RefreshDatatable = {
@@ -143,15 +142,15 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
   const [openAddunitUpdate, setOpenUnitUpdate] = React.useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [selectedUnit, setSelectedUnit] = React.useState<Units>({
-    unitID: "",
-    name: "",
-    shortName: "",
+    unit_id: "",
+    unitName: "",
+    unitShortName: "",
     status: "ACTIVE",
   });
   const getallUnit = async () => {
     try {
       const res = await getAllUnit(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setUnitData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
@@ -177,11 +176,11 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
   const handleUpdate = () => {
     try {
       const payload = {
-        name: selectedUnit.name,
-        shortName: selectedUnit.shortName,
+        unitName: selectedUnit.unitName,
+        unitShortName: selectedUnit.unitShortName,
         status: selectedUnit.status,
       };
-      const updatePromise = updateUnit(selectedUnit?.unitID, payload);
+      const updatePromise = updateUnit(selectedUnit?.unit_id, payload);
       toast.promise(updatePromise, {
         loading: "Updating Unit",
         success: (res) => {
@@ -199,7 +198,7 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
   };
   const handleDelete = () => {
     try {
-      const deletePromise = deleteUnit(selectedUnit.unitID);
+      const deletePromise = deleteUnit(selectedUnit.unit_id);
       toast.promise(deletePromise, {
         loading: "Deleting Unit",
         success: () => {
@@ -240,7 +239,7 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
+      accessorKey: "unitName",
       header: ({ column }) => {
         return (
           <Button
@@ -253,17 +252,17 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">{row.getValue("unitName")}</div>
       ),
     },
 
     {
-      accessorKey: "shortName",
+      accessorKey: "unitShortName",
       header: () => <div className="text-left">Short Name</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("shortName")}
+            {row.getValue("unitShortName")}
           </div>
         );
       },
@@ -529,8 +528,8 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
               <Input
                 id="category-1"
                 type="text"
-                name="name"
-                value={selectedUnit?.name}
+                name="unitName"
+                value={selectedUnit?.unitName}
                 onChange={handleChange}
               />
             </div>
@@ -542,8 +541,8 @@ export default function UnitsDataTable({ refresh }: RefreshDatatable) {
               <Input
                 id="category-1"
                 type="text"
-                name="shortName"
-                value={selectedUnit.shortName}
+                name="unitShortName"
+                value={selectedUnit.unitShortName}
                 onChange={handleChange}
               />
             </div>

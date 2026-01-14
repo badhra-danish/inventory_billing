@@ -1,10 +1,9 @@
-import { Rss } from "lucide-react";
 import { axiosClient } from "..";
 
 const attributeEndPoint = {
   createAttribute: "/v1/attribute/create",
-  getAllAttributePage: "/v1/attribute/page",
-  getAllAttributeAll: "/v1/attribute/all",
+  getAllAttributePage: "/v1/attribute/getattributepage",
+  getAllAttributeAll: "/v1/attribute/getattributepage",
   deleteAttribute: "/v1/attribute/delete",
   updateAttribute: "/v1/attribute/update",
 };
@@ -15,10 +14,12 @@ export const getAllVaariantAttribute = async (
   try {
     const res = await axiosClient.get(attributeEndPoint.getAllAttributePage, {
       params: {
-        pageNumber: pageNo,
-        pageSize: pageSize,
-        sortParameter: "name",
-        sortDesc: false,
+        // pageNumber: pageNo,
+        // pageSize: pageSize,
+        // sortParameter: "name",
+        // sortDesc: false,
+        page: pageNo,
+        limit: pageSize,
       },
     });
     return res.data;

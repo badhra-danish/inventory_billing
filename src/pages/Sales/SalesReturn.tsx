@@ -1,21 +1,21 @@
-import React from "react";
+// import React from "react";
 import { Button } from "@/components/ui/button";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { CirclePlus, RefreshCcw } from "lucide-react";
 import SalesReturnDataTable from "@/components/Sales/SalesReturnDatatable";
-import {
-  Dialog,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-  DialogContent,
-} from "@/components/ui/dialog";
+// import {
+//   Dialog,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTrigger,
+//   DialogContent,
+// } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 function Sales() {
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
-  const [refresh, setRefresh] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
+  // const [refresh, setRefresh] = React.useState(false);
   return (
     <>
       <div className="flex items-center justify-between mb-5">
