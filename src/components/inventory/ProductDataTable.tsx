@@ -46,8 +46,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import { getAllProductPage } from "@/api/CreateProduct/ProductClinet";
+import {
+  getAllProductPage,
+  getAllVariantByProduct,
+} from "@/api/CreateProduct/ProductClinet";
 import Loader from "../commen/loader";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 // const data: Product[] = [
 //   {
 //     id: "P001",
@@ -223,17 +234,31 @@ import Loader from "../commen/loader";
 // ];
 
 export type Product = {
-  productID: string;
-  id: string;
-  name: string;
-  category: string;
-  brand: string;
-  unit: string;
-  qty: number;
-  price: number;
-  status: "In Stock" | "Low Stock" | "Out of Stock" | "failed";
+  product_id: string;
+  productName: string;
+  product_type: string;
+  manufacturer_date: null;
+  expiry_date: Date;
+  unitName: string;
+  subCategoryName: string;
+  variant_count: number;
+  categoryName: string;
+  brandName: string;
 };
-
+export type VariantAttribute = {
+  attributeName: string;
+  attributeValue: string;
+};
+export type Variant = {
+  product_variant_id: string;
+  skuCode: string;
+  price: number;
+  tax_type: string;
+  tax_value: number;
+  discount_type: string;
+  discount_value: number;
+  attributes: VariantAttribute[];
+};
 export default function Products() {
   const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -249,17 +274,58 @@ export default function Products() {
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [productData, setProductData] = React.useState([]);
-  const [selectedProduct, setSelecctedProduct] = React.useState({});
+  //const [selectedProduct, setSelectedProduct] = React.useState({});
+  const [expandedRows, setExpandedRows] = React.useState<
+    Record<string, boolean>
+  >({});
+  const [variantsMap, setVariantsMap] = React.useState<
+    Record<string, Variant[]>
+  >({});
+  const [loadingVariants, setLoadingVariants] = React.useState<
+    Record<string, boolean>
+  >({});
   const [pageMeteData, setPageMetaData] = React.useState({
     totalPages: 0,
   });
   const [isLoading, setIsLoading] = React.useState(false);
 
+  const [openVariant, setOpenVariant] = React.useState(false);
+  const [selectedVariant, setSelectedVariant] = React.useState({
+    variant_id: "",
+    skuCode: "",
+    price: 0,
+    tax_type: "",
+    tax_value: 0,
+    discount_type: "",
+    discount_value: 0,
+  });
+  const getSelectedVariant = (
+    id: string,
+    code: string,
+    price: number,
+    tx_t: string,
+    tx_v: number,
+    dis_t: string,
+    dis_v: number
+  ) => {
+    setSelectedVariant((prev) => ({
+      ...prev,
+      variant_id: id,
+      skuCode: code,
+      price: price,
+      tax_type: tx_t,
+      tax_value: tx_v,
+      discount_type: dis_t,
+      discount_value: dis_v,
+    }));
+  };
+  console.log(selectedVariant);
+
   const getAllProduct = async () => {
     try {
       setIsLoading(true);
       const res = await getAllProductPage(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setProductData(res.data || []);
         setPageMetaData(res.pageMetaData);
         setIsLoading(false);
@@ -271,11 +337,57 @@ export default function Products() {
       setIsLoading(false);
     }
   };
+
+  const fetchAllVariant = async (product_id: string) => {
+    try {
+      setLoadingVariants((prev) => ({ ...prev, [product_id]: true }));
+
+      // call your API to get variants for this product
+      const res = await getAllVariantByProduct(product_id); // API you already have
+
+      if (res.status === "OK") {
+        setVariantsMap((prev) => ({
+          ...prev,
+          [product_id]: res.data, // save variants for this product
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingVariants((prev) => ({ ...prev, [product_id]: false }));
+    }
+  };
+  const handleViewClick = (product_id: string) => {
+    // toggle expanded row
+    setExpandedRows((prev) => ({
+      ...prev,
+      [product_id]: !prev[product_id],
+    }));
+
+    // fetch variants only if not already loaded
+    if (!variantsMap[product_id]) {
+      fetchAllVariant(product_id);
+    }
+  };
+  React.useEffect(() => {
+    if (selectedVariant.discount_type === "NONE") {
+      setSelectedVariant((prev) => ({
+        ...prev,
+        discount_value: 0,
+      }));
+    }
+    if (selectedVariant.tax_type === "NONE") {
+      setSelectedVariant((prev) => ({
+        ...prev,
+        tax_value: 0,
+      }));
+    }
+  }, [selectedVariant.discount_type, selectedVariant.tax_type]);
+
   React.useEffect(() => {
     getAllProduct();
   }, [page]);
 
-  console.log(selectedProduct);
   const data: Product[] = productData;
   const columns: ColumnDef<Product>[] = [
     {
@@ -302,7 +414,7 @@ export default function Products() {
     },
 
     {
-      accessorKey: "name",
+      accessorKey: "productName",
       header: ({ column }) => {
         return (
           <Button
@@ -315,7 +427,9 @@ export default function Products() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize font-bold">{row.getValue("name")}</div>
+        <div className="capitalize font-bold">
+          {row.getValue("productName")}
+        </div>
       ),
     },
     {
@@ -325,6 +439,17 @@ export default function Products() {
         return (
           <div className="capitalize text-left ">
             {row.getValue("categoryName")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "subCategoryName",
+      header: () => <div className="text-left">SubCategory</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">
+            {row.getValue("subCategoryName")}
           </div>
         );
       },
@@ -340,13 +465,57 @@ export default function Products() {
         );
       },
     },
-
     {
-      accessorKey: "createdAt",
-      header: () => <div className="text-left">Created At</div>,
+      accessorKey: "unitName",
+      header: () => <div className="text-left">Units</div>,
       cell: ({ row }) => {
         return (
-          <div className="lowercase text-left">{row.getValue("createdAt")}</div>
+          <div className="lowercase text-left">{row.getValue("unitName")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "warrantyName",
+      header: () => <div className="text-left">Warranty</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">
+            {row.getValue("warrantyName")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "product_type",
+      header: () => <div className="text-left">Product-Type</div>,
+      cell: ({ row }) => {
+        return (
+          <div className=" text-left capitalize">
+            {row.getValue("product_type")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "variant_count",
+      header: () => <div className="text-left">Variants</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">
+            {row.getValue("variant_count")}
+          </div>
+        );
+      },
+    },
+
+    {
+      accessorKey: "manufacturer_date",
+      header: () => <div className="text-left">Manufacturer-Date</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="lowercase text-left">
+            {row.getValue("manufacturer_date")}
+          </div>
         );
       },
     },
@@ -361,10 +530,10 @@ export default function Products() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                navigate(`/product-detail/${product.productID}`);
-                setSelecctedProduct(product);
-              }}
+              onClick={() => handleViewClick(product.product_id)}
+              className={`transition-transform ${
+                expandedRows ? "rotate-180" : ""
+              }`}
             >
               <Eye />
             </Button>
@@ -575,7 +744,7 @@ export default function Products() {
             ))}
           </TableHeader>
 
-          <TableBody>
+          {/* <TableBody>
             {isLoading ? (
               <>
                 {" "}
@@ -620,6 +789,170 @@ export default function Products() {
                 )}
               </>
             )}
+          </TableBody> */}
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length}>
+                  <Loader />
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => {
+                const product = row.original;
+                const isExpanded = expandedRows[product.product_id]; // <-- state to track expanded rows
+                const attributeHeaders = Array.from(
+                  new Set(
+                    variantsMap[product.product_id]?.flatMap((variant) =>
+                      variant.attributes?.map((attr) => attr.attributeName)
+                    ) || []
+                  )
+                );
+
+                return (
+                  <React.Fragment key={row.id}>
+                    {/* Main product row */}
+                    <TableRow
+                      data-state={row.getIsSelected() && "selected"}
+                      className="hover:bg-gray-50 transition-colors capitalize"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className="px-4 py-3 text-sm text-gray-700 capitalize"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+
+                    {/* Expanded variant row */}
+                    {isExpanded && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className="bg-white py-2"
+                        >
+                          {loadingVariants[product.product_id] ? (
+                            <Loader />
+                          ) : variantsMap[product.product_id]?.length ? (
+                            <div className="space-y-2">
+                              {/* Scroll Container */}
+                              <div className="overflow-x-auto">
+                                <div className="min-w-max space-y-2">
+                                  {/* Header */}
+                                  <div
+                                    className="grid gap-2 bg-blue-500 py-3 px-3 rounded text-sm font-semibold text-white"
+                                    style={{
+                                      gridTemplateColumns: `repeat(${
+                                        5 + attributeHeaders.length
+                                      }, 160px)`,
+                                    }}
+                                  >
+                                    {attributeHeaders.map((attr) => (
+                                      <span key={attr}>{attr}</span>
+                                    ))}
+                                    <span>SKU</span>
+                                    <span>Price</span>
+                                    <span>Tax</span>
+                                    <span>Discount</span>
+                                    <span>Actions</span>
+                                  </div>
+
+                                  {/* Rows */}
+                                  {variantsMap[product.product_id].map(
+                                    (variant) => (
+                                      <div
+                                        key={variant.product_variant_id}
+                                        className="grid gap-2 bg-blue-100 p-2 rounded shadow-sm text-sm"
+                                        style={{
+                                          gridTemplateColumns: `repeat(${
+                                            5 + attributeHeaders.length
+                                          }, 160px)`,
+                                        }}
+                                      >
+                                        {/* Dynamic attributes */}
+                                        {attributeHeaders.map((attrName) => {
+                                          const attr = variant.attributes?.find(
+                                            (a) => a.attributeName === attrName
+                                          );
+                                          return (
+                                            <span key={attrName}>
+                                              {attr ? attr.attributeValue : "-"}
+                                            </span>
+                                          );
+                                        })}
+
+                                        {/* Fixed columns */}
+                                        <span className="font-medium">
+                                          {variant.skuCode}
+                                        </span>
+                                        <span>₹{variant.price}</span>
+                                        <span>
+                                          {variant.tax_type} {variant.tax_value}
+                                          %
+                                        </span>
+                                        <span>
+                                          {variant.discount_type}{" "}
+                                          {variant.discount_value}%
+                                        </span>
+                                        <span className="flex gap-2">
+                                          <Button
+                                            variant={"outline"}
+                                            size="sm"
+                                            onClick={() => (
+                                              setOpenVariant(true),
+                                              getSelectedVariant(
+                                                variant.product_variant_id,
+                                                variant.skuCode,
+                                                variant.price,
+                                                variant.tax_type,
+                                                variant.tax_value,
+                                                variant.discount_type,
+                                                variant.discount_value
+                                              )
+                                            )}
+                                          >
+                                            <Edit />
+                                          </Button>
+                                          <Button
+                                            variant={"outline"}
+                                            size="sm"
+                                            className="hover:bg-red-400 hover:text-white"
+                                          >
+                                            <Trash />
+                                          </Button>
+                                        </span>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-center">
+                              No variants found
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-gray-500 capitalize"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
@@ -651,6 +984,138 @@ export default function Products() {
           </Button>
         </div>
       </div>
+
+      {/* Dialog Box for the Variant Updated */}
+      <Dialog open={openVariant} onOpenChange={setOpenVariant}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <p> Edit Variant Details..</p>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-5 pt-5 mt-3 border-t-2">
+            <div className="flex gap-4 w-full">
+              {" "}
+              <div className="grid gap-3 w-full">
+                <Label>SkuCode:</Label>
+                <Input
+                  type="text"
+                  name="skuCode"
+                  value={selectedVariant.skuCode}
+                  onChange={(e) =>
+                    setSelectedVariant((prev) => ({
+                      ...prev,
+                      skuCode: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-3 w-full">
+                <Label>Price:</Label>
+                <Input
+                  type="number"
+                  name="price"
+                  value={selectedVariant.price}
+                  onChange={(e) =>
+                    setSelectedVariant((prev) => ({
+                      ...prev,
+                      price: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex gap-4 w-full">
+              {" "}
+              <div className="grid gap-3 w-full">
+                <Label>Tax Type:</Label>
+                <Select
+                  value={selectedVariant?.tax_type}
+                  onValueChange={(value) =>
+                    setSelectedVariant((prev) => {
+                      if (!prev) return prev;
+                      return {
+                        ...prev,
+                        tax_type: value,
+                      };
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Tax Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INCLUSIVE">Inclusive</SelectItem>
+                    <SelectItem value="EXCLUSIVE">Exclusive</SelectItem>
+                    <SelectItem value="NONE">None</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-3 w-full">
+                <Label>Tax Value:</Label>
+                <Input
+                  type="text"
+                  disabled={selectedVariant.tax_type === "NONE"}
+                  value={selectedVariant.tax_value}
+                  onChange={(e) =>
+                    setSelectedVariant((prev) => ({
+                      ...prev,
+                      tax_value: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex gap-4 w-full">
+              {" "}
+              <div className="grid gap-3 w-full">
+                <Label>Discount Type:</Label>
+                <Select
+                  value={selectedVariant?.discount_type}
+                  onValueChange={(value) =>
+                    setSelectedVariant((prev) => {
+                      if (!prev) return prev;
+                      return {
+                        ...prev,
+                        discount_type: value,
+                      };
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Discount Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FIXED">Fixed</SelectItem>
+                    <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+                    <SelectItem value="NONE">None</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-3 w-full">
+                <Label>Discount value:</Label>
+                <Input
+                  type="text"
+                  disabled={selectedVariant?.discount_type === "NONE"}
+                  value={selectedVariant.discount_value}
+                  onChange={(e) =>
+                    setSelectedVariant((prev) => ({
+                      ...prev,
+                      discount_value: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button>Update Variant</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
