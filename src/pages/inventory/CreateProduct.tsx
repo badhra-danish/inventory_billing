@@ -103,12 +103,12 @@ function CreateProduct() {
     valuesList: { attribute_value_id: string; value: string }[];
   }
   const [AllAttribute, setAllAttribute] = React.useState<VariantAttribute[]>(
-    []
+    [],
   );
   const [selectedAttribute, setSelectedAttribute] =
     React.useState<VariantAttribute | null>(null);
   const [attribute, setAttribute] = React.useState<VariantAttribute[] | null>(
-    []
+    [],
   );
   const [productType, setProductType] = React.useState<
     "SINGLE" | "VARIABLE" | ""
@@ -121,13 +121,11 @@ function CreateProduct() {
     expiry_date: "",
   });
   const [singleProductInfo, setSingleProductInfo] = React.useState({
-    quantity: "",
     price: "",
     taxType: "",
-    tax: "",
+    taxValue: "",
     discountType: "",
     discountValue: "",
-    quantityAlert: "",
     skuCode: "",
   });
 
@@ -146,7 +144,7 @@ function CreateProduct() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -205,7 +203,7 @@ function CreateProduct() {
   const handleSingleProduct = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setSingleProductInfo((prev) => ({
@@ -226,7 +224,7 @@ function CreateProduct() {
   const handleCustomFeildChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setcustomFeild((prev) => ({
@@ -239,7 +237,7 @@ function CreateProduct() {
   const handleProductInfoChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setProductInformation((prev) => ({
@@ -275,7 +273,8 @@ function CreateProduct() {
         if (a.attribute_id !== attributeId) return a;
         // check duplicates
         const exists = a.valuesList?.some(
-          (v) => v.value.trim().toLowerCase() === obj.value.trim().toLowerCase()
+          (v) =>
+            v.value.trim().toLowerCase() === obj.value.trim().toLowerCase(),
         );
         if (exists) return a;
         // otherwise push new value
@@ -305,10 +304,10 @@ function CreateProduct() {
           ? {
               ...a,
               valuesList: a.valuesList.filter(
-                (o) => o.attribute_value_id !== optionId
+                (o) => o.attribute_value_id !== optionId,
               ),
             }
-          : a
+          : a,
       );
     });
   };
@@ -321,7 +320,7 @@ function CreateProduct() {
         attributeName: a.attributeName,
         attribute_value_id: o.attribute_value_id,
         attributeValueName: o.value,
-      }))
+      })),
     );
     // cartesian product
     let combos: Array<Array<VariantAttributeDetail>> = [[]];
@@ -348,68 +347,64 @@ function CreateProduct() {
     if (productType == "SINGLE") {
       try {
         const singlePayload = {
-          productType: productType.toUpperCase(),
-          name: productInformation.productName,
-          slug: productInformation.slugName,
-          sellingType: productInformation.sellingType.toUpperCase(),
-          description: productInformation.description,
-          categoryID: productInformation.category,
-          subCategoryID: productInformation.subCategory,
-          brandID: productInformation.brand,
-          unitID: productInformation.unit,
-
-          ...customFeild,
-          productMetaData: {
-            quantity: Number(singleProductInfo.quantity),
-            price: Number(singleProductInfo.price),
-            taxType: singleProductInfo.taxType.toUpperCase(),
-            taxValue: Number(singleProductInfo.tax || 0),
-            discountType: singleProductInfo.discountType.toUpperCase(),
-            discountValue: Number(singleProductInfo.discountValue || 0),
-            quantityAlert: Number(singleProductInfo.quantityAlert || 0),
-            sku: singleProductInfo.skuCode,
-            image: image,
+          product: {
+            product_type: productType.toUpperCase(),
+            productName: productInformation.productName,
+            slugName: productInformation.slugName,
+            selling_type: productInformation.sellingType.toUpperCase(),
+            description: productInformation.description,
+            category_id: productInformation.category,
+            subcategory_id: productInformation.subCategory,
+            brand_id: productInformation.brand,
+            unit_id: productInformation.unit,
+            ...customFeild,
           },
+          productVariants: [
+            {
+              skuCode: singleProductInfo.skuCode,
+              price: Number(singleProductInfo.price),
+              tax_type: singleProductInfo.taxType?.toUpperCase(),
+              tax_value: Number(singleProductInfo.taxValue || 0),
+              discount_type: singleProductInfo.discountType?.toUpperCase(),
+              discount_value: Number(singleProductInfo.discountValue || 0),
+            },
+          ],
         };
-
-        // const productPromise = createProduct(singlePayload);
-        // toast.promise(productPromise, {
-        //   loading: "Creating Product..",
-        //   success: (res) => {
-        //     setProductInformation({
-        //       productName: "",
-        //       slugName: "",
-        //       skuCode: "",
-        //       sellingType: "",
-        //       category: "",
-        //       subCategory: "",
-        //       brand: "",
-        //       unit: "",
-        //       description: "",
-        //     });
-        //     setcustomFeild({
-        //       warrantyID: "",
-        //       manufacturer: "",
-        //       manufacturedDate: "",
-        //       expiryDate: "",
-        //     });
-        //     setImage([]);
-        //     setSingleProductInfo({
-        //       quantity: "",
-        //       price: "",
-        //       taxType: "",
-        //       tax: "",
-        //       discountType: "",
-        //       discountValue: "",
-        //       quantityAlert: "",
-        //       skuCode: "",
-        //     });
-        //     return res.message;
-        //   },
-        //   error: (err) => {
-        //     return err.response.data.message;
-        //   },
-        // });
+        const productPromise = createProduct(singlePayload);
+        toast.promise(productPromise, {
+          loading: "Creating Product..",
+          success: (res) => {
+            setProductInformation({
+              productName: "",
+              slugName: "",
+              skuCode: "",
+              sellingType: "",
+              category: "",
+              subCategory: "",
+              brand: "",
+              unit: "",
+              description: "",
+            });
+            setcustomFeild({
+              warranty_id: "",
+              manufacturer: "",
+              manufacturer_date: "",
+              expiry_date: "",
+            });
+            setSingleProductInfo({
+              price: "",
+              taxType: "",
+              taxValue: "",
+              discountType: "",
+              discountValue: "",
+              skuCode: "",
+            });
+            return res.message;
+          },
+          error: (err) => {
+            return err.response.data.message;
+          },
+        });
       } catch (error: any) {
         if (error.response?.data) {
           console.log(error);
@@ -435,19 +430,15 @@ function CreateProduct() {
           productVariants: variants?.map((v) => ({
             skuCode: v.sku,
             price: Number(v.price),
-            // quantity: Number(v.quantity),
             tax_type: v.taxType?.toUpperCase(),
             tax_value: Number(v.taxValue || 0),
             discount_type: v.discountType?.toUpperCase(),
             discount_value: Number(v.discountValue || 0),
-            //  quantityAlert: Number(v.quantityAlert || 0),
-
             attribute_value_ids: v.attributeDetails?.map(
-              (d) => d.attribute_value_id
+              (d) => d.attribute_value_id,
             ),
           })),
         };
-        console.log(variablePayload);
 
         const productPromise = createProduct(variablePayload);
         toast.promise(productPromise, {
@@ -491,12 +482,12 @@ function CreateProduct() {
   const updateVariantField = (
     variantId: string,
     field: keyof Variant,
-    value: any
+    value: any,
   ) => {
     setVariants((prev) => {
       if (!prev) return prev; // or return [] if you want to reset instead
       return prev.map((v) =>
-        v.id === variantId ? { ...v, [field]: value } : v
+        v.id === variantId ? { ...v, [field]: value } : v,
       );
     });
   };
@@ -506,35 +497,6 @@ function CreateProduct() {
       return prev.filter((v) => v.id !== id);
     });
   };
-
-  // const handleVariantImage = (variantId: string, file: File) => {
-  //   const imageURL = URL.createObjectURL(file); // preview before upload
-
-  //   setVariants((prev) => {
-  //     if (!prev) return prev;
-  //     return prev.map((v) =>
-  //       v.id === variantId ? { ...v, image: file, imageUrl: imageURL } : v
-  //     );
-  //   });
-  // };
-
-  // const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files = e.target.files;
-  //   if (!files) return;
-
-  //   const selectedFiles = Array.from(files);
-  //   const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-
-  //   setImageUrls((prev) => [...prev, ...urls]);
-  //   setImage((prev) => [...prev, ...selectedFiles]);
-  // };
-  // const removeImage = (index: number) => {
-  //   setImageUrls((prev) => prev.filter((_, i) => i !== index));
-  //   setImage((prev) => prev.filter((_, i) => i !== index));
-  // };
-  // const handleRemoveImage = (id: string) => {
-  //   setImages((prev) => prev.filter((img) => img.id !== id));
-  // };
 
   return (
     <>
@@ -593,6 +555,7 @@ function CreateProduct() {
                       id="productName"
                       placeholder="Enter product name"
                       name="productName"
+                      required
                       onChange={handleProductInfoChange}
                     />
                   </div>
@@ -607,6 +570,7 @@ function CreateProduct() {
                       placeholder="Enter slug"
                       name="slugName"
                       value={productInformation?.slugName}
+                      required
                       onChange={handleProductInfoChange}
                     />
                   </div>
@@ -870,24 +834,6 @@ function CreateProduct() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <Label
-                        htmlFor="quantity"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Quantity <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        className="w-full"
-                        placeholder=""
-                        name="quantity"
-                        onChange={handleSingleProduct}
-                        value={singleProductInfo.quantity}
-                      />
-                    </div>
-
-                    <div>
-                      <Label
                         htmlFor="price"
                         className="text-sm font-medium text-gray-700 mb-2 block"
                       >
@@ -924,44 +870,34 @@ function CreateProduct() {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="inclusive">Inclusive</SelectItem>
-                          <SelectItem value="exclusive">Exclusive</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="INCLUSIVE">Inclusive</SelectItem>
+                          <SelectItem value="EXCLUSIVE">Exclusive</SelectItem>
+                          <SelectItem value="NONE">None</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-
-                  {/* Row 2: Tax, Discount Type, Discount Value */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <Label
                         htmlFor="tax"
                         className="text-sm font-medium text-gray-700 mb-2 block"
                       >
-                        Tax <span className="text-red-500">*</span>
+                        Tax Value<span className="text-red-500">*</span>
                       </Label>
-                      <Select
-                        value={singleProductInfo.tax}
-                        onValueChange={(val) =>
-                          setSingleProductInfo((prev) => ({
-                            ...prev,
-                            tax: val,
-                          }))
-                        }
-                      >
-                        <SelectTrigger id="tax" className="w-full">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="10">GST 5%</SelectItem>
-                          <SelectItem value="12">GST 12%</SelectItem>
-                          <SelectItem value="18">GST 18%</SelectItem>
-                          <SelectItem value="28">GST 28%</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        id="taxvalue"
+                        type="number"
+                        className="w-full"
+                        placeholder=""
+                        name="taxValue"
+                        disabled={singleProductInfo.taxType === "NONE"}
+                        onChange={handleSingleProduct}
+                        value={singleProductInfo.taxValue}
+                      />
                     </div>
+                  </div>
 
+                  {/* Row 2: Tax, Discount Type, Discount Value */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <Label
                         htmlFor="discountType"
@@ -982,9 +918,9 @@ function CreateProduct() {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="percentage">Percentage</SelectItem>
-                          <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+                          <SelectItem value="FIXED">Fixed Amount</SelectItem>
+                          <SelectItem value="NONE">None</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1002,35 +938,14 @@ function CreateProduct() {
                         className="w-full"
                         placeholder=""
                         name="discountValue"
+                        disabled={singleProductInfo.discountType === "NONE"}
                         onChange={handleSingleProduct}
                         value={singleProductInfo.discountValue}
                       />
                     </div>
-                  </div>
-
-                  {/* Row 3: Quantity Alert */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <Label
-                        htmlFor="quantityAlert"
-                        className="text-sm font-medium text-gray-700 mb-2 block"
-                      >
-                        Quantity Alert <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="quantityAlert"
-                        type="number"
-                        className="w-full"
-                        placeholder=""
-                        name="quantityAlert"
-                        onChange={handleSingleProduct}
-                        value={singleProductInfo.quantityAlert}
-                      />
-                    </div>
-
                     <div>
                       <Label htmlFor="sku">
-                        SKU <span className="text-red-500">*</span>
+                        SKU Code<span className="text-red-500">*</span>
                       </Label>
                       <div className="flex gap-2">
                         <Input
@@ -1173,7 +1088,7 @@ function CreateProduct() {
                                       onClick={() =>
                                         removeOption(
                                           attr.attribute_id,
-                                          opt.attribute_value_id
+                                          opt.attribute_value_id,
                                         )
                                       }
                                       className="text-red-500 text-xs"
@@ -1246,7 +1161,7 @@ function CreateProduct() {
                                         {
                                           v.attributeDetails?.find(
                                             (d) =>
-                                              d.attribute_id === a.attribute_id
+                                              d.attribute_id === a.attribute_id,
                                           )?.attributeValueName
                                         }
                                       </div>
@@ -1263,7 +1178,7 @@ function CreateProduct() {
                                           "price",
                                           e.target.value === ""
                                             ? ""
-                                            : Number(e.target.value)
+                                            : Number(e.target.value),
                                         )
                                       }
                                       className="w-24"
@@ -1294,7 +1209,7 @@ function CreateProduct() {
                                         updateVariantField(
                                           v.id,
                                           "sku",
-                                          e.target.value
+                                          e.target.value,
                                         )
                                       }
                                       className="w-32"
@@ -1335,7 +1250,7 @@ function CreateProduct() {
                                           "taxValue",
                                           e.target.value === ""
                                             ? ""
-                                            : Number(e.target.value)
+                                            : Number(e.target.value),
                                         )
                                       }
                                       className="w-24"
@@ -1349,7 +1264,7 @@ function CreateProduct() {
                                           updateVariantField(
                                             v.id,
                                             "discountType",
-                                            val
+                                            val,
                                           )
                                         }
                                       >
@@ -1385,7 +1300,7 @@ function CreateProduct() {
                                           "discountValue",
                                           e.target.value === ""
                                             ? ""
-                                            : Number(e.target.value)
+                                            : Number(e.target.value),
                                         )
                                       }
                                       className="w-24"

@@ -47,26 +47,13 @@ export const Customer = () => {
     status: "INACTIVE",
   });
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    let finalValue = value;
-
-    if (name === "phone") {
-      const digits = value.replace(/\D/g, "");
-
-      if (!digits) {
-        finalValue = "+91 ";
-      } else {
-        finalValue = digits.startsWith("91")
-          ? `+91 ${digits.slice(2)}`
-          : `+91 ${digits}`;
-      }
-    }
 
     setCustomerFormData((prev: Customer) => ({
       ...prev,
-      [name]: finalValue,
+      [name]: value,
     }));
   };
   console.log(customerFormData);
@@ -79,9 +66,11 @@ export const Customer = () => {
         email: customerFormData.email,
         phone: customerFormData.phone,
         address: customerFormData.address,
-        city: customerFormData.city,
-        state: customerFormData.state,
-        postalCode: customerFormData.postalCode,
+        location: {
+          city: customerFormData.city,
+          state: customerFormData.state,
+          postalCode: customerFormData.postalCode,
+        },
         status: customerFormData.status,
       };
       const createPromise = createCustomer(payload);
@@ -193,7 +182,7 @@ export const Customer = () => {
                     <Input
                       type="tel"
                       name="phone"
-                      maxLength={14}
+                      maxLength={10}
                       value={customerFormData.phone}
                       onChange={handleChange}
                     />

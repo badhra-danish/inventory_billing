@@ -124,7 +124,7 @@ import toast from "react-hot-toast";
 // ];
 
 export type CustomerDetails = {
-  customerID: string;
+  customer_id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -141,7 +141,7 @@ interface refreshTable {
 export default function CustomerDataTable({ refresh }: refreshTable) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
@@ -151,7 +151,12 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
   const [pageMetaData, setPageMetaData] = React.useState({
-    totalPages: 0,
+    totalPage: 0,
+    currentPage: 0,
+    totalItems: 0,
+    pageSize: 0,
+    hasnextPage: false,
+    hasPrevPage: false,
   });
   const [customerData, setCustomerData] = React.useState([]);
   const [selectedCustomer, setSelectecdCustomer] =
@@ -162,7 +167,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
   const getAllCustomer = async () => {
     try {
       const res = await getAllCustomertPage(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setCustomerData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
@@ -179,15 +184,17 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
         email: selectedCustomer?.email,
         phone: selectedCustomer?.phone,
         address: selectedCustomer?.address,
-        city: selectedCustomer?.city,
-        state: selectedCustomer?.state,
-        postalCode: selectedCustomer?.postalCode,
+        location: {
+          city: selectedCustomer?.city,
+          state: selectedCustomer?.state,
+          postalCode: selectedCustomer?.postalCode,
+        },
         status: selectedCustomer?.status,
       };
-      if (!selectedCustomer?.customerID) return;
+      if (!selectedCustomer?.customer_id) return;
       const updatePromise = updateCustomer(
         payload,
-        selectedCustomer?.customerID
+        selectedCustomer?.customer_id,
       );
       toast.promise(updatePromise, {
         loading: "Upadating Customer",
@@ -207,8 +214,8 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
   };
   const handleDelete = () => {
     try {
-      if (!selectedCustomer?.customerID) return;
-      const deletePromise = deleteCustomer(selectedCustomer?.customerID);
+      if (!selectedCustomer?.customer_id) return;
+      const deletePromise = deleteCustomer(selectedCustomer?.customer_id);
       toast.promise(deletePromise, {
         loading: "Deleting Customer",
         success: () => {
@@ -226,7 +233,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
     }
   };
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     let finalValue = value;
@@ -520,7 +527,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -548,7 +555,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -571,7 +578,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -602,7 +609,7 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
             variant="outline"
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page == 1}
+            disabled={pageMetaData.hasPrevPage === false}
           >
             Previous
           </Button>
@@ -610,9 +617,9 @@ export default function CustomerDataTable({ refresh }: refreshTable) {
             variant="outline"
             size="sm"
             onClick={() =>
-              setPage((p) => Math.min(pageMetaData.totalPages, p + 1))
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
             }
-            disabled={page >= pageMetaData?.totalPages}
+            disabled={pageMetaData.hasnextPage === false}
           >
             Next
           </Button>

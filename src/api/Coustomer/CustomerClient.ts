@@ -1,10 +1,11 @@
 import { axiosClient } from "..";
 
 const EndPoint = {
-  createCustomer: "/v1/customers/create",
-  getAllCustomerPage: "/v1/customers/page",
-  updateCustomer: "/v1/customers/update",
-  deleteCustomer: "/v1/customers/delete",
+  createCustomer: "/v1/customer/create",
+  getAllCustomerPage: "/v1/customer/getcustomerpage",
+  updateCustomer: "/v1/customer/update",
+  deleteCustomer: "/v1/customer/delete",
+  getAllCustomer: "v1/customer/getallcustomer",
 };
 
 export const createCustomer = async (payload: object) => {
@@ -22,10 +23,17 @@ export const getAllCustomertPage = async (pageNo: number, pageSize: number) => {
       params: {
         pageNumber: pageNo,
         pageSize: pageSize,
-        sortParameter: "firstName",
-        sortDesc: false,
       },
     });
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAllCustomer = async () => {
+  try {
+    const res = await axiosClient.get(EndPoint.getAllCustomer);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -36,7 +44,7 @@ export const updateCustomer = async (payload: object, id: string) => {
   try {
     const res = await axiosClient.put(
       `${EndPoint.updateCustomer}/${id}`,
-      payload
+      payload,
     );
     return res.data;
   } catch (error) {

@@ -63,115 +63,39 @@ import {
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea";
-const data: StockProduct[] = [
-  {
-    image: Img,
-    productName: "Dell XPS 13 9310",
-    code: "P1200",
-    unit: "piece",
-    quantity: "20",
-    sellingPrice: "60,000",
-    purchasePrice: "50,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "MacBook Air M2",
-    code: "P1201",
-    unit: "piece",
-    quantity: "15",
-    sellingPrice: "95,000",
-    purchasePrice: "80,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "HP Spectre x360",
-    code: "P1202",
-    unit: "piece",
-    quantity: "10",
-    sellingPrice: "88,000",
-    purchasePrice: "72,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "Lenovo ThinkPad X1 Carbon",
-    code: "P1203",
-    unit: "piece",
-    quantity: "25",
-    sellingPrice: "1,10,000",
-    purchasePrice: "90,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "ASUS ROG Zephyrus G14",
-    code: "P1204",
-    unit: "piece",
-    quantity: "5",
-    sellingPrice: "1,25,000",
-    purchasePrice: "1,00,000",
-    status: "out of stock",
-  },
-  {
-    image: Img,
-    productName: "MacBook Air M2",
-    code: "P1201",
-    unit: "piece",
-    quantity: "15",
-    sellingPrice: "95,000",
-    purchasePrice: "80,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "HP Spectre x360",
-    code: "P1202",
-    unit: "piece",
-    quantity: "10",
-    sellingPrice: "88,000",
-    purchasePrice: "72,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "Lenovo ThinkPad X1 Carbon",
-    code: "P1203",
-    unit: "piece",
-    quantity: "25",
-    sellingPrice: "1,10,000",
-    purchasePrice: "90,000",
-    status: "stock In",
-  },
-  {
-    image: Img,
-    productName: "ASUS ROG Zephyrus G14",
-    code: "P1204",
-    unit: "piece",
-    quantity: "5",
-    sellingPrice: "1,25,000",
-    purchasePrice: "1,00,000",
-    status: "out of stock",
-  },
-];
+import {
+  deleteStock,
+  getAllStockPage,
+  updateStockQuantity,
+} from "@/api/Stock/Stockclinet";
+import toast from "react-hot-toast";
 
-export type StockProduct = {
-  image: String;
-  productName: String;
-  code: String;
-  unit: String;
-  quantity: String;
-  sellingPrice: String;
-  purchasePrice: String;
-  status: "stock In" | "out of stock";
+interface StockVariant {
+  stock_id: string;
+  productName: string;
+  skuCode: string;
+  price: number;
+  variant_label: string;
+  quantity: string;
+  status: "INSTOCK" | "STOCKOUT";
+}
+type stockDatatable = {
+  refresh: boolean;
 };
+interface SelectedVariant {
+  stock_id: string;
+  skuCode: string;
+  price: number;
+  variant_label: string;
+  productName: string;
+  quantity: string;
+}
 
-export default function StockMangeDatatable() {
+export default function StockMangeDatatable({ refresh }: stockDatatable) {
   // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
@@ -180,15 +104,144 @@ export default function StockMangeDatatable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
+  const [page, setPage] = React.useState(1);
   // DialogBox State Variable
   const [openStockIn, setOpenStockIn] = React.useState(false);
   const [openStockOut, setOpenStockOut] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [openHistory, setOpenHistory] = React.useState(false);
+  //hggk
+  const [stockVariantData, setStockVariantData] = React.useState<
+    StockVariant[]
+  >([]);
+  const [selectedVariant, setSelectedVariant] = React.useState<SelectedVariant>(
+    {
+      stock_id: "",
+      productName: "",
+      price: 0,
+      skuCode: "",
+      variant_label: "",
+      quantity: "",
+    },
+  );
+  const [quantityUpdateType, setQuantityUpdateType] = React.useState("");
+  const getAllStockData = async () => {
+    try {
+      const res = await getAllStockPage(page, 10);
+      if (res.status == "OK") {
+        setStockVariantData(res.data || []);
+      }
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message);
+      }
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllStockData();
+  }, [refresh]);
 
-  const columns: ColumnDef<StockProduct>[] = [
+  const handleUpdateStockQuantity = async () => {
+    const stock_id = selectedVariant.stock_id;
+
+    if (!stock_id) {
+      toast.error("Stock ID is missing");
+      return;
+    }
+
+    const payload = {
+      quantity: Number(selectedVariant.quantity),
+      type: quantityUpdateType,
+    };
+    // console.log(payload);
+
+    const updatePromise = updateStockQuantity(stock_id, payload);
+
+    toast.promise(updatePromise, {
+      loading: "Updating stock quantity...",
+      success: (res) => {
+        if (res?.status === "OK") {
+          getAllStockData();
+          setOpenStockIn(false);
+          setOpenStockOut(false);
+
+          setSelectedVariant({
+            stock_id: "",
+            productName: "",
+            price: 0,
+            skuCode: "",
+            variant_label: "",
+            quantity: "",
+          });
+
+          return res?.message || "Stock updated successfully";
+        }
+
+        return "Stock updated";
+      },
+      error: (err) => {
+        return (
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to update stock"
+        );
+      },
+    });
+  };
+  const handleDeleteStock = async () => {
+    const stock_id = selectedVariant.stock_id;
+
+    if (!stock_id) {
+      toast.error("Stock ID is missing");
+      return;
+    }
+
+    const deletePromise = deleteStock(stock_id);
+
+    toast.promise(deletePromise, {
+      loading: "Deleting stock...",
+      success: (res) => {
+        getAllStockData();
+        setOpenStockIn(false);
+        setOpenStockOut(false);
+        setOpenDelete(false);
+        setSelectedVariant({
+          stock_id: "",
+          productName: "",
+          price: 0,
+          skuCode: "",
+          variant_label: "",
+          quantity: "",
+        });
+
+        return res?.message || "Stock deleted successfully";
+      },
+      error: (err) => {
+        return (
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to delete stock"
+        );
+      },
+    });
+  };
+
+  const setVariantValue = (variant: StockVariant) => {
+    setSelectedVariant((prev) => ({
+      ...prev,
+      stock_id: variant.stock_id,
+      skuCode: variant.skuCode,
+      price: variant.price,
+      quantity: variant.quantity,
+      variant_label: variant.variant_label,
+      productName: variant.productName,
+    }));
+  };
+
+  const data: StockVariant[] = stockVariantData;
+  const columns: ColumnDef<StockVariant>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -211,22 +264,7 @@ export default function StockMangeDatatable() {
       enableSorting: false,
       enableHiding: false,
     },
-    // {
-    //   accessorKey: "image",
-    //   header: () => <div className="text-left">Image</div>,
-    //   cell: ({ row }) => {
-    //     const imageUrl = row.getValue("image") as string;
-    //     return (
-    //       <div className="flex justify-left">
-    //         <img
-    //           src={imageUrl}
-    //           alt="category"
-    //           className="w-6 h-6 rounded-md object-cover border"
-    //         />
-    //       </div>
-    //     );
-    //   },
-    // },
+
     {
       accessorKey: "productName",
       header: ({ column }) => {
@@ -241,15 +279,8 @@ export default function StockMangeDatatable() {
         );
       },
       cell: ({ row }) => {
-        // const imageUrl = row.getValue("image") as string;
-        const imageUrl = row.original as any;
         return (
           <div className="capitalize font-bold flex gap-3">
-            <img
-              src={imageUrl.image}
-              alt="category"
-              className="w-6 h-6 rounded-md object-cover border"
-            />
             {row.getValue("productName")}
           </div>
         );
@@ -257,20 +288,22 @@ export default function StockMangeDatatable() {
     },
 
     {
-      accessorKey: "code",
+      accessorKey: "variant_label",
       header: () => <div className="text-left">Code</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("code")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("variant_label")}
+          </div>
         );
       },
     },
     {
-      accessorKey: "unit",
+      accessorKey: "skuCode",
       header: () => <div className="text-left">Unit</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("unit")}</div>
+          <div className="capitalize text-left ">{row.getValue("skuCode")}</div>
         );
       },
     },
@@ -286,27 +319,15 @@ export default function StockMangeDatatable() {
       },
     },
     {
-      accessorKey: "sellingPrice",
-      header: () => <div className="text-left"> Selling Price</div>,
+      accessorKey: "price",
+      header: () => <div className="text-left"> Price</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">
-            {row.getValue("sellingPrice")}
-          </div>
+          <div className="capitalize text-left ">₹{row.getValue("price")}</div>
         );
       },
     },
-    {
-      accessorKey: "purchasePrice",
-      header: () => <div className="text-left"> Purchase Price</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">
-            {row.getValue("purchasePrice")}
-          </div>
-        );
-      },
-    },
+
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
@@ -314,7 +335,7 @@ export default function StockMangeDatatable() {
         const status: string = row.getValue("status");
 
         const colorClass =
-          status === "stock In"
+          status === "INSTOCK"
             ? "bg-green-400 text-white"
             : "bg-red-400 text-white";
 
@@ -333,8 +354,8 @@ export default function StockMangeDatatable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: () => {
-        // const product = row.original;
+      cell: ({ row }) => {
+        const product = row.original;
         return (
           <div className="flex gap-1">
             {/* Dialog History veiw */}
@@ -351,7 +372,11 @@ export default function StockMangeDatatable() {
               variant="outline"
               size="sm"
               className="bg-green-100 text-green-600"
-              onClick={() => setOpenStockIn(true)}
+              onClick={() => {
+                setOpenStockIn(true);
+                setVariantValue(product);
+                setQuantityUpdateType("add");
+              }}
             >
               <Layers />
               Stock In
@@ -361,7 +386,11 @@ export default function StockMangeDatatable() {
               variant="outline"
               size="sm"
               className="bg-red-100 text-red-500 text-xs"
-              onClick={() => setOpenStockOut(true)}
+              onClick={() => {
+                setOpenStockOut(true);
+                setVariantValue(product);
+                setQuantityUpdateType("remove");
+              }}
             >
               <Layers />
               Stock Out
@@ -370,26 +399,22 @@ export default function StockMangeDatatable() {
         );
       },
     },
-
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: () => {
-        // const product = row.original;
+      cell: ({ row }) => {
+        const product = row.original;
         return (
           <div className="flex gap-1">
+            {/* Dialog History veiw */}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setOpenUpdate(true)}
-            >
-              <Edit />
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setOpenDelete(true)}
+              className="bg-gray-200"
+              onClick={() => {
+                setOpenDelete(true);
+                setVariantValue(product);
+              }}
             >
               <Trash />
             </Button>
@@ -545,7 +570,7 @@ export default function StockMangeDatatable() {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -573,7 +598,7 @@ export default function StockMangeDatatable() {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -596,7 +621,7 @@ export default function StockMangeDatatable() {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -664,85 +689,82 @@ export default function StockMangeDatatable() {
             <DialogTitle>Add Quantity</DialogTitle>
           </DialogHeader>
           <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">
-                Product Type <span className="text-red-500">*</span>
-              </Label>
-              <RadioGroup className="flex gap-6">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="single" id="single" />
-                  <Label
-                    htmlFor="single"
-                    className="font-normal cursor-pointer"
-                  >
-                    Single Product
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="variable" id="variable" />
-                  <Label
-                    htmlFor="variable"
-                    className="font-normal cursor-pointer"
-                  >
-                    Variable Product
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div className="grid gap-4">
-              <Label>
-                {" "}
-                Product <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                onValueChange={(value) => console.log("Selected:", value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wood">Wood</SelectItem>
-                  <SelectItem value="hardware">Hardware</SelectItem>
-                  <SelectItem value="finishing">Finishing</SelectItem>
-                  <SelectItem value="tools">Tools</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Product details codec,quantiy */}
             <div className="flex gap-2 ">
               <div className="w-full grid gap-3">
                 <Label>
                   {" "}
-                  Code <span className="text-red-500">*</span>
+                  SkuCode <span className="text-red-500">*</span>
                 </Label>
-                <Input type="text" name="sub-category" readOnly disabled />
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant?.skuCode}
+                />
               </div>
               <div className="w-full grid gap-3">
                 <Label>
                   {" "}
-                  Unit <span className="text-red-500">*</span>
+                  Variant_label <span className="text-red-500">*</span>
                 </Label>
-                <Input type="text" name="sub-category" readOnly disabled />
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant?.variant_label}
+                />
               </div>
             </div>
-
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Price <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant.price}
+                />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  ProductName <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant.productName}
+                />
+              </div>
+            </div>
             {/* *** */}
             <div className="grid gap-4">
               <Label>
                 {" "}
                 Quantity <span className="text-red-500">*</span>
               </Label>
-              <Input type="text" name="sub-category" />
+              <Input
+                type="text"
+                name="quantity"
+                //  value={selectedVariant?.quantity}
+                onChange={(e) =>
+                  setSelectedVariant((prev) => ({
+                    ...prev,
+                    quantity: e.target.value,
+                  }))
+                }
+              />
             </div>
             {/* *** */}
-            <div className="grid gap-4">
-              <Label>
-                {" "}
-                Notes <span className="text-red-500">*</span>
-              </Label>
-              <Textarea rows={5} />
-            </div>
           </div>
 
           <div className="border-t-1 pt-5">
@@ -750,7 +772,7 @@ export default function StockMangeDatatable() {
               <DialogClose>
                 <Button variant={"outline"}>Cancel</Button>
               </DialogClose>
-              <Button>Add Quantity</Button>
+              <Button onClick={handleUpdateStockQuantity}>Add Quantity</Button>
             </DialogFooter>
           </div>
         </DialogContent>
@@ -762,92 +784,92 @@ export default function StockMangeDatatable() {
             <DialogTitle>Remove Quantity</DialogTitle>
           </DialogHeader>
           <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">
-                Product Type <span className="text-red-500">*</span>
-              </Label>
-              <RadioGroup className="flex gap-6">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="single" id="single" />
-                  <Label
-                    htmlFor="single"
-                    className="font-normal cursor-pointer"
-                  >
-                    Single Product
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="variable" id="variable" />
-                  <Label
-                    htmlFor="variable"
-                    className="font-normal cursor-pointer"
-                  >
-                    Variable Product
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div className="grid gap-4">
-              <Label>
-                {" "}
-                Product <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                onValueChange={(value) => console.log("Selected:", value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wood">Wood</SelectItem>
-                  <SelectItem value="hardware">Hardware</SelectItem>
-                  <SelectItem value="finishing">Finishing</SelectItem>
-                  <SelectItem value="tools">Tools</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Product details codec,quantiy */}
             <div className="flex gap-2 ">
               <div className="w-full grid gap-3">
                 <Label>
                   {" "}
-                  Code <span className="text-red-500">*</span>
+                  SkuCode <span className="text-red-500">*</span>
                 </Label>
-                <Input type="text" name="sub-category" readOnly disabled />
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant?.skuCode}
+                />
               </div>
               <div className="w-full grid gap-3">
                 <Label>
                   {" "}
-                  Unit <span className="text-red-500">*</span>
+                  Variant_label <span className="text-red-500">*</span>
                 </Label>
-                <Input type="text" name="sub-category" readOnly disabled />
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant?.variant_label}
+                />
               </div>
             </div>
-
+            <div className="flex gap-2 ">
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  Price <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant.price}
+                />
+              </div>
+              <div className="w-full grid gap-3">
+                <Label>
+                  {" "}
+                  ProductName <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  name="sub-category"
+                  readOnly
+                  disabled
+                  value={selectedVariant?.productName}
+                />
+              </div>
+            </div>
             {/* *** */}
             <div className="grid gap-4">
               <Label>
                 {" "}
                 Quantity <span className="text-red-500">*</span>
               </Label>
-              <Input type="text" name="sub-category" />
+              <Input
+                type="text"
+                name="quantity"
+                //    value={selectedVariant?.quantity}
+                onChange={(e) =>
+                  setSelectedVariant((prev) => ({
+                    ...prev,
+                    quantity: e.target.value,
+                  }))
+                }
+              />
             </div>
             {/* *** */}
-            <div className="grid gap-4">
-              <Label>
-                {" "}
-                Notes <span className="text-red-500">*</span>
-              </Label>
-              <Textarea rows={5} />
-            </div>
           </div>
+
           <div className="border-t-1 pt-5">
             <DialogFooter>
               <DialogClose>
                 <Button variant={"outline"}>Cancel</Button>
               </DialogClose>
-              <Button>Remove Quantity</Button>
+              <Button onClick={handleUpdateStockQuantity}>
+                Remove Quantity
+              </Button>
             </DialogFooter>
           </div>
         </DialogContent>
@@ -860,31 +882,6 @@ export default function StockMangeDatatable() {
             <DialogTitle>Update Stock</DialogTitle>
           </DialogHeader>
           <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-3 block">
-                Product Type <span className="text-red-500">*</span>
-              </Label>
-              <RadioGroup className="flex gap-6">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="single" id="single" />
-                  <Label
-                    htmlFor="single"
-                    className="font-normal cursor-pointer"
-                  >
-                    Single Product
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="variable" id="variable" />
-                  <Label
-                    htmlFor="variable"
-                    className="font-normal cursor-pointer"
-                  >
-                    Variable Product
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
             <div className="grid gap-4">
               <Label>
                 {" "}
@@ -986,10 +983,10 @@ export default function StockMangeDatatable() {
             </div>
 
             <DialogTitle className="text-lg font-semibold">
-              Delete Product
+              Delete Stock Variant
             </DialogTitle>
             <DialogDescription className="text-gray-500">
-              Are you sure you want to delete this product?
+              Are you sure you want to delete this Stock Variant?
             </DialogDescription>
           </DialogHeader>
 
@@ -997,7 +994,9 @@ export default function StockMangeDatatable() {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="destructive">Delete</Button>
+            <Button variant="destructive" onClick={handleDeleteStock}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
