@@ -608,7 +608,11 @@ export default function Products() {
       error: (err) => err.response.data.message,
     });
   };
-  const handleDeleteProduct = (product_id: string) => {
+  console.log(selectedProduct.product_id);
+
+  const handleDeleteProduct = () => {
+    const product_id = selectedProduct.product_id;
+    if (!product_id) return;
     const deletePromise = deleteProduct(product_id);
     toast.promise(deletePromise, {
       loading: "Product Deleting ...",
@@ -638,6 +642,7 @@ export default function Products() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="checked:text-white"
         />
       ),
       enableSorting: false,
@@ -651,6 +656,7 @@ export default function Products() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="text-white"
           >
             Product Name
             <ArrowUpDown />
@@ -665,7 +671,7 @@ export default function Products() {
     },
     {
       accessorKey: "categoryName",
-      header: () => <div className="text-left">Category</div>,
+      header: () => <div className="text-left text-white">Category</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
@@ -676,7 +682,7 @@ export default function Products() {
     },
     {
       accessorKey: "subCategoryName",
-      header: () => <div className="text-left">SubCategory</div>,
+      header: () => <div className="text-left text-white">SubCategory</div>,
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">
@@ -687,7 +693,7 @@ export default function Products() {
     },
     {
       accessorKey: "brandName",
-      header: () => <div className="text-left">Brand</div>,
+      header: () => <div className="text-left text-white">Brand</div>,
       cell: ({ row }) => {
         return (
           <div className=" text-left capitalize">
@@ -698,7 +704,7 @@ export default function Products() {
     },
     {
       accessorKey: "unitName",
-      header: () => <div className="text-left">Units</div>,
+      header: () => <div className="text-left text-white">Units</div>,
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">{row.getValue("unitName")}</div>
@@ -707,7 +713,7 @@ export default function Products() {
     },
     {
       accessorKey: "warrantyName",
-      header: () => <div className="text-left">Warranty</div>,
+      header: () => <div className="text-left text-white">Warranty</div>,
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">
@@ -718,7 +724,7 @@ export default function Products() {
     },
     {
       accessorKey: "product_type",
-      header: () => <div className="text-left">Product-Type</div>,
+      header: () => <div className="text-left text-white">Product-Type</div>,
       cell: ({ row }) => {
         return (
           <div className=" text-left capitalize">
@@ -729,7 +735,7 @@ export default function Products() {
     },
     {
       accessorKey: "variant_count",
-      header: () => <div className="text-left">Variants</div>,
+      header: () => <div className="text-left text-white">Variants</div>,
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">
@@ -741,7 +747,9 @@ export default function Products() {
 
     {
       accessorKey: "manufacturer_date",
-      header: () => <div className="text-left">Manufacturer-Date</div>,
+      header: () => (
+        <div className="text-left text-white">Manufacturer-Date</div>
+      ),
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">
@@ -824,43 +832,19 @@ export default function Products() {
             >
               <Edit />
             </Button>
-            <Dialog
-              open={openDeleteProduct}
-              onOpenChange={setOpenDeleteProduct}
+            <Button
+              variant={"outline"}
+              onClick={() => {
+                setOpenDeleteVariant(true);
+                setSelectedProduct((prev) => ({
+                  ...prev,
+                  product_id: product.product_id,
+                  product_name: product.productName,
+                }));
+              }}
             >
-              <DialogTrigger>
-                <Button variant="outline" size="sm">
-                  <Trash />
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="flex flex-col items-center text-center">
-                <DialogHeader className="flex flex-col items-center ">
-                  <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-                    <img src={trashImg} className="w-20  rounded-full" />
-                  </div>
-
-                  <DialogTitle className="text-lg font-semibold">
-                    Delete Product
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Are you sure you want to delete this product?
-                  </DialogDescription>
-                </DialogHeader>
-
-                <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDeleteProduct(product.product_id)}
-                  >
-                    Delete
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              <Trash />
+            </Button>
           </div>
         );
       },
@@ -1007,7 +991,7 @@ export default function Products() {
       {/*  Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="bg-blue-500 text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -2160,6 +2144,32 @@ export default function Products() {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button variant="destructive" onClick={handleDeleteVariant}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* delete Product Dialog Box */}
+      <Dialog open={openDeleteProduct} onOpenChange={setOpenDeleteProduct}>
+        <DialogContent className="flex flex-col items-center text-center">
+          <DialogHeader className="flex flex-col items-center ">
+            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
+              <img src={trashImg} className="w-20  rounded-full" />
+            </div>
+
+            <DialogTitle className="text-lg font-semibold">
+              Delete Product
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Are you sure you want to delete this product?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-1 flex justify-center space-x-1">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDeleteProduct}>
               Delete
             </Button>
           </DialogFooter>

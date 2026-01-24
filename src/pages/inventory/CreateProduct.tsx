@@ -9,6 +9,15 @@ import {
   List,
   PlusCircle,
   Trash,
+  Settings2,
+  Layers,
+  Tag,
+  Trash2,
+  X,
+  Sparkles,
+  AlertCircle,
+  Hash,
+  Box,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
@@ -357,7 +366,17 @@ function CreateProduct() {
             subcategory_id: productInformation.subCategory,
             brand_id: productInformation.brand,
             unit_id: productInformation.unit,
-            ...customFeild,
+            warranty_id: customFeild.warranty_id,
+            manufacturer: customFeild.manufacturer
+              ? customFeild.manufacturer
+              : undefined,
+            manufacturer_date: customFeild.manufacturer_date
+              ? customFeild.manufacturer_date
+              : undefined,
+            expiry_date: customFeild.expiry_date
+              ? customFeild.expiry_date
+              : undefined,
+            // ...customFeild,
           },
           productVariants: [
             {
@@ -797,31 +816,70 @@ function CreateProduct() {
             <div className="space-y-6 border-t pt-6">
               {/* Product Type */}
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                <Label className="text-sm font-semibold text-gray-900 mb-3 block">
                   Product Type <span className="text-red-500">*</span>
                 </Label>
 
                 <RadioGroup
-                  className="flex gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4"
                   onValueChange={(v) => handleProductTypeChange(v)}
                   value={productType}
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="SINGLE" id="single" />
+                  {/* Option 1: Single Product */}
+                  <div className="relative">
+                    <RadioGroupItem
+                      value="SINGLE"
+                      id="single"
+                      className="peer sr-only"
+                    />
                     <Label
                       htmlFor="single"
-                      className="font-normal cursor-pointer"
+                      className="
+          flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 cursor-pointer bg-white transition-all duration-200
+          hover:border-gray-300 hover:bg-gray-50
+          peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50/50 peer-data-[state=checked]:shadow-sm
+        "
                     >
-                      Single Product
+                      <div className="p-2.5 rounded-lg bg-gray-100 text-gray-600 peer-group-data-[state=checked]:bg-blue-100 peer-group-data-[state=checked]:text-blue-600">
+                        <Box className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-900">
+                          Single Product
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Standalone item with one SKU
+                        </span>
+                      </div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="VARIABLE" id="variable" />
+
+                  {/* Option 2: Variable Product */}
+                  <div className="relative">
+                    <RadioGroupItem
+                      value="VARIABLE"
+                      id="variable"
+                      className="peer sr-only"
+                    />
                     <Label
                       htmlFor="variable"
-                      className="font-normal cursor-pointer"
+                      className="
+          flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 cursor-pointer bg-white transition-all duration-200
+          hover:border-gray-300 hover:bg-gray-50
+          peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50/50 peer-data-[state=checked]:shadow-sm
+        "
                     >
-                      Variable Product
+                      <div className="p-2.5 rounded-lg bg-gray-100 text-gray-600">
+                        <Layers className="w-5 h-5" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-900">
+                          Variable Product
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Product with multiple options (size/color)
+                        </span>
+                      </div>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -967,145 +1025,180 @@ function CreateProduct() {
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-                    {/* Attributes manager */}
-                    <div className="p-4 border rounded space-y-4">
-                      <Label className="text-sm font-medium">Attributes</Label>
-                      <div className="flex gap-2">
-                        <Select
-                          value={
-                            selectedAttribute
-                              ? JSON.stringify(selectedAttribute)
-                              : ""
-                          }
-                          // onValueChange={(value) => setSelectedAttribute(value)}
-                          onValueChange={(value) => {
-                            const attrObj = JSON.parse(value); // convert string back to object
-                            setSelectedAttribute(attrObj);
-                            console.log("sfldmflds", selectedAttribute);
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Attribute" />
-                          </SelectTrigger>
-                          <SelectContent className="w-full">
-                            {AllAttribute.map((attr) => (
-                              <SelectItem
-                                key={attr.attribute_id}
-                                value={JSON.stringify(attr)}
-                              >
-                                {attr.attributeName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          onClick={() => {
-                            if (!selectedAttribute) return;
-                            // const obj = selectedAttribute;
-                            // console.log(obj);
-
-                            addAttribute(selectedAttribute);
-                            setSelectedAttribute(null);
-                          }}
-                        >
-                          <PlusCircle />
-                          Add
-                        </Button>
+                  <div className="max-w-7xl mx-auto space-y-8">
+                    {/* ---------------------------------------------------------------------------
+          SECTION 1: ATTRIBUTE MANAGER
+         --------------------------------------------------------------------------- */}
+                    <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                      <div className="px-6 py-4 border-b bg-gray-50/50 flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            Product Attributes
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            Define the options for your product (e.g., Size,
+                            Color).
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="space-y-3">
-                        {attribute?.length === 0 && (
-                          <p className="text-sm text-gray-500">
-                            No attributes added yet. Add an attribute name, then
-                            add options.
-                          </p>
-                        )}
-
-                        {attribute?.map((attr) => (
-                          <div
-                            key={attr.attribute_id}
-                            className="border p-3 rounded"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium">
-                                {attr.attributeName}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  onClick={() =>
-                                    removeAttribute(attr.attribute_id)
-                                  }
-                                  className="bg-transparent px-2 py-1 border-0 "
-                                  variant="outline"
-                                >
-                                  <Trash
-                                    className="text-red-500 stroke-3"
-                                    size={22}
-                                  />
-                                </Button>
-                              </div>
-                            </div>
-
-                            <div className="mt-3">
-                              <div className="flex gap-2">
-                                <Select
-                                  onValueChange={(value) => {
-                                    const obj = JSON.parse(value);
-                                    console.log(obj);
-
-                                    addValues(attr.attribute_id, obj);
-                                  }}
-                                >
-                                  <SelectTrigger className="w-full">
-                                    <SelectValue
-                                      placeholder={`Add Values for ${attr.attributeName} `}
-                                    >
-                                      Select The Values
-                                    </SelectValue>
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {attr.attributeValues?.map((val) => (
-                                      <SelectItem
-                                        key={val.attribute_value_id}
-                                        value={JSON.stringify(val)}
-                                      >
-                                        {val.value}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-
-                              <div className="mt-3 flex flex-wrap gap-2">
-                                {attr.valuesList?.map((opt) => (
-                                  <div
-                                    key={opt.attribute_value_id}
-                                    className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded"
+                      <div className="p-6 space-y-6">
+                        {/* Add New Attribute Control */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-end max-w-2xl">
+                          {/* Attribute Select Wrapper */}
+                          <div className="w-full sm:flex-1 space-y-2">
+                            <Label className="text-sm font-medium text-gray-700">
+                              Choose Attribute
+                            </Label>
+                            <Select
+                              value={
+                                selectedAttribute
+                                  ? JSON.stringify(selectedAttribute)
+                                  : ""
+                              }
+                              onValueChange={(value) => {
+                                const attrObj = JSON.parse(value);
+                                setSelectedAttribute(attrObj);
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select an attribute..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {AllAttribute.map((attr) => (
+                                  <SelectItem
+                                    key={attr.attribute_id}
+                                    value={JSON.stringify(attr)}
                                   >
-                                    <span className="text-sm">{opt.value}</span>
-                                    <button
-                                      onClick={() =>
-                                        removeOption(
-                                          attr.attribute_id,
-                                          opt.attribute_value_id,
-                                        )
-                                      }
-                                      className="text-red-500 text-xs"
-                                      type="button"
-                                    >
-                                      x
-                                    </button>
-                                  </div>
+                                    {attr.attributeName}
+                                  </SelectItem>
                                 ))}
-                              </div>
-                            </div>
+                              </SelectContent>
+                            </Select>
                           </div>
-                        ))}
 
-                        {attribute && attribute?.length > 0 && (
-                          <div className="flex justify-end">
-                            <Button onClick={generateVariants}>
+                          {/* Add Button */}
+                          <Button
+                            onClick={() => {
+                              if (!selectedAttribute) return;
+                              addAttribute(selectedAttribute);
+                              setSelectedAttribute(null);
+                            }}
+                            size="lg"
+                            disabled={!selectedAttribute}
+                            className="w-full sm:w-auto"
+                          >
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add Attribute
+                          </Button>
+                        </div>
+
+                        <hr className="border-gray-100" />
+
+                        {/* List of Added Attributes */}
+                        <div className="space-y-4">
+                          {attribute?.length === 0 ? (
+                            <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                              <p className="text-sm text-gray-500">
+                                No attributes added yet.
+                              </p>
+                            </div>
+                          ) : (
+                            attribute?.map((attr) => (
+                              <div
+                                key={attr.attribute_id}
+                                className="bg-white border rounded-lg p-4 shadow-sm hover:border-gray-300 transition-colors"
+                              >
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">
+                                      {attr.attributeName.charAt(0)}
+                                    </span>
+                                    <span className="font-semibold text-gray-900">
+                                      {attr.attributeName}
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      removeAttribute(attr.attribute_id)
+                                    }
+                                    className="text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                  {/* Select Values */}
+                                  <div className="w-full sm:w-64 flex-shrink-0">
+                                    <Select
+                                      onValueChange={(value) => {
+                                        const obj = JSON.parse(value);
+                                        addValues(attr.attribute_id, obj);
+                                      }}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={`+ Add ${attr.attributeName} value`}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {attr.attributeValues?.map((val) => (
+                                          <SelectItem
+                                            key={val.attribute_value_id}
+                                            value={JSON.stringify(val)}
+                                          >
+                                            {val.value}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+
+                                  {/* Value Chips */}
+                                  <div className="flex flex-wrap gap-2 items-center">
+                                    {attr.valuesList?.length === 0 && (
+                                      <span className="text-xs text-gray-400 italic px-2">
+                                        No values selected
+                                      </span>
+                                    )}
+                                    {attr.valuesList?.map((opt) => (
+                                      <span
+                                        key={opt.attribute_value_id}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200"
+                                      >
+                                        {opt.value}
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            removeOption(
+                                              attr.attribute_id,
+                                              opt.attribute_value_id,
+                                            )
+                                          }
+                                          className="text-gray-400 hover:text-red-500 focus:outline-none"
+                                        >
+                                          <Trash className="h-3 w-3" />
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+
+                        {/* Generate Action */}
+                        {attribute && attribute.length > 0 && (
+                          <div className="flex justify-end pt-2">
+                            <Button
+                              size="lg"
+                              onClick={generateVariants}
+                              className="px-8"
+                            >
                               Generate Variants
                             </Button>
                           </div>
@@ -1113,153 +1206,181 @@ function CreateProduct() {
                       </div>
                     </div>
 
-                    {/* Variants table */}
-                    <div className="p-4 border rounded">
-                      <div className="flex items-center justify-between mb-3">
-                        <Label className="text-sm font-medium">Variants</Label>
-                        <div className="text-sm text-gray-500">
-                          {variants?.length} variants
+                    {/* ---------------------------------------------------------------------------
+          SECTION 2: VARIANTS TABLE
+         --------------------------------------------------------------------------- */}
+                    <div className="bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                      <div className="px-6 py-4 border-b bg-gray-50/50 flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            Variants Preview
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            Adjust price, stock, and codes for each variant.
+                          </p>
                         </div>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {variants?.length || 0} items
+                        </span>
                       </div>
 
-                      {variants?.length === 0 ? (
-                        <p className="text-sm text-gray-500">
-                          No variants generated. Add attributes and click
-                          "Generate Variants".
-                        </p>
-                      ) : (
-                        <div className="overflow-x-auto max-w-full max-h-[400px] border rounded p-2">
-                          <table className="min-w-max w-full text-sm table-auto">
-                            <thead>
-                              <tr className="text-left bg-gray-200">
-                                {attribute?.map((a) => (
-                                  <th
-                                    key={a.attribute_id}
-                                    className="px-2 py-3"
-                                  >
-                                    {a.attributeName}
-                                  </th>
-                                ))}
-                                <th className="px-2 py-3">Price</th>
-                                <th className="px-2 py-3">SKU</th>
-                                <th className="px-2 py-3">Tax Type</th>
-                                <th className="px-2 py-3">Tax Value</th>
-                                <th className="px-2 py-3">Discount</th>
-                                <th className="px-2 py-3">Discount value</th>
-                                <th className="px-2 py-3">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {variants?.map((v) => (
-                                <tr key={v.id} className="border-t">
+                      <div className="flex-1 w-full overflow-hidden">
+                        {variants?.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-16 text-center">
+                            <AlertCircle className="h-10 w-10 text-gray-300 mb-2" />
+                            <p className="text-gray-500 font-medium">
+                              No variants generated yet
+                            </p>
+                            <p className="text-sm text-gray-400">
+                              Add attributes above and click Generate.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto w-full">
+                            <table className="w-full text-sm text-left">
+                              <thead className="text-xs text-white uppercase bg-blue-500 border-b ">
+                                <tr>
+                                  {/* Dynamic Attribute Headers */}
                                   {attribute?.map((a) => (
-                                    <td
+                                    <th
                                       key={a.attribute_id}
-                                      className="px-2 py-3 align-middle"
+                                      className="px-4 py-3 font-medium whitespace-nowrap min-w-[100px]"
                                     >
-                                      <div className="bg-gray-100 px-2 py-1 rounded text-sm inline-block">
+                                      {a.attributeName}
+                                    </th>
+                                  ))}
+                                  <th className="px-4 py-3 font-medium min-w-[120px]">
+                                    Price{" "}
+                                    <span className="text-red-500">*</span>
+                                  </th>
+                                  <th className="px-4 py-3 font-medium min-w-[140px]">
+                                    SKU
+                                  </th>
+                                  <th className="px-4 py-3 font-medium min-w-[130px]">
+                                    Tax Type
+                                  </th>
+                                  <th className="px-4 py-3 font-medium min-w-[100px]">
+                                    Tax Val
+                                  </th>
+                                  <th className="px-4 py-3 font-medium min-w-[130px]">
+                                    Discount
+                                  </th>
+                                  <th className="px-4 py-3 font-medium min-w-[100px]">
+                                    Disc Val
+                                  </th>
+                                  <th className="px-4 py-3 font-medium text-center w-[50px]"></th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-100">
+                                {variants?.map((v) => (
+                                  <tr
+                                    key={v.id}
+                                    className="hover:bg-blue-50 group transition-colors"
+                                  >
+                                    {/* Read-Only Attribute Columns */}
+                                    {attribute?.map((a) => (
+                                      <td
+                                        key={a.attribute_id}
+                                        className="px-4 py-3 whitespace-nowrap text-gray-700 font-medium"
+                                      >
                                         {
                                           v.attributeDetails?.find(
                                             (d) =>
                                               d.attribute_id === a.attribute_id,
                                           )?.attributeValueName
                                         }
+                                      </td>
+                                    ))}
+
+                                    {/* Input Fields - Using h-8 for compact look */}
+                                    <td className="px-4 py-2">
+                                      <Input
+                                        type="number"
+                                        className="h-8 w-28"
+                                        placeholder="0.00"
+                                        value={v.price}
+                                        onChange={(e) =>
+                                          updateVariantField(
+                                            v.id,
+                                            "price",
+                                            e.target.value === ""
+                                              ? ""
+                                              : Number(e.target.value),
+                                          )
+                                        }
+                                      />
+                                    </td>
+
+                                    <td className="px-4 py-2">
+                                      <Input
+                                        className="h-8 w-32 font-mono text-xs"
+                                        placeholder="SKU"
+                                        value={v.sku}
+                                        onChange={(e) =>
+                                          updateVariantField(
+                                            v.id,
+                                            "sku",
+                                            e.target.value,
+                                          )
+                                        }
+                                      />
+                                    </td>
+
+                                    <td className="px-4 py-2">
+                                      <Select
+                                        value={v.taxType}
+                                        onValueChange={(val) =>
+                                          updateVariantField(
+                                            v.id,
+                                            "taxType",
+                                            val,
+                                          )
+                                        }
+                                      >
+                                        <SelectTrigger className="h-8 w-32 text-xs">
+                                          <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="NONE">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="INCLUSIVE">
+                                            Inclusive
+                                          </SelectItem>
+                                          <SelectItem value="EXCLUSIVE">
+                                            Exclusive
+                                          </SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </td>
+
+                                    <td className="px-4 py-2">
+                                      <div className="relative">
+                                        <Input
+                                          type="number"
+                                          className="h-8 w-24 pr-6"
+                                          placeholder="0"
+                                          disabled={v.taxType === "NONE"}
+                                          value={v.taxValue}
+                                          onChange={(e) =>
+                                            updateVariantField(
+                                              v.id,
+                                              "taxValue",
+                                              e.target.value === ""
+                                                ? ""
+                                                : Number(e.target.value),
+                                            )
+                                          }
+                                        />
+                                        <span className="absolute right-2 top-1.5 text-xs text-gray-400 pointer-events-none">
+                                          %
+                                        </span>
                                       </div>
                                     </td>
-                                  ))}
 
-                                  <td className="px-2 py-3 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.price}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "price",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value),
-                                        )
-                                      }
-                                      className="w-24"
-                                    />
-                                  </td>
-
-                                  {/* <td className="px-2 py-3 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.quantity}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "quantity",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value)
-                                        )
-                                      }
-                                      className="w-24"
-                                    />
-                                  </td> */}
-
-                                  <td className="px-2 py-4 align-middle">
-                                    <Input
-                                      value={v.sku}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "sku",
-                                          e.target.value,
-                                        )
-                                      }
-                                      className="w-32"
-                                    />
-                                  </td>
-
-                                  <td className="px-2 py-4 align-middle">
-                                    <Select
-                                      onValueChange={(val) =>
-                                        updateVariantField(v.id, "taxType", val)
-                                      }
-                                    >
-                                      <SelectTrigger className="w-36">
-                                        <SelectValue
-                                          placeholder={v.taxType || "Select"}
-                                        />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="inclusive">
-                                          Inclusive
-                                        </SelectItem>
-                                        <SelectItem value="exclusive">
-                                          Exclusive
-                                        </SelectItem>
-                                        <SelectItem value="none">
-                                          None
-                                        </SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </td>
-                                  <td className="px-2 py-4 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.taxValue}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "taxValue",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value),
-                                        )
-                                      }
-                                      className="w-24"
-                                      disabled={v.taxType === "none"}
-                                    />
-                                  </td>
-                                  <td className="px-2 py-4 align-middle">
-                                    <div className="flex gap-2">
+                                    <td className="px-4 py-2">
                                       <Select
+                                        value={v.discountType}
                                         onValueChange={(val) =>
                                           updateVariantField(
                                             v.id,
@@ -1268,77 +1389,59 @@ function CreateProduct() {
                                           )
                                         }
                                       >
-                                        <SelectTrigger className="w-36">
-                                          <SelectValue
-                                            placeholder={
-                                              v.discountType || "Type"
-                                            }
-                                          />
+                                        <SelectTrigger className="h-8 w-32 text-xs">
+                                          <SelectValue placeholder="Type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="percentage">
+                                          <SelectItem value="NONE">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="PERCENTAGE">
                                             Percentage
                                           </SelectItem>
-                                          <SelectItem value="fixed">
+                                          <SelectItem value="FIXED">
                                             Fixed
-                                          </SelectItem>
-                                          <SelectItem value="none">
-                                            No Discount
                                           </SelectItem>
                                         </SelectContent>
                                       </Select>
-                                    </div>
-                                  </td>
+                                    </td>
 
-                                  <td className="px-2 py-4 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.discountValue}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "discountValue",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value),
-                                        )
-                                      }
-                                      className="w-24"
-                                      disabled={v.discountType === "none"}
-                                    />
-                                  </td>
-                                  {/* <td className="px-2 py-4 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.quantityAlert}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "quantityAlert",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value)
-                                        )
-                                      }
-                                      className="w-24"
-                                    />
-                                  </td> */}
+                                    <td className="px-4 py-2">
+                                      <Input
+                                        type="number"
+                                        className="h-8 w-24"
+                                        placeholder="0"
+                                        disabled={v.discountType === "NONE"}
+                                        value={v.discountValue}
+                                        onChange={(e) =>
+                                          updateVariantField(
+                                            v.id,
+                                            "discountValue",
+                                            e.target.value === ""
+                                              ? ""
+                                              : Number(e.target.value),
+                                          )
+                                        }
+                                      />
+                                    </td>
 
-                                  <td className="px-3 py-4 align-middle">
-                                    <Button
-                                      variant="outline"
-                                      className="h-8 w-8 p-0 text-red-500 border-red-400 hover:bg-red-100"
-                                      onClick={() => deleteVariant(v.id)}
-                                    >
-                                      <Trash />
-                                    </Button>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
+                                    <td className="px-4 py-2 text-center">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={() => deleteVariant(v.id)}
+                                      >
+                                        <Trash className="h-4 w-4" />
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </>
