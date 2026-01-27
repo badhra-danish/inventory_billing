@@ -13,7 +13,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -24,18 +24,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getAllCustomer } from "@/api/Coustomer/CustomerClient";
 import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import Loader from "@/components/commen/loader";
-import { createSales } from "@/api/Sales/SalesClient";
+import { createSales, getSaleById } from "@/api/Sales/SalesClient";
 import toast from "react-hot-toast";
 // type Product = {
 //   code: string;
 //   name: string;
 //   price: number;
 // };
-
+import type { SalesDetail } from "./SalesDetail";
+import type { SalesItemDetail } from "./SalesDetail";
+import type { CustomerDetail } from "./SalesDetail";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
 type ProductRow = {
   varint_id: string;
   skuCode: string;
@@ -62,14 +72,18 @@ type Product = {
   quantity: number;
   productName: string;
 };
-export default function AddSales() {
+
+export default function EditSales() {
   const navigate = useNavigate();
+  const { sale_id } = useParams();
+
   const [query, setQuery] = useState("");
   const [variant, setVariant] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
   //const [filtered, setFiltered] = useState<Product[]>([]);
   const [rows, setRows] = useState<ProductRow[]>([]);
   const [customer, setCustomer] = React.useState<customer[]>([]);
+
   const [selectedVariant, setSelectedVariant] = React.useState({
     product_variant_id: "",
     skuCode: "",
@@ -77,6 +91,7 @@ export default function AddSales() {
     variant_label: "",
     productName: "",
   });
+
   const [formData, setFormData] = React.useState({
     customer_id: "",
     date: "",
@@ -85,6 +100,46 @@ export default function AddSales() {
     discount: 0,
     status: "INPROGRESS",
   });
+  const [sales, setSales] = React.useState<SalesDetail>();
+
+  const getSales = async () => {
+    try {
+      if (!sale_id) return;
+      const res = await getSaleById(sale_id);
+      if (res.status == "OK") {
+        setSales(res.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    getSales();
+  }, []);
+  console.log(sales);
+
+  useEffect(() => {
+    if (!sales?.sales_items?.length) return;
+
+    const formattedRows: ProductRow[] = sales.sales_items.map((item) => ({
+      varint_id: item.product_variant_id,
+
+      skuCode: item.variant?.skuCode ?? "",
+      ProductName: item.variant?.productName ?? "",
+      variant_label: item.variant?.variant_label ?? "",
+
+      quantity: item.quantity,
+      price: item.variant.price ?? 0,
+
+      discount: Number(item.discount) ?? 0,
+      tax: item.tax ?? 0,
+      tax_amount: item.tax_amount ?? 0,
+      total: item.total ?? 0,
+    }));
+
+    setRows(formattedRows);
+  }, [sales]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -96,40 +151,10 @@ export default function AddSales() {
     }));
   };
 
-  // const handleClickVariant = (variant: Product) => {
-  //   try {
-  //     setSelectedVariant((prev) => ({
-  //       ...prev,
-  //       product_variant_id: variant.product_variant_id,
-  //       skuCode: variant.skuCode,
-  //       price: variant.price,
-  //       variant_label: variant.variant_label,
-  //       productName: variant.productName,
-  //     }));
-  //     setQuery("");
-  //     setVariant([]);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
   const handleCancel = () => {
     navigate("/sales");
   };
-  // Search logic
-  // const handleSearch = (value: string) => {
-  //   setQuery(value);
-
-  //   if (value.trim() === "") {
-  //     setFiltered([]);
-  //     return;
-  //   }
-
-  //   const match = products.filter((p) =>
-  //     p.code.toLowerCase().includes(value.toLowerCase()),
-  //   );
-
-  //   setFiltered(match);
-  // };
+  console.log(rows);
 
   // // Add row to table
   const addProductToTable = (variant: Product) => {
@@ -359,19 +384,6 @@ export default function AddSales() {
               onChange={handleInputChange}
             />
           </div>
-          {/* <div className="w-full grid gap-3">
-            <Label>Supplier Name</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select The Supplier" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Jhone">Jhone</SelectItem>
-                <SelectItem value="Alice">Alice</SelectItem>
-                <SelectItem value="Harry">Harry</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
         </div>
         <div className="grid gap-4 relative">
           <Label>Product</Label>
@@ -382,168 +394,6 @@ export default function AddSales() {
             onChange={(e) => setQuery(e.target.value)}
           />
           {query && (
-            // <div className="absolute top-full left-0 right-0 z-50 mt-2 w-full transform transition-all duration-200 ease-in-out">
-            //   <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden ring-1 ring-black/5">
-            //     {/* Header */}
-            //     {!loading && variant.length > 0 && (
-            //       <div className="bg-neutral-50/80 dark:bg-neutral-800/80 backdrop-blur-sm px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
-            //         <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-            //           Search Results
-            //         </p>
-            //         <span className="text-xs font-medium bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 px-2 py-0.5 rounded-full">
-            //           {variant.length} found
-            //         </span>
-            //       </div>
-            //     )}
-
-            //     {/* List Container */}
-            //     <div className="max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-200 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent">
-            //       {loading ? (
-            //         <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
-            //           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
-            //           <p className="text-sm font-medium">
-            //             Searching inventory...
-            //           </p>
-            //         </div>
-            //       ) : variant.length > 0 ? (
-            //         <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            //           {variant.map((item) => {
-            //             const isSelected =
-            //               selectedVariant?.product_variant_id ===
-            //               item.product_variant_id;
-
-            //             // --- STOCK LOGIC (Adjust 'item.stock' to your actual API variable name) ---
-            //             const stockCount = item.quantity || 0;
-            //             const isOutOfStock = stockCount === 0;
-            //             const isLowStock = stockCount > 0 && stockCount < 10;
-            //             // ------------------------------------------------------------------------
-
-            //             return (
-            //               <li
-            //                 key={item.product_variant_id}
-            //                 onClick={() =>
-            //                   !isOutOfStock && addProductToTable(item)
-            //                 }
-            //                 className={`
-            //           group relative p-4 transition-all duration-200 border-l-4
-            //           ${
-            //             isOutOfStock
-            //               ? "opacity-60 cursor-not-allowed bg-neutral-50 border-transparent grayscale"
-            //               : "cursor-pointer hover:bg-blue-50/60 dark:hover:bg-blue-900/10"
-            //           }
-            //           ${
-            //             isSelected
-            //               ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
-            //               : "bg-white dark:bg-neutral-900 border-transparent"
-            //           }
-            //         `}
-            //               >
-            //                 <div className="flex items-center justify-between gap-4">
-            //                   {/* Left: Product Details */}
-            //                   <div className="flex-1 min-w-0">
-            //                     <div className="flex items-center gap-2 mb-1.5">
-            //                       <h4
-            //                         className={`text-sm font-bold truncate ${isSelected ? "text-blue-700 dark:text-blue-300" : "text-neutral-900 dark:text-neutral-100"}`}
-            //                       >
-            //                         {item.productName}
-            //                       </h4>
-            //                       <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
-            //                         {item.variant_label}
-            //                       </span>
-            //                     </div>
-
-            //                     <div className="flex items-center gap-3">
-            //                       <span className="text-xs font-mono text-neutral-400 bg-neutral-50 dark:bg-neutral-800 px-1.5 rounded">
-            //                         {item.skuCode}
-            //                       </span>
-
-            //                       {/* Desktop Stock Indicator (Hidden on very small screens if needed) */}
-            //                       {!isOutOfStock && (
-            //                         <span
-            //                           className={`flex items-center text-xs font-medium ${isLowStock ? "text-orange-600" : "text-green-600"}`}
-            //                         >
-            //                           <Box className="w-3 h-3 mr-1" />
-            //                           {stockCount} Units Available
-            //                         </span>
-            //                       )}
-            //                     </div>
-            //                   </div>
-
-            //                   {/* Right: Price, Stock Badge & Actions */}
-            //                   <div className="text-right flex flex-col items-end gap-1 shrink-0">
-            //                     {/* Price Display */}
-            //                     <span className="text-base font-bold text-neutral-900 dark:text-white tabular-nums">
-            //                       ₹{item.price.toLocaleString()}
-            //                     </span>
-
-            //                     {/* Status / Action Button */}
-            //                     <div className="h-6 flex items-center justify-end">
-            //                       {isOutOfStock ? (
-            //                         <span className="inline-flex items-center text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md">
-            //                           Out of Stock
-            //                         </span>
-            //                       ) : isSelected ? (
-            //                         <span className="flex items-center text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md animate-in fade-in">
-            //                           <Check className="w-3.5 h-3.5 mr-1" />{" "}
-            //                           Added
-            //                         </span>
-            //                       ) : (
-            //                         <button className="flex items-center text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md shadow-sm opacity-0 group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0 transition-all duration-200">
-            //                           <Plus className="w-3.5 h-3.5 mr-1" /> Add
-            //                         </button>
-            //                       )}
-            //                     </div>
-
-            //                     {/* Mobile/Compact Stock Warning (Only shows if Low Stock) */}
-            //                     {isLowStock && !isOutOfStock && (
-            //                       <span className="text-[10px] text-orange-500 flex items-center mt-1">
-            //                         <AlertCircle className="w-3 h-3 mr-1" /> Low
-            //                         Stock
-            //                       </span>
-            //                     )}
-            //                   </div>
-            //                 </div>
-            //               </li>
-            //             );
-            //           })}
-            //         </ul>
-            //       ) : (
-            //         // Empty State
-            //         <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-            //           <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-full mb-3 ring-8 ring-neutral-50 dark:ring-neutral-800">
-            //             <PackageX className="h-8 w-8 text-neutral-400" />
-            //           </div>
-            //           <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            //             No products found
-            //           </p>
-            //           <p className="text-xs text-neutral-500 mt-1 max-w-[200px]">
-            //             We couldn't find any inventory matching "{query}"
-            //           </p>
-            //         </div>
-            //       )}
-            //     </div>
-
-            //     {/* Footer Hint */}
-            //     {!loading && variant.length > 0 && (
-            //       <div className="bg-neutral-50 dark:bg-neutral-800 px-4 py-2 border-t border-neutral-100 dark:border-neutral-800 text-center">
-            //         <p className="text-[10px] text-neutral-400">
-            //           Use{" "}
-            //           <span className="font-mono bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-1">
-            //             ↑
-            //           </span>{" "}
-            //           <span className="font-mono bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-1">
-            //             ↓
-            //           </span>{" "}
-            //           to navigate,{" "}
-            //           <span className="font-mono bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-1">
-            //             Enter
-            //           </span>{" "}
-            //           to select
-            //         </p>
-            //       </div>
-            //     )}
-            //   </div>
-            // </div>
             <div className="absolute top-full left-0 right-0 z-50 mt-2 w-full transform transition-all duration-200 ease-in-out">
               <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden ring-1 ring-black/5">
                 {/* Header */}
@@ -827,7 +677,7 @@ export default function AddSales() {
 
                       {/* Price */}
                       <td className="px-4 py-4 text-right tabular-nums text-neutral-600 dark:text-neutral-300">
-                        ${row.price.toFixed(2)}
+                        ${Number(row.price).toFixed(2)}
                       </td>
 
                       {/* Discount Input */}
@@ -883,13 +733,13 @@ export default function AddSales() {
 
                       {/* Tax Amount */}
                       <td className="px-4 py-4 text-right tabular-nums text-neutral-500 dark:text-neutral-400">
-                        ${row.tax_amount.toFixed(2)}
+                        ${Number(row.tax_amount).toFixed(2)}
                       </td>
 
                       {/* Total Cost */}
                       <td className="px-6 py-4 text-right">
                         <span className="font-bold text-neutral-900 dark:text-white tabular-nums">
-                          ₹{row.total.toFixed(2)}
+                          ₹{Number(row.total).toFixed(2)}
                         </span>
                       </td>
 
@@ -934,7 +784,7 @@ export default function AddSales() {
                   </td>
                   <td className="px-4 py-3 text-right font-semibold">
                     {" "}
-                    $ {orderSummary.total.toFixed(2)}
+                    $ {Number(orderSummary.total).toFixed(2)}
                   </td>
                 </tr>
                 <tr className="border-b last:border-none">
@@ -1039,6 +889,7 @@ export default function AddSales() {
           </div>
         </div>
       </div>
+      ;
     </>
   );
 }
