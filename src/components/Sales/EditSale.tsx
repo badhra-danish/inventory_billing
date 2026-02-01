@@ -4,6 +4,7 @@ import {
   Ban,
   Box,
   Check,
+  Cog,
   Loader2,
   Minus,
   Package,
@@ -28,7 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getAllCustomer } from "@/api/Coustomer/CustomerClient";
 import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import Loader from "@/components/commen/loader";
-import { createSales, getSaleById } from "@/api/Sales/SalesClient";
+import { createSales, getSaleById, updateSale } from "@/api/Sales/SalesClient";
 import toast from "react-hot-toast";
 // type Product = {
 //   code: string;
@@ -47,6 +48,7 @@ import {
 } from "../ui/dialog";
 import { DialogContent } from "@radix-ui/react-dialog";
 type ProductRow = {
+  sale_item_id?: string;
   varint_id: string;
   skuCode: string;
   ProductName: string;
@@ -72,6 +74,16 @@ type Product = {
   quantity: number;
   productName: string;
 };
+type SaleStatus = "INPROGRESS" | "COMPLETED" | "CANCELLED";
+
+interface SaleFormData {
+  customer_id: string;
+  date: string;
+  order_tax: number;
+  shipping: number;
+  discount: number;
+  status: SaleStatus;
+}
 
 export default function EditSales() {
   const navigate = useNavigate();
@@ -91,8 +103,7 @@ export default function EditSales() {
     variant_label: "",
     productName: "",
   });
-
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState<SaleFormData>({
     customer_id: "",
     date: "",
     order_tax: 0,
@@ -100,6 +111,7 @@ export default function EditSales() {
     discount: 0,
     status: "INPROGRESS",
   });
+
   const [sales, setSales] = React.useState<SalesDetail>();
 
   const getSales = async () => {
@@ -122,6 +134,7 @@ export default function EditSales() {
     if (!sales?.sales_items?.length) return;
 
     const formattedRows: ProductRow[] = sales.sales_items.map((item) => ({
+      sale_item_id: item.sales_item_id,
       varint_id: item.product_variant_id,
 
       skuCode: item.variant?.skuCode ?? "",
@@ -136,7 +149,15 @@ export default function EditSales() {
       tax_amount: item.tax_amount ?? 0,
       total: item.total ?? 0,
     }));
-
+    setFormData((prev) => ({
+      ...prev,
+      customer_id: sales.customer?.customer_id ?? "",
+      date: sales.sale_date,
+      order_tax: Number(sales.order_tax),
+      shipping: Number(sales.shipping),
+      discount: Number(sales.discount),
+      status: sales.status as SaleStatus,
+    }));
     setRows(formattedRows);
   }, [sales]);
 
@@ -295,7 +316,9 @@ export default function EditSales() {
       order_tax: Number(formData.order_tax || 0),
       shipping: Number(formData.shipping || 0),
       discount: Number(formData.discount || 0),
-      salesItems: rows.map((row) => ({
+
+      sales_items: rows.map((row) => ({
+        ...(row.sale_item_id && { sale_item_id: row.sale_item_id }),
         product_variant_id: row.varint_id,
         price: row.price,
         quantity: row.quantity,
@@ -305,11 +328,13 @@ export default function EditSales() {
         total: row.total,
       })),
     };
+    console.log(payload);
+    const sale_id = sales?.sale_id;
+    if (!sale_id) return;
+    const updatePromise = updateSale(sale_id, payload);
 
-    const salePromise = createSales(payload);
-
-    toast.promise(salePromise, {
-      loading: "Creating Sale ..",
+    toast.promise(updatePromise, {
+      loading: "updating Sale ..",
       success: (res) => {
         setRows([]);
         setQuery("");
@@ -319,8 +344,9 @@ export default function EditSales() {
           order_tax: 0,
           shipping: 0,
           discount: 0,
-          status: "",
+          status: "INPROGRESS",
         });
+        navigate("/sales");
         return res.message || "Sale created successfully!";
       },
       error: (err) => {
@@ -469,7 +495,7 @@ export default function EditSales() {
                             ${
                               isSelected
                                 ? "bg-blue-100 text-blue-700 border-blue-200"
-                                : "bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"
+                                : "bg-neutral-100 text-neutral-600  border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"
                             }
                           `}
                                   >
@@ -866,7 +892,7 @@ export default function EditSales() {
               onValueChange={(value) => {
                 setFormData((prev) => ({
                   ...prev,
-                  status: value,
+                  status: value as SaleStatus,
                 }));
               }}
             >

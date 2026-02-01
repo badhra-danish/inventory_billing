@@ -25,6 +25,7 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  Barcode,
   ChevronDown,
   CircleAlert,
   CirclePlus,
@@ -33,6 +34,7 @@ import {
   List,
   Plus,
   PlusCircle,
+  Printer,
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -79,6 +81,7 @@ import toast from "react-hot-toast";
 import { getAllVaariantAttributeAll } from "@/api/VariantAttribute/Attributeclinet";
 import { Textarea } from "../ui/textarea";
 import { useCategory } from "@/context/Category-SubCategory/Category-Sub";
+import BarcodeView from "../utils/Barcode";
 
 // ];
 
@@ -145,6 +148,7 @@ export type Variants = {
   price: number;
   tax_type: string;
   tax_value: number;
+  barcode: string;
   discount_type: string;
   discount_value: number;
   attributes: VariantAttributes[];
@@ -188,12 +192,14 @@ export default function Products() {
   const [openUpdateProduct, setOpenUpdateProduct] = React.useState(false);
   const [openDeleteVariant, setOpenDeleteVariant] = React.useState(false);
   const [openDeleteProduct, setOpenDeleteProduct] = React.useState(false);
+  const [openBarcode, setOpenBarcode] = React.useState(false);
   const [selectedVariant, setSelectedVariant] = React.useState({
     variant_id: "",
     skuCode: "",
     price: 0,
     tax_type: "",
     tax_value: 0,
+    barcode: "",
     discount_type: "",
     discount_value: 0,
     product_id: "",
@@ -224,6 +230,7 @@ export default function Products() {
     unit: "",
     description: "",
   });
+
   const {
     categories,
     brand,
@@ -262,6 +269,7 @@ export default function Products() {
     tx_t: string,
     tx_v: number,
     dis_t: string,
+    barcode: string,
     dis_v: number,
     product_id: string,
   ) => {
@@ -269,6 +277,7 @@ export default function Products() {
       ...prev,
       variant_id: id,
       skuCode: code,
+      barcode: barcode,
       price: price,
       tax_type: tx_t,
       tax_value: tx_v,
@@ -293,6 +302,57 @@ export default function Products() {
   React.useEffect(() => {
     getAllAttribute();
   }, []);
+
+  const handlePrint = () => {
+    const element = document.getElementById("barcode-print");
+    if (!element) return;
+
+    const w = window.open("", "_blank");
+    if (!w) return;
+
+    const clone = element.cloneNode(true) as Element;
+
+    w.document.write(`
+    <html>
+      <head>
+        <style>
+          @page {
+            size: 50mm 25mm;
+            margin: 0;
+          }
+
+          html, body {
+            width: 50mm;
+            height: 25mm;
+            margin: 0;
+            padding: 0;
+          }
+
+          #barcode-print {
+            width: 50mm;
+            height: 25mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          svg, canvas, img {
+            max-width: 100%;
+            max-height: 100%;
+          }
+        </style>
+      </head>
+      <body>
+        ${clone.outerHTML}
+      </body>
+    </html>
+  `);
+
+    w.document.close();
+    w.focus();
+    w.print();
+    w.close();
+  };
 
   // All finctions of the Add the varints opreations
   const addValues = (attributeId: string, obj: any) => {
@@ -426,6 +486,9 @@ export default function Products() {
       success: (res) => {
         setOpenAddVariant(false);
         fetchAllVariant(product_id);
+        setVariantsMap({});
+        setVariants([]);
+        setAttribute([]);
         return res.message;
       },
       error: (err) => {
@@ -549,6 +612,7 @@ export default function Products() {
           skuCode: "",
           price: 0,
           tax_type: "",
+          barcode: "",
           tax_value: 0,
           discount_type: "",
           discount_value: 0,
@@ -618,11 +682,13 @@ export default function Products() {
       loading: "Product Deleting ...",
       success: (res) => {
         getAllProduct();
+        setOpenDeleteProduct(false);
         return res.message;
       },
       error: (err) => err.response.data.message,
     });
   };
+  console.log("ks;mdaks", variantsMap);
   const data: Product[] = productData;
   const columns: ColumnDef<Product>[] = [
     {
@@ -835,7 +901,7 @@ export default function Products() {
             <Button
               variant={"outline"}
               onClick={() => {
-                setOpenDeleteVariant(true);
+                setOpenDeleteProduct(true);
                 setSelectedProduct((prev) => ({
                   ...prev,
                   product_id: product.product_id,
@@ -1054,81 +1120,92 @@ export default function Products() {
 
                     {/* Expanded variant row */}
                     {isExpanded && (
-                      <TableRow>
+                      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                         <TableCell
                           colSpan={columns.length}
-                          className="bg-white py-2"
+                          className="p-0 border-b border-slate-200"
                         >
-                          {loadingVariants[product.product_id] ? (
-                            <Loader />
-                          ) : variantsMap[product.product_id]?.length ? (
-                            <div className="space-y-2">
-                              {/* Scroll Container */}
-                              <div className="overflow-x-auto">
-                                <div className="min-w-max space-y-2">
-                                  {/* Header */}
-                                  <div
-                                    className="grid gap-2 bg-blue-500 py-3 px-3 rounded text-sm font-semibold text-white"
-                                    style={{
-                                      gridTemplateColumns:
-                                        "minmax(0, 2.5fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr)",
-                                    }}
-                                  >
-                                    {/* {attributeHeaders.map((attr) => (
-                                      <span key={attr}>{attr}</span>
-                                    ))} */}
-                                    <span>Attribute</span>
-                                    <span>SKU</span>
-                                    <span>Price</span>
-                                    <span>Tax</span>
-                                    <span>Discount</span>
-                                    <span>Actions</span>
+                          <div className="px-10 py-6 animate-in fade-in slide-in-from-top-2 duration-300 ease-out">
+                            {loadingVariants[product.product_id] ? (
+                              <div className="flex items-center justify-center py-10">
+                                <Loader />
+                              </div>
+                            ) : variantsMap[product.product_id]?.length ? (
+                              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                {/* Table Header 
+               Adjusted Grid: 3 (Attr) + 2 (SKU) + 2 (Price) + 2 (Tax) + 1 (Disc) + 2 (Actions) = 12
+            */}
+                                <div className="grid grid-cols-12 gap-4 bg-slate-50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                                  <div className="col-span-3">
+                                    Attribute Details
                                   </div>
+                                  <div className="col-span-2">SKU Code</div>
+                                  <div className="col-span-2">Base Price</div>
+                                  <div className="col-span-2">Tax/GST</div>
+                                  <div className="col-span-1">Discount</div>
+                                  <div className="col-span-2 text-right">
+                                    Actions
+                                  </div>
+                                </div>
 
-                                  {/* Rows */}
+                                {/* Table Rows Container */}
+                                <div className="divide-y divide-slate-100 max-h-[450px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 custom-scrollbar">
                                   {variantsMap[product.product_id].map(
                                     (variant) => (
                                       <div
                                         key={variant.product_variant_id}
-                                        className="grid gap-2 bg-blue-100 p-2 rounded shadow-sm text-sm"
-                                        style={{
-                                          gridTemplateColumns:
-                                            "minmax(0, 2.5fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr)",
-                                        }}
+                                        className="grid grid-cols-12 gap-4 items-center px-6 py-4 text-sm hover:bg-slate-50 transition-colors duration-150 group"
                                       >
-                                        {/* Dynamic attributes */}
-                                        {/* {attributeHeaders.map((attrName) => {
-                                          const attr = variant.attributes?.find(
-                                            (a) => a.attributeName === attrName,
-                                          );
-                                          return (
-                                            <span key={attrName}>
-                                              {attr ? attr.attributeValue : "-"}
-                                            </span>
-                                          );
-                                        })} */}
-                                        <span className="font-bold truncate whitespace-nowrap overflow-hidden">
-                                          {variant.variant_label}
-                                        </span>
-                                        {/* Fixed columns */}
-                                        <span className="font-medium">
+                                        {/* Label / Attribute (Col Span 3) */}
+                                        <div className="col-span-3">
+                                          <span className="inline-flex items-center font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100 text-xs">
+                                            {variant.variant_label}
+                                          </span>
+                                        </div>
+
+                                        {/* SKU (Col Span 2) */}
+                                        <div className="col-span-2 font-mono text-xs text-slate-500 font-medium">
                                           {variant.skuCode}
-                                        </span>
-                                        <span>₹{variant.price}</span>
-                                        <span>
-                                          {variant.tax_type} {variant.tax_value}
-                                          %
-                                        </span>
-                                        <span>
-                                          {variant.discount_type}{" "}
-                                          {variant.discount_value}%
-                                        </span>
-                                        <span className="flex gap-2">
+                                        </div>
+
+                                        {/* Price (Col Span 2) */}
+                                        <div className="col-span-2 font-semibold text-slate-900">
+                                          ₹{variant.price.toLocaleString()}
+                                        </div>
+
+                                        {/* Tax (Col Span 2) */}
+                                        <div className="col-span-2">
+                                          <div className="flex flex-col">
+                                            <span className="text-slate-700 font-medium text-xs">
+                                              {variant.tax_value}%
+                                            </span>
+                                            <span className="text-[10px] text-slate-400 uppercase leading-none mt-0.5">
+                                              {variant.tax_type}
+                                            </span>
+                                          </div>
+                                        </div>
+
+                                        {/* Discount (Col Span 1) */}
+                                        <div className="col-span-1">
+                                          {variant.discount_value > 0 ? (
+                                            <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded-full">
+                                              -{variant.discount_value}%
+                                            </span>
+                                          ) : (
+                                            <span className="text-slate-300 font-medium">
+                                              —
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        {/* Actions (Col Span 2 - Right Aligned) */}
+                                        <div className="col-span-2 flex justify-end items-center gap-2">
                                           <Button
-                                            variant={"outline"}
+                                            variant="outline"
                                             size="sm"
-                                            onClick={() => (
-                                              setOpenVariant(true),
+                                            className="h-7 px-3 text-[10px] font-bold uppercase border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+                                            onClick={() => {
+                                              setOpenBarcode(true);
                                               getSelectedVariant(
                                                 variant.product_variant_id,
                                                 variant.skuCode,
@@ -1136,23 +1213,46 @@ export default function Products() {
                                                 variant.tax_type,
                                                 variant.tax_value,
                                                 variant.discount_type,
+                                                variant.barcode,
                                                 variant.discount_value,
                                                 product.product_id,
-                                              )
-                                            )}
+                                              );
+                                            }}
                                           >
-                                            <Edit />
+                                            Barcode
                                           </Button>
-                                          {product.product_type ===
-                                            "VARIABLE" && (
-                                            <>
-                                              {" "}
+
+                                          <div className="flex items-center border-l border-slate-200 pl-2 gap-1">
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              className="h-7 w-7 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95"
+                                              onClick={() => {
+                                                setOpenVariant(true);
+                                                getSelectedVariant(
+                                                  variant.product_variant_id,
+                                                  variant.skuCode,
+                                                  variant.price,
+                                                  variant.tax_type,
+                                                  variant.tax_value,
+                                                  variant.discount_type,
+                                                  variant.barcode,
+                                                  variant.discount_value,
+                                                  product.product_id,
+                                                );
+                                              }}
+                                            >
+                                              <Edit className="w-3.5 h-3.5" />
+                                            </Button>
+
+                                            {product.product_type ===
+                                              "VARIABLE" && (
                                               <Button
-                                                variant={"outline"}
-                                                size="sm"
-                                                className="hover:bg-red-400 hover:text-white"
-                                                onClick={() => (
-                                                  setOpenDeleteVariant(true),
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all active:scale-95"
+                                                onClick={() => {
+                                                  setOpenDeleteVariant(true);
                                                   getSelectedVariant(
                                                     variant.product_variant_id,
                                                     variant.skuCode,
@@ -1160,27 +1260,30 @@ export default function Products() {
                                                     variant.tax_type,
                                                     variant.tax_value,
                                                     variant.discount_type,
+                                                    variant.barcode,
                                                     variant.discount_value,
                                                     product.product_id,
-                                                  )
-                                                )}
+                                                  );
+                                                }}
                                               >
-                                                <Trash />
+                                                <Trash className="w-3.5 h-3.5" />
                                               </Button>
-                                            </>
-                                          )}
-                                        </span>
+                                            )}
+                                          </div>
+                                        </div>
                                       </div>
                                     ),
                                   )}
                                 </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="text-gray-500 text-center">
-                              No variants found
-                            </div>
-                          )}
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-12 rounded-xl border-2 border-dashed border-slate-200 bg-white">
+                                <p className="text-sm font-medium text-slate-400">
+                                  No variants found for this product.
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     )}
@@ -1363,105 +1466,120 @@ export default function Products() {
       {/* For the Add the Variants of the Products */}
 
       <Dialog open={openAddVariant} onOpenChange={setOpenAddVariant}>
-        <DialogContent className="max-w-[90vw] w-full lg:max-w-4xl h-[90vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>Add the New Variant.</DialogTitle>
-            <DialogDescription>
-              Add The Variant Of the{" "}
-              <span className="text-blue-600 font-bold ">
-                {selectedProduct.product_name}
-              </span>
-            </DialogDescription>
+        <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-50/50">
+          {/* Header */}
+          <DialogHeader className="px-6 py-4 bg-white border-b border-slate-200 shrink-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-xl font-semibold text-slate-900">
+                  Variant Configuration
+                </DialogTitle>
+                <DialogDescription className="mt-1">
+                  Configure attributes and generate SKUs for{" "}
+                  <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                    {selectedProduct.product_name}
+                  </span>
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
-          <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-              {/* Attributes manager */}
-              <div className="p-4 border rounded space-y-4">
-                <Label className="text-sm font-medium">Attributes</Label>
-                <div className="flex gap-2">
-                  <Select
-                    value={
-                      selectedAttribute ? JSON.stringify(selectedAttribute) : ""
-                    }
-                    // onValueChange={(value) => setSelectedAttribute(value)}
-                    onValueChange={(value) => {
-                      const attrObj = JSON.parse(value); // convert string back to object
-                      setSelectedAttribute(attrObj);
-                      console.log("sfldmflds", selectedAttribute);
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Attribute" />
-                    </SelectTrigger>
-                    <SelectContent className="w-full">
-                      {AllAttribute.map((attr) => (
-                        <SelectItem
-                          key={attr.attribute_id}
-                          value={JSON.stringify(attr)}
-                        >
-                          {attr.attributeName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    onClick={() => {
-                      if (!selectedAttribute) return;
-                      // const obj = selectedAttribute;
-                      // console.log(obj);
+          {/* Scrollable Main Content */}
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* LEFT SIDE: Attribute Manager (Takes 4 cols on large screens) */}
+              <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <Label className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                      1. Define Attributes
+                    </Label>
+                    <span className="text-xs text-slate-400">Step 1 of 2</span>
+                  </div>
 
-                      addAttribute(selectedAttribute);
-                      setSelectedAttribute(null);
-                    }}
-                  >
-                    <PlusCircle />
-                    Add
-                  </Button>
-                </div>
+                  {/* Add Attribute Controls */}
+                  <div className="flex gap-2 mb-6">
+                    <Select
+                      value={
+                        selectedAttribute
+                          ? JSON.stringify(selectedAttribute)
+                          : ""
+                      }
+                      onValueChange={(value) => {
+                        const attrObj = JSON.parse(value);
+                        setSelectedAttribute(attrObj);
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 focus:ring-blue-500">
+                        <SelectValue placeholder="Select Attribute (e.g., Color)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {AllAttribute.map((attr) => (
+                          <SelectItem
+                            key={attr.attribute_id}
+                            value={JSON.stringify(attr)}
+                          >
+                            {attr.attributeName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      onClick={() => {
+                        if (!selectedAttribute) return;
+                        addAttribute(selectedAttribute);
+                        setSelectedAttribute(null);
+                      }}
+                      className="h-10 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add
+                    </Button>
+                  </div>
 
-                <div className="space-y-3">
-                  {attribute?.length === 0 && (
-                    <p className="text-sm text-gray-500">
-                      No attributes added yet. Add an attribute name, then add
-                      options.
-                    </p>
-                  )}
+                  {/* Active Attributes List */}
+                  <div className="space-y-4">
+                    {attribute?.length === 0 && (
+                      <div className="text-center py-8 border-2 border-dashed border-slate-100 rounded-lg bg-slate-50/50">
+                        <p className="text-sm text-slate-500">
+                          No attributes selected.
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Select an attribute above to start.
+                        </p>
+                      </div>
+                    )}
 
-                  {attribute?.map((attr) => (
-                    <div key={attr.attribute_id} className="border p-3 rounded">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium">{attr.attributeName}</div>
-                        <div className="flex items-center gap-2">
+                    {attribute?.map((attr) => (
+                      <div
+                        key={attr.attribute_id}
+                        className="group border border-slate-200 rounded-lg overflow-hidden transition-all hover:border-blue-300 hover:shadow-md bg-white"
+                      >
+                        <div className="flex items-center justify-between bg-slate-50 px-3 py-2 border-b border-slate-100">
+                          <span className="font-semibold text-sm text-slate-700">
+                            {attr.attributeName}
+                          </span>
                           <Button
                             onClick={() => removeAttribute(attr.attribute_id)}
-                            className="bg-transparent px-2 py-1 border-0 "
-                            variant="outline"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
                           >
-                            <Trash
-                              className="text-red-500 stroke-3"
-                              size={22}
-                            />
+                            <Trash size={14} />
                           </Button>
                         </div>
-                      </div>
 
-                      <div className="mt-3">
-                        <div className="flex gap-2">
+                        <div className="p-3 bg-white">
                           <Select
                             onValueChange={(value) => {
                               const obj = JSON.parse(value);
-                              console.log(obj);
-
                               addValues(attr.attribute_id, obj);
                             }}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full h-9 text-xs mb-3 border-slate-200">
                               <SelectValue
-                                placeholder={`Add Values for ${attr.attributeName} `}
-                              >
-                                Select The Values
-                              </SelectValue>
+                                placeholder={`+ Add ${attr.attributeName} option`}
+                              />
                             </SelectTrigger>
                             <SelectContent>
                               {attr.attributeValues?.map((val) => (
@@ -1474,184 +1592,230 @@ export default function Products() {
                               ))}
                             </SelectContent>
                           </Select>
-                        </div>
 
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {attr.valuesList?.map((opt) => (
-                            <div
-                              key={opt.attribute_value_id}
-                              className="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded"
-                            >
-                              <span className="text-sm">{opt.value}</span>
-                              <button
-                                onClick={() =>
-                                  removeOption(
-                                    attr.attribute_id,
-                                    opt.attribute_value_id,
-                                  )
-                                }
-                                className="text-red-500 text-xs"
-                                type="button"
+                          <div className="flex flex-wrap gap-2">
+                            {attr.valuesList?.length === 0 && (
+                              <span className="text-[10px] text-slate-400 italic">
+                                No options selected
+                              </span>
+                            )}
+                            {attr.valuesList?.map((opt) => (
+                              <span
+                                key={opt.attribute_value_id}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
                               >
-                                x
-                              </button>
-                            </div>
-                          ))}
+                                {opt.value}
+                                <button
+                                  onClick={() =>
+                                    removeOption(
+                                      attr.attribute_id,
+                                      opt.attribute_value_id,
+                                    )
+                                  }
+                                  className="text-slate-400 hover:text-red-500 transition-colors focus:outline-none"
+                                >
+                                  <span className="sr-only">Remove</span>
+                                  <span aria-hidden="true">×</span>
+                                </button>
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
 
-                  {attribute && attribute?.length > 0 && (
-                    <div className="flex justify-end">
-                      <Button onClick={generateVariants}>
-                        Generate Variants
+                    {attribute && attribute?.length > 0 && (
+                      <Button
+                        onClick={generateVariants}
+                        className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white shadow-md h-11"
+                      >
+                        Generate Combinations
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Variants table */}
-              <div className="p-4 border rounded">
-                <div className="flex items-center justify-between mb-3">
-                  <Label className="text-sm font-medium">Variants</Label>
-                  <div className="text-sm text-gray-500">
-                    {variants?.length} variants
+              {/* RIGHT SIDE: Variants Table (Takes 8 cols) */}
+              <div className="lg:col-span-8 h-full">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm h-full flex flex-col overflow-hidden">
+                  <div className="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                        2. Variant Pricing & SKU
+                      </Label>
+                      <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                        {variants?.length || 0} Generated
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {variants?.length === 0 ? (
-                  <p className="text-sm text-gray-500">
-                    No variants generated. Add attributes and click "Generate
-                    Variants".
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto max-w-full max-h-[400px] border rounded p-2 custom-scrollbar">
-                    <table className="min-w-max w-full text-sm table-auto">
-                      <thead>
-                        <tr className="text-left bg-gray-200">
-                          {attribute?.map((a) => (
-                            <th key={a.attribute_id} className="px-2 py-3">
-                              {a.attributeName}
-                            </th>
-                          ))}
-                          <th className="px-2 py-3">Price</th>
-                          <th className="px-2 py-3">SKU</th>
-                          <th className="px-2 py-3">Tax Type</th>
-                          <th className="px-2 py-3">Tax Value</th>
-                          <th className="px-2 py-3">Discount</th>
-                          <th className="px-2 py-3">Discount value</th>
-                          <th className="px-2 py-3">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {variants?.map((v) => (
-                          <tr key={v.id} className="border-t">
+                  {variants?.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center p-10 text-center bg-slate-50/30">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                        <svg
+                          className="w-8 h-8 text-slate-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-sm font-semibold text-slate-900">
+                        No Combinations Yet
+                      </h3>
+                      <p className="text-sm text-slate-500 mt-1 max-w-xs">
+                        Add attributes and options on the left, then click
+                        "Generate Combinations".
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex-1 overflow-auto custom-scrollbar relative">
+                      <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
+                          <tr>
                             {attribute?.map((a) => (
-                              <td
+                              <th
                                 key={a.attribute_id}
-                                className="px-2 py-3 align-middle"
+                                className="px-4 py-3 font-semibold whitespace-nowrap bg-slate-50"
                               >
-                                <div className="bg-gray-100 px-2 py-1 rounded text-sm inline-block">
-                                  {
-                                    v.attributeDetails?.find(
-                                      (d) => d.attribute_id === a.attribute_id,
-                                    )?.attributeValueName
-                                  }
+                                {a.attributeName}
+                              </th>
+                            ))}
+                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
+                              Price <span className="text-red-500">*</span>
+                            </th>
+                            <th className="px-4 py-3 font-semibold min-w-[120px] bg-slate-50">
+                              SKU Code
+                            </th>
+                            <th className="px-4 py-3 font-semibold min-w-[140px] bg-slate-50">
+                              Tax Details
+                            </th>
+                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
+                              Tax %
+                            </th>
+                            <th className="px-4 py-3 font-semibold min-w-[140px] bg-slate-50">
+                              Discount Type
+                            </th>
+                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
+                              Value
+                            </th>
+                            <th className="px-4 py-3 font-semibold text-center bg-slate-50 w-[50px]"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 bg-white">
+                          {variants?.map((v) => (
+                            <tr
+                              key={v.id}
+                              className="hover:bg-blue-50/30 transition-colors group"
+                            >
+                              {attribute?.map((a) => (
+                                <td
+                                  key={a.attribute_id}
+                                  className="px-4 py-3 whitespace-nowrap"
+                                >
+                                  <span className="font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded text-xs">
+                                    {
+                                      v.attributeDetails?.find(
+                                        (d) =>
+                                          d.attribute_id === a.attribute_id,
+                                      )?.attributeValueName
+                                    }
+                                  </span>
+                                </td>
+                              ))}
+
+                              {/* Price Input */}
+                              <td className="px-4 py-3">
+                                <div className="relative">
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
+                                    ₹
+                                  </span>
+                                  <Input
+                                    type="number"
+                                    value={v.price}
+                                    onChange={(e) =>
+                                      updateVariantField(
+                                        v.id,
+                                        "price",
+                                        e.target.value === ""
+                                          ? ""
+                                          : Number(e.target.value),
+                                      )
+                                    }
+                                    className="w-24 pl-6 h-9 focus-visible:ring-blue-500"
+                                    placeholder="0.00"
+                                  />
                                 </div>
                               </td>
-                            ))}
 
-                            <td className="px-2 py-3 align-middle">
-                              <Input
-                                type="number"
-                                value={v.price}
-                                onChange={(e) =>
-                                  updateVariantField(
-                                    v.id,
-                                    "price",
-                                    e.target.value === ""
-                                      ? ""
-                                      : Number(e.target.value),
-                                  )
-                                }
-                                className="w-24"
-                              />
-                            </td>
+                              {/* SKU Input */}
+                              <td className="px-4 py-3">
+                                <Input
+                                  value={v.sku}
+                                  onChange={(e) =>
+                                    updateVariantField(
+                                      v.id,
+                                      "sku",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="w-32 h-9 font-mono text-xs uppercase"
+                                  placeholder="AUTO-GEN"
+                                />
+                              </td>
 
-                            {/* <td className="px-2 py-3 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.quantity}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "quantity",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value)
-                                        )
-                                      }
-                                      className="w-24"
+                              {/* Tax Type */}
+                              <td className="px-4 py-3">
+                                <Select
+                                  onValueChange={(val) =>
+                                    updateVariantField(v.id, "taxType", val)
+                                  }
+                                >
+                                  <SelectTrigger className="w-32 h-9 text-xs">
+                                    <SelectValue
+                                      placeholder={v.taxType || "Select"}
                                     />
-                                  </td> */}
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="inclusive">
+                                      Inclusive
+                                    </SelectItem>
+                                    <SelectItem value="exclusive">
+                                      Exclusive
+                                    </SelectItem>
+                                    <SelectItem value="none">No Tax</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </td>
 
-                            <td className="px-2 py-4 align-middle">
-                              <Input
-                                value={v.sku}
-                                onChange={(e) =>
-                                  updateVariantField(
-                                    v.id,
-                                    "sku",
-                                    e.target.value,
-                                  )
-                                }
-                                className="w-32"
-                              />
-                            </td>
+                              {/* Tax Value */}
+                              <td className="px-4 py-3">
+                                <Input
+                                  type="number"
+                                  value={v.taxValue}
+                                  onChange={(e) =>
+                                    updateVariantField(
+                                      v.id,
+                                      "taxValue",
+                                      e.target.value === ""
+                                        ? ""
+                                        : Number(e.target.value),
+                                    )
+                                  }
+                                  className="w-20 h-9"
+                                  disabled={v.taxType === "none"}
+                                />
+                              </td>
 
-                            <td className="px-2 py-4 align-middle">
-                              <Select
-                                onValueChange={(val) =>
-                                  updateVariantField(v.id, "taxType", val)
-                                }
-                              >
-                                <SelectTrigger className="w-36">
-                                  <SelectValue
-                                    placeholder={v.taxType || "Select"}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="inclusive">
-                                    Inclusive
-                                  </SelectItem>
-                                  <SelectItem value="exclusive">
-                                    Exclusive
-                                  </SelectItem>
-                                  <SelectItem value="none">None</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </td>
-                            <td className="px-2 py-4 align-middle">
-                              <Input
-                                type="number"
-                                value={v.taxValue}
-                                onChange={(e) =>
-                                  updateVariantField(
-                                    v.id,
-                                    "taxValue",
-                                    e.target.value === ""
-                                      ? ""
-                                      : Number(e.target.value),
-                                  )
-                                }
-                                className="w-24"
-                                disabled={v.taxType === "none"}
-                              />
-                            </td>
-                            <td className="px-2 py-4 align-middle">
-                              <div className="flex gap-2">
+                              {/* Discount Type */}
+                              <td className="px-4 py-3">
                                 <Select
                                   onValueChange={(val) =>
                                     updateVariantField(
@@ -1661,81 +1825,86 @@ export default function Products() {
                                     )
                                   }
                                 >
-                                  <SelectTrigger className="w-36">
+                                  <SelectTrigger className="w-32 h-9 text-xs">
                                     <SelectValue
-                                      placeholder={v.discountType || "Type"}
+                                      placeholder={v.discountType || "None"}
                                     />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="percentage">
-                                      Percentage
+                                      % Percentage
                                     </SelectItem>
-                                    <SelectItem value="fixed">Fixed</SelectItem>
+                                    <SelectItem value="fixed">
+                                      ₹ Fixed
+                                    </SelectItem>
                                     <SelectItem value="none">
                                       No Discount
                                     </SelectItem>
                                   </SelectContent>
                                 </Select>
-                              </div>
-                            </td>
+                              </td>
 
-                            <td className="px-2 py-4 align-middle">
-                              <Input
-                                type="number"
-                                value={v.discountValue}
-                                onChange={(e) =>
-                                  updateVariantField(
-                                    v.id,
-                                    "discountValue",
-                                    e.target.value === ""
-                                      ? ""
-                                      : Number(e.target.value),
-                                  )
-                                }
-                                className="w-24"
-                                disabled={v.discountType === "none"}
-                              />
-                            </td>
-                            {/* <td className="px-2 py-4 align-middle">
-                                    <Input
-                                      type="number"
-                                      value={v.quantityAlert}
-                                      onChange={(e) =>
-                                        updateVariantField(
-                                          v.id,
-                                          "quantityAlert",
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value)
-                                        )
-                                      }
-                                      className="w-24"
-                                    />
-                                  </td> */}
+                              {/* Discount Value */}
+                              <td className="px-4 py-3">
+                                <Input
+                                  type="number"
+                                  value={v.discountValue}
+                                  onChange={(e) =>
+                                    updateVariantField(
+                                      v.id,
+                                      "discountValue",
+                                      e.target.value === ""
+                                        ? ""
+                                        : Number(e.target.value),
+                                    )
+                                  }
+                                  className="w-20 h-9"
+                                  disabled={v.discountType === "none"}
+                                />
+                              </td>
 
-                            <td className="px-3 py-4 align-middle">
-                              <Button
-                                variant="outline"
-                                className="h-8 w-8 p-0 text-red-500 border-red-400 hover:bg-red-100"
-                                onClick={() => deleteVariants(v.id)}
-                              >
-                                <Trash />
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                              {/* Delete Action */}
+                              <td className="px-4 py-3 text-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  onClick={() => deleteVariants(v.id)}
+                                  tabIndex={-1}
+                                >
+                                  <Trash className="w-4 h-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <DialogClose>
-              <Button variant="outline">Cancel</Button>
-              <Button onClick={handleCreateVariant}>Add Variant</Button>
+
+          {/* Footer */}
+          <DialogFooter className="px-6 py-4 bg-white border-t border-slate-200 shrink-0">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </Button>
             </DialogClose>
+            <Button
+              onClick={handleCreateVariant}
+              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[140px] shadow-sm"
+              disabled={!variants || variants.length === 0}
+            >
+              {(variants?.length ?? 0) > 0
+                ? `Save ${variants?.length ?? 0} Variants`
+                : "Save Variants"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1795,26 +1964,6 @@ export default function Products() {
                       onChange={handleProductInfoChange}
                     />
                   </div>
-
-                  {/* SKU */}
-                  {/* <div className="space-y-2 grid">
-                    <Label htmlFor="sku">
-                      SKU <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="sku"
-                        placeholder="Enter SKU"
-                        className="flex-1"
-                        name="skuCode"
-                        value={productInformation.skuCode}
-                        onChange={handleProductInfoChange}
-                      />
-                      <Button type="button" className=" text-white px-4">
-                        Generate
-                      </Button>
-                    </div>
-                  </div> */}
 
                   {/* Selling Type */}
                   <div className="space-y-2 grid">
@@ -2171,6 +2320,55 @@ export default function Products() {
             </DialogClose>
             <Button variant="destructive" onClick={handleDeleteProduct}>
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={openBarcode} onOpenChange={setOpenBarcode}>
+        <DialogContent className="max-w-[400px] rounded-2xl p-0 overflow-hidden border-none shadow-2xl">
+          {/* Screen-Only Header */}
+          <DialogHeader className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 print:hidden">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
+                <Barcode className="w-4 h-4 text-slate-600" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-semibold text-slate-900">
+                  Product Barcode
+                </DialogTitle>
+                <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">
+                  SKU: {selectedVariant.skuCode}
+                </p>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* The Printable Area */}
+          <div
+            id="barcode-print"
+            className="flex flex-col items-center justify-center p-10 bg-white"
+          >
+            {/* Visual Wrapper for Screen (removed on print via CSS below) */}
+            <div className="print:p-0 p-6 rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/30 print:bg-white print:border-none">
+              <div className="bg-white p-4 print:p-0 rounded-lg shadow-sm border border-slate-100 print:border-none print:shadow-none">
+                <BarcodeView value={selectedVariant.barcode} />
+              </div>
+            </div>
+          </div>
+
+          {/* Screen-Only Footer */}
+          <DialogFooter className="bg-slate-50/80 px-6 py-4 border-t border-slate-100 flex gap-2 print:hidden">
+            <DialogClose asChild>
+              <Button variant="ghost" className="flex-1 text-slate-600">
+                Close
+              </Button>
+            </DialogClose>
+            <Button
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 transition-all active:scale-95"
+              onClick={handlePrint}
+            >
+              <Printer className="w-4 h-4" />
+              Print Label
             </Button>
           </DialogFooter>
         </DialogContent>

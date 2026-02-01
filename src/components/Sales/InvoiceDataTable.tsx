@@ -39,105 +39,30 @@ import {
 // import trashImg from "../../assets/images/trash.jpg";
 // import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
-const data: InvoiceDetails[] = [
-  {
-    invoiceNo: "INV006",
-    customer: "Mark Joslyn",
-    dueDate: "24 Dec 2024",
-    amount: "500",
-    paid: "0.00",
-    amountDue: "500",
-    status: "unpaid",
-  },
-  {
-    invoiceNo: "INV007",
-    customer: "John Carter",
-    dueDate: "28 Dec 2024",
-    amount: "750",
-    paid: "250.00",
-    amountDue: "500",
-    status: "overdue",
-  },
-  {
-    invoiceNo: "INV008",
-    customer: "Emily Watson",
-    dueDate: "30 Dec 2024",
-    amount: "1200",
-    paid: "1200.00",
-    amountDue: "0.00",
-    status: "paid",
-  },
-  {
-    invoiceNo: "INV009",
-    customer: "Ava Smith",
-    dueDate: "02 Jan 2025",
-    amount: "950",
-    paid: "0.00",
-    amountDue: "950",
-    status: "unpaid",
-  },
-  {
-    invoiceNo: "INV010",
-    customer: "Michael Brown",
-    dueDate: "05 Jan 2025",
-    amount: "650",
-    paid: "100.00",
-    amountDue: "550",
-    status: "overdue",
-  },
-  {
-    invoiceNo: "INV008",
-    customer: "Emily Watson",
-    dueDate: "30 Dec 2024",
-    amount: "1200",
-    paid: "1200.00",
-    amountDue: "0.00",
-    status: "paid",
-  },
-  {
-    invoiceNo: "INV009",
-    customer: "Ava Smith",
-    dueDate: "02 Jan 2025",
-    amount: "950",
-    paid: "0.00",
-    amountDue: "950",
-    status: "unpaid",
-  },
-  {
-    invoiceNo: "INV008",
-    customer: "Emily Watson",
-    dueDate: "30 Dec 2024",
-    amount: "1200",
-    paid: "1200.00",
-    amountDue: "0.00",
-    status: "paid",
-  },
-  {
-    invoiceNo: "INV009",
-    customer: "Ava Smith",
-    dueDate: "02 Jan 2025",
-    amount: "950",
-    paid: "0.00",
-    amountDue: "950",
-    status: "unpaid",
-  },
-];
+import { getAllInvoiceInfo } from "@/api/Sales/SalesClient";
+import { useNavigate } from "react-router-dom";
+
+export type Customer = {
+  firstName: string;
+  lastName?: string;
+};
 
 export type InvoiceDetails = {
-  invoiceNo: string;
-  customer: string;
-  dueDate: string;
-  amount: string;
-  paid: string;
-  amountDue: string;
-  status: "unpaid" | "paid" | "overdue";
+  sale_id: string;
+  invoice_no: string;
+  customer: Customer;
+  sale_date: Date;
+  grand_total: number;
+  paid_amount: number;
+  due_amount: number;
+  payment_status: "UNPAID" | "PAID" | "PARTILLY_PAID";
 };
 
 export default function InvoiceDataTable() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   // const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
@@ -146,6 +71,33 @@ export default function InvoiceDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [page, setPage] = React.useState(1);
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPage: 0,
+    currentPage: 0,
+    totalItems: 0,
+    pageSize: 0,
+    hasnextPage: false,
+    hasPrevPage: false,
+  });
+  const [invoiceData, setInvoiceData] = React.useState<InvoiceDetails[]>([]);
+  const getAllInvoiceDetail = async () => {
+    try {
+      const res = await getAllInvoiceInfo(page, 10);
+      if (res.status == "OK") {
+        setInvoiceData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllInvoiceDetail();
+  }, []);
+  console.log(invoiceData);
+
+  const data: InvoiceDetails[] = invoiceData;
   const columns: ColumnDef<InvoiceDetails>[] = [
     {
       id: "select",
@@ -170,12 +122,12 @@ export default function InvoiceDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "invoiceNo",
+      accessorKey: "invoice_no",
       header: () => <div className="text-left">Inovoice No</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
-            {row.getValue("invoiceNo")}
+            {row.getValue("invoice_no")}
           </div>
         );
       },
@@ -195,80 +147,91 @@ export default function InvoiceDataTable() {
         );
       },
       cell: ({ row }) => {
-        // const sales = row.original;
+        const customer = row.original.customer;
         return (
           <div className="flex items-center gap-3">
             {/* Customer Image */}
 
             {/* Customer Name */}
             <span className="capitalize font-bold">
-              {row.getValue("customer")}
+              {customer?.firstName}-{customer.lastName}
             </span>
           </div>
         );
       },
     },
     {
-      accessorKey: "dueDate",
-      header: () => <div className="text-left">Due Date</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left ">{row.getValue("dueDate")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "amount",
+      accessorKey: "grand_total",
       header: () => <div className="text-left">Amount</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("amount")}</div>
+          <div className=" text-left capitalize font-bold">
+            ₹ {row.getValue("grand_total")}
+          </div>
         );
       },
     },
     {
-      accessorKey: "paid",
+      accessorKey: "paid_amount",
       header: () => <div className="text-left">Paid</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("paid")}</div>
+          <div className=" text-left capitalize text-green-600 font-bold">
+            ₹ {row.getValue("paid_amount")}
+          </div>
         );
       },
     },
     {
-      accessorKey: "amountDue",
+      accessorKey: "due_amount",
       header: () => <div className="text-left">Amount Due</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">
-            {row.getValue("amountDue")}
+          <div className=" text-left capitalize text-red-500 font-bold">
+            ₹ {row.getValue("due_amount")}
           </div>
         );
       },
     },
 
     {
-      accessorKey: "status",
+      accessorKey: "payment_status",
       header: () => <div className="text-left"> Status</div>,
       cell: ({ row }) => {
-        const status = String(row.getValue("status")).toLowerCase();
+        const status = String(row.getValue("payment_status")).toLowerCase();
 
-        let color = "bg-gray-500";
-        let label = status;
+        let color = "bg-gray-100 text-gray-600 border-gray-200";
 
         if (status === "paid") {
-          color = "bg-green-100 text-green-400 ";
-        } else if (status === "overdue") {
-          color = "bg-yellow-50 text-yellow-400";
+          color = "bg-emerald-200 text-emerald-700 border-emerald-200";
+        } else if (status === "partially_paid") {
+          color = "bg-amber-50 text-amber-700 border-amber-200";
         } else if (status === "unpaid") {
-          color = "bg-red-50 text-red-400";
+          color = "bg-rose-100 text-rose-700 border-rose-200";
         }
+
+        const label = status.replace("_", " ");
+
         return (
-          <div className="lowercase text-left">
+          <div className="flex justify-start items-center">
             <Badge
-              className={`${color} px-3 py-1 rounded-md capitalize font-semibold flex items-center`}
+              className={`
+                   ${color} 
+                   pl-3 pr-3.5 py-2 
+                   rounded-lg 
+                   capitalize 
+                   font-semibold 
+                   text-[11px] 
+                   tracking-wide
+                   flex items-center 
+                   gap-1.5
+                   border
+                   shadow-sm
+                 `}
             >
-              {label}
+              {/* Static Dot for payment status */}
+              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-70" />
+              <span className="leading-none">{label}</span>
             </Badge>
           </div>
         );
@@ -277,11 +240,15 @@ export default function InvoiceDataTable() {
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: () => {
-        // const product = row.original;
+      cell: ({ row }) => {
+        const invoice = row.original;
         return (
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/sales/invoice/${invoice.sale_id}`)}
+            >
               <Eye />
             </Button>
 
@@ -420,7 +387,7 @@ export default function InvoiceDataTable() {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -448,7 +415,7 @@ export default function InvoiceDataTable() {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -471,7 +438,7 @@ export default function InvoiceDataTable() {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

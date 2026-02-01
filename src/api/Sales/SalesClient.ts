@@ -3,7 +3,9 @@ import { axiosClient } from "..";
 const endpoint = {
   createSales: "v1/sale/create",
   getAllSalesInfo: "v1/sale/getallsale",
+  getAllInvoiceInfo: "v1/sale/getallinvoice",
   createPayment: "v1/sale/createpayment",
+  updateSale: "v1/sale/update",
   getAllPayment: "v1/sale/getallpayment",
   getSaleById: "v1/sale/getsalebyid",
   updatePayment: "v1/sale/updatepayment",
@@ -19,9 +21,32 @@ export const createSales = async (payload: object) => {
     throw error;
   }
 };
+export const updateSale = async (id: string, payload: object) => {
+  try {
+    const res = await axiosClient.put(`${endpoint.updateSale}/${id}`, payload);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export const getAllSalesInfo = async (pageNo: number, pageSize: number) => {
   try {
     const res = await axiosClient.get(endpoint.getAllSalesInfo, {
+      params: {
+        page: pageNo,
+        limit: pageSize,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAllInvoiceInfo = async (pageNo: number, pageSize: number) => {
+  try {
+    const res = await axiosClient.get(endpoint.getAllInvoiceInfo, {
       params: {
         page: pageNo,
         limit: pageSize,

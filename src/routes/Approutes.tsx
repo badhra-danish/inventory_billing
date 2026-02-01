@@ -22,6 +22,7 @@ import AddPurchase from "@/pages/Purchase/AddPurchase";
 import { Customer } from "@/pages/People/Customer";
 import { Suppliers } from "@/pages/People/Supplier";
 import EditSales from "@/components/Sales/EditSale";
+import Invoice from "@/components/Sales/Invoice";
 function Approutes() {
   return (
     <BrowserRouter>
@@ -50,7 +51,7 @@ function Approutes() {
             <Route path="/add-sales-return" element={<AddSalesReturn />} />
             <Route path="/invoices" element={<Invoives />} />
             <Route path="/sales/update/:sale_id" element={<EditSales />} />
-
+            <Route path="/sales/invoice/:sale_id" element={<Invoice />} />
             {/* Purchase , order , return*/}
             <Route path="/purchase" element={<Purchase />} />
             <Route path="/add-purchase" element={<AddPurchase />} />

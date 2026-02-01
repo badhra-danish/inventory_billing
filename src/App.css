@@ -33,3 +33,67 @@
 .custom-scrollbar {
   -ms-overflow-style: none;
 }
+/* @media print {
+  body {
+    background: white;
+  }
+
+
+  body * {
+    visibility: hidden;
+  }
+
+
+  #invoice-print,
+  #invoice-print * {
+    visibility: visible;
+  }
+
+  #invoice-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+@page {
+  size: A4;
+  margin: 20mm;
+} */
+
+/* print the barcode */
+
+/* @media print {
+  html,
+  body {
+    width: 50mm;
+    height: 25mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #barcode-print,
+  #barcode-print * {
+    visibility: visible;
+  }
+
+  #barcode-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50mm;
+    height: 25mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@page {
+  size: 50mm 25mm;
+  margin: 0;
+} */

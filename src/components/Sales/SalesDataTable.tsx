@@ -126,6 +126,7 @@ export type SalesDetail = {
   sale_id: string;
   invoice_no: string;
   sale_date: string;
+  sub_total: number;
   order_tax: number;
   shipping: number;
   discount: number;
