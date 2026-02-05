@@ -9,7 +9,8 @@ export default function OutletLayout() {
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 ">
+    // Added dark:bg-slate-950 to the root container for the sidebar area background
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-slate-950 transition-colors">
       {/* Sidebar (left) */}
       <AppSidebar open={isSidebarOpen} setOpen={setIsSidebarOpen} />
 
@@ -19,7 +20,10 @@ export default function OutletLayout() {
         <ERPNavbar toggleSidebar={toggleSidebar} />
 
         {/* Page content (scrollable outlet) */}
-        <main className="flex-1 overflow-auto p-6 bg-gray-100 custom-scrollbar">
+        {/* Changed bg-gray-100 to bg-gray-50 for consistency 
+            Added dark:bg-slate-900 for the main content dark mode 
+        */}
+        <main className="flex-1 overflow-auto p-6 bg-gray-50 dark:bg-slate-900 custom-scrollbar transition-colors">
           <Outlet />
         </main>
       </div>

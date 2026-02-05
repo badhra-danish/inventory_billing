@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const endPoint = {
   createWarriant: "/v1/warranty/create",
   updateWarriant: "/v1/warranty/update",
@@ -10,7 +10,7 @@ const endPoint = {
 
 export const createWarranty = async (payload: object) => {
   try {
-    const res = await axiosClient.post(endPoint.createWarriant, payload);
+    const res = await api.post(endPoint.createWarriant, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -20,7 +20,7 @@ export const createWarranty = async (payload: object) => {
 
 export const getAllWarrantyPage = async (pageNo: number, pageSize: number) => {
   try {
-    const res = axiosClient.get(endPoint.getAllWarriantPage, {
+    const res = api.get(endPoint.getAllWarriantPage, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -34,7 +34,7 @@ export const getAllWarrantyPage = async (pageNo: number, pageSize: number) => {
 };
 export const getAllWarranties = async () => {
   try {
-    const res = axiosClient.get(endPoint.getAllWarranties);
+    const res = api.get(endPoint.getAllWarranties);
     return (await res).data;
   } catch (error) {
     console.error(error);
@@ -43,10 +43,7 @@ export const getAllWarranties = async () => {
 };
 export const updateWarranty = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${endPoint.updateWarriant}/${id}`,
-      payload
-    );
+    const res = await api.put(`${endPoint.updateWarriant}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -56,7 +53,7 @@ export const updateWarranty = async (id: string, payload: object) => {
 
 export const deleteWarranty = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${endPoint.deleteWarriant}/${id}`);
+    const res = await api.delete(`${endPoint.deleteWarriant}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

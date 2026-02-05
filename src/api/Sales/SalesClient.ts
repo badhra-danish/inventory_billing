@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const endpoint = {
   createSales: "v1/sale/create",
   getAllSalesInfo: "v1/sale/getallsale",
@@ -14,7 +14,7 @@ const endpoint = {
 
 export const createSales = async (payload: object) => {
   try {
-    const res = await axiosClient.post(endpoint.createSales, payload);
+    const res = await api.post(endpoint.createSales, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -23,7 +23,7 @@ export const createSales = async (payload: object) => {
 };
 export const updateSale = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(`${endpoint.updateSale}/${id}`, payload);
+    const res = await api.put(`${endpoint.updateSale}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -32,7 +32,7 @@ export const updateSale = async (id: string, payload: object) => {
 };
 export const getAllSalesInfo = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(endpoint.getAllSalesInfo, {
+    const res = await api.get(endpoint.getAllSalesInfo, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -46,7 +46,7 @@ export const getAllSalesInfo = async (pageNo: number, pageSize: number) => {
 };
 export const getAllInvoiceInfo = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(endpoint.getAllInvoiceInfo, {
+    const res = await api.get(endpoint.getAllInvoiceInfo, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -60,7 +60,7 @@ export const getAllInvoiceInfo = async (pageNo: number, pageSize: number) => {
 };
 export const getSaleById = async (id: string) => {
   try {
-    const res = await axiosClient.get(`${endpoint.getSaleById}/${id}`);
+    const res = await api.get(`${endpoint.getSaleById}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -69,10 +69,7 @@ export const getSaleById = async (id: string) => {
 };
 export const createPayment = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.post(
-      `${endpoint.createPayment}/${id}`,
-      payload,
-    );
+    const res = await api.post(`${endpoint.createPayment}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -81,10 +78,7 @@ export const createPayment = async (id: string, payload: object) => {
 };
 export const updatePayment = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${endpoint.updatePayment}/${id}`,
-      payload,
-    );
+    const res = await api.put(`${endpoint.updatePayment}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -93,7 +87,7 @@ export const updatePayment = async (id: string, payload: object) => {
 };
 export const deletePayment = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${endpoint.deleteSale}/${id}`);
+    const res = await api.delete(`${endpoint.deleteSale}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -102,7 +96,7 @@ export const deletePayment = async (id: string) => {
 };
 export const getAllPaymentDetials = async (id: string) => {
   try {
-    const res = await axiosClient.get(`${endpoint.getAllPayment}/${id}`);
+    const res = await api.get(`${endpoint.getAllPayment}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

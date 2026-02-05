@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const attributeEndPoint = {
   createAttribute: "/v1/attribute/create",
   getAllAttributePage: "/v1/attribute/getattributepage",
@@ -9,10 +9,10 @@ const attributeEndPoint = {
 };
 export const getAllVaariantAttribute = async (
   pageNo: number,
-  pageSize: number
+  pageSize: number,
 ) => {
   try {
-    const res = await axiosClient.get(attributeEndPoint.getAllAttributePage, {
+    const res = await api.get(attributeEndPoint.getAllAttributePage, {
       params: {
         // pageNumber: pageNo,
         // pageSize: pageSize,
@@ -30,7 +30,7 @@ export const getAllVaariantAttribute = async (
 };
 export const getAllVaariantAttributeAll = async () => {
   try {
-    const res = await axiosClient.get(attributeEndPoint.getAllAttributeAll);
+    const res = await api.get(attributeEndPoint.getAllAttributeAll);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -40,10 +40,7 @@ export const getAllVaariantAttributeAll = async () => {
 
 export const createAttribute = async (payload: object) => {
   try {
-    const res = await axiosClient.post(
-      attributeEndPoint.createAttribute,
-      payload
-    );
+    const res = await api.post(attributeEndPoint.createAttribute, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -53,9 +50,9 @@ export const createAttribute = async (payload: object) => {
 
 export const updateAttribute = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
+    const res = await api.put(
       `${attributeEndPoint.updateAttribute}/${id}`,
-      payload
+      payload,
     );
     return res.data;
   } catch (error) {
@@ -64,9 +61,7 @@ export const updateAttribute = async (id: string, payload: object) => {
 };
 export const deleteAttribute = async (id: string) => {
   try {
-    const res = await axiosClient.delete(
-      `${attributeEndPoint.deleteAttribute}/${id}`
-    );
+    const res = await api.delete(`${attributeEndPoint.deleteAttribute}/${id}`);
     return res;
   } catch (error) {
     console.error(error);

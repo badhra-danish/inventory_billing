@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const endPoint = {
   createStock: "v1/stock/create",
   getAllStockPage: "v1/stock/getallstockpage",
@@ -10,7 +10,7 @@ const endPoint = {
 
 export const createStock = async (payload: object) => {
   try {
-    const res = await axiosClient.post(endPoint.createStock, payload);
+    const res = await api.post(endPoint.createStock, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -19,7 +19,7 @@ export const createStock = async (payload: object) => {
 };
 export const getAllStockPage = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(endPoint.getAllStockPage, {
+    const res = await api.get(endPoint.getAllStockPage, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -32,10 +32,7 @@ export const getAllStockPage = async (pageNo: number, pageSize: number) => {
 };
 export const updateStockQuantity = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${endPoint.updateStockQuantity}/${id}`,
-      payload,
-    );
+    const res = await api.put(`${endPoint.updateStockQuantity}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -44,7 +41,7 @@ export const updateStockQuantity = async (id: string, payload: object) => {
 };
 export const getAllVariantInstock = async (query: string) => {
   try {
-    const res = await axiosClient.get(endPoint.searchVarintInstock, {
+    const res = await api.get(endPoint.searchVarintInstock, {
       params: {
         q: query,
       },
@@ -56,7 +53,7 @@ export const getAllVariantInstock = async (query: string) => {
 };
 export const deleteStock = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${endPoint.deleteStock}/${id}`);
+    const res = await api.delete(`${endPoint.deleteStock}/${id}`);
     return res.data;
   } catch (error) {
     throw error;

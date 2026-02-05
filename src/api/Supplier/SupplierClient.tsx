@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const EndPoint = {
   createSupplier: "/v1/suppliers/create",
   getAllSupplierPage: "/v1/suppliers/page",
@@ -9,7 +9,7 @@ const EndPoint = {
 
 export const createSupplier = async (payload: object) => {
   try {
-    const res = await axiosClient.post(EndPoint.createSupplier, payload);
+    const res = await api.post(EndPoint.createSupplier, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -18,7 +18,7 @@ export const createSupplier = async (payload: object) => {
 };
 export const getAllSupplierPage = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(EndPoint.getAllSupplierPage, {
+    const res = await api.get(EndPoint.getAllSupplierPage, {
       params: {
         pageNumber: pageNo,
         pageSize: pageSize,
@@ -35,10 +35,7 @@ export const getAllSupplierPage = async (pageNo: number, pageSize: number) => {
 
 export const updateSupplier = async (payload: object, id: string) => {
   try {
-    const res = await axiosClient.put(
-      `${EndPoint.updateSuppliers}/${id}`,
-      payload
-    );
+    const res = await api.put(`${EndPoint.updateSuppliers}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -47,7 +44,7 @@ export const updateSupplier = async (payload: object, id: string) => {
 };
 export const deleteSupplier = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${EndPoint.deleteSupplier}/${id}`);
+    const res = await api.delete(`${EndPoint.deleteSupplier}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

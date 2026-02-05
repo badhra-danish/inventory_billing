@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const ProductEndPoint = {
   getAllProductPage: "/v1/product/getallproduct",
   createProduct: "/v1/product/create",
@@ -18,7 +18,7 @@ const ProductEndPoint = {
 
 export const createProduct = async (payload: object) => {
   try {
-    const res = await axiosClient.post(ProductEndPoint.createProduct, payload);
+    const res = await api.post(ProductEndPoint.createProduct, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -28,7 +28,7 @@ export const createProduct = async (payload: object) => {
 
 export const getAllProductPage = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(ProductEndPoint.getAllProductPage, {
+    const res = await api.get(ProductEndPoint.getAllProductPage, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -42,9 +42,7 @@ export const getAllProductPage = async (pageNo: number, pageSize: number) => {
 };
 export const getProductById = async (id: string) => {
   try {
-    const res = await axiosClient.get(
-      `${ProductEndPoint.getProductById}/${id}`,
-    );
+    const res = await api.get(`${ProductEndPoint.getProductById}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -53,7 +51,7 @@ export const getProductById = async (id: string) => {
 };
 export const getAllVariantByProduct = async (id: string) => {
   try {
-    const res = await axiosClient.get(
+    const res = await api.get(
       `${ProductEndPoint.getAllVariantByProduct}/${id}`,
     );
     return res.data;
@@ -65,7 +63,7 @@ export const getAllVariantByProduct = async (id: string) => {
 
 export const getAllVariantBySearch = async (query: string) => {
   try {
-    const res = await axiosClient.get(ProductEndPoint.getAllVariantBySearch, {
+    const res = await api.get(ProductEndPoint.getAllVariantBySearch, {
       params: {
         query: query,
       },
@@ -79,7 +77,7 @@ export const getAllVariantBySearch = async (query: string) => {
 
 export const updateVariant = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
+    const res = await api.put(
       `${ProductEndPoint.updateVariant}/${id}`,
       payload,
     );
@@ -91,7 +89,7 @@ export const updateVariant = async (id: string, payload: object) => {
 };
 export const updateProduct = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
+    const res = await api.put(
       `${ProductEndPoint.updateProduct}/${id}`,
       payload,
     );
@@ -104,10 +102,7 @@ export const updateProduct = async (id: string, payload: object) => {
 
 export const createVariant = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.post(
-      `${ProductEndPoint.addvariant}/${id}`,
-      payload,
-    );
+    const res = await api.post(`${ProductEndPoint.addvariant}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -116,9 +111,7 @@ export const createVariant = async (id: string, payload: object) => {
 };
 export const deleteVariant = async (id: string) => {
   try {
-    const res = await axiosClient.delete(
-      `${ProductEndPoint.deleteVariant}/${id}`,
-    );
+    const res = await api.delete(`${ProductEndPoint.deleteVariant}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -127,9 +120,7 @@ export const deleteVariant = async (id: string) => {
 };
 export const deleteProduct = async (id: string) => {
   try {
-    const res = await axiosClient.delete(
-      `${ProductEndPoint.deleteProduct}/${id}`,
-    );
+    const res = await api.delete(`${ProductEndPoint.deleteProduct}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

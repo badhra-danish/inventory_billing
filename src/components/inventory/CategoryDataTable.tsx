@@ -166,7 +166,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   const { categories } = useCategory();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
@@ -227,7 +227,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
 
       const res = await updateCategory(
         selectedCategoryUpdate?.category_id,
-        payload
+        payload,
       );
       if (res.status === "OK") {
         toast.success(res.message);
@@ -394,34 +394,40 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4">
+    <div className="w-full bg-white dark:bg-slate-900 rounded-md shadow-md p-4 transition-colors">
       {/* 🔍 Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search....."
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm border-gray-300 focus-visible:ring-gray-500"
+          className="max-w-sm border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-gray-500"
         />
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Toggle Columns
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize dark:text-slate-300 dark:focus:bg-slate-700"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -436,29 +442,36 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Category: {selectedCategory}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Filter by Category
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
 
               {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
                   key={cat.category_id}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("name");
                     if (categoryColumn) {
                       categoryColumn.setFilterValue(
-                        cat.name === "All" ? "" : cat.name
+                        cat.name === "All" ? "" : cat.name,
                       );
                     }
                   }}
@@ -472,24 +485,31 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Status: {selectedStatus}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="shadow-lg">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
               {["All", "active", "inactive"].map((status) => (
                 <DropdownMenuItem
-                  //key={status}
+                  key={status}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedStatus(status);
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -502,22 +522,22 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
         </div>
       </div>
 
-      {/*  Data Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200">
+      {/* 📊 Data Table */}
+      <div className="overflow-hidden rounded-md border border-gray-200 dark:border-slate-800 transition-colors">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="bg-gray-100 dark:bg-slate-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="dark:border-slate-800">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="text-sm font-semibold text-gray-800  tracking-wide px-4 py-3"
+                    className="text-sm font-semibold text-gray-800 dark:text-slate-200 tracking-wide px-4 py-3"
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -525,15 +545,16 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
             ))}
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="dark:bg-slate-900 transition-colors">
             {isLoading ? (
-              <>
-                <TableRow>
-                  <TableCell colSpan={columns.length}>
-                    <Loader />
-                  </TableCell>
-                </TableRow>
-              </>
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="dark:border-slate-800"
+                >
+                  <Loader />
+                </TableCell>
+              </TableRow>
             ) : (
               <>
                 {table.getRowModel().rows?.length ? (
@@ -541,16 +562,16 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors "
+                      className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors dark:border-slate-800"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 "
+                          className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
@@ -560,7 +581,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center text-gray-500 capitalize"
+                      className="h-24 text-center text-gray-500 dark:text-slate-400 capitalize dark:border-slate-800"
                     >
                       No results found.
                     </TableCell>
@@ -572,7 +593,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
         </Table>
       </div>
 
-      {/* Single Edit Dialog (controlled) */}
+      {/* Single Edit Dialog */}
       <Dialog
         open={openEdit}
         onOpenChange={(open) => {
@@ -580,19 +601,22 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           if (!open) setSelectedCategoryUpdate(null);
         }}
       >
-        <DialogContent>
+        <DialogContent className="dark:bg-slate-900 dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle>Edit Category</DialogTitle>
+            <DialogTitle className="dark:text-slate-100">
+              Edit Category
+            </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+          <div className="grid gap-8 pt-5 mt-3 border-t-2 dark:border-slate-800">
             <div className="grid gap-4">
-              <Label htmlFor="category-1">
+              <Label htmlFor="category-1" className="dark:text-slate-300">
                 Category <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="category-1"
                 type="text"
                 name="categoryname"
+                className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 value={selectedCategoryUpdate?.name}
                 onChange={(e) =>
                   setSelectedCategoryUpdate((prev) => {
@@ -603,13 +627,14 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
               />
             </div>
             <div className="grid gap-4">
-              <Label htmlFor="slug-1">
+              <Label htmlFor="slug-1" className="dark:text-slate-300">
                 Slug Category <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="slug-1"
                 type="text"
                 name="slugName"
+                className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 value={selectedCategoryUpdate?.slug}
                 onChange={(e) =>
                   setSelectedCategoryUpdate((prev) => {
@@ -619,8 +644,8 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
                 }
               />
             </div>
-            <div className="flex items-center justify-between border-b-2 pb-7">
-              <Label htmlFor="status">
+            <div className="flex items-center justify-between border-b-2 dark:border-slate-800 pb-7">
+              <Label htmlFor="status" className="dark:text-slate-300">
                 Status <span className="text-red-500">*</span>
               </Label>
               <Switch
@@ -632,37 +657,52 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
                     status: checked ? "ACTIVE" : "INACTIVE",
                   }))
                 }
-                className=" data-[state=checked]:bg-green-500 transition-colors"
+                className="data-[state=checked]:bg-green-500 transition-colors"
               />
             </div>
           </div>
           <DialogFooter>
-            <DialogClose>
-              <Button variant={"outline"}>Cancel</Button>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button onClick={handleupdate}>Save Changes</Button>
+            <Button
+              onClick={handleupdate}
+              className="dark:bg-blue-600 dark:hover:bg-blue-500"
+            >
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* for the Delete */}
-      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-        <DialogContent className="flex flex-col items-center text-center">
-          <DialogHeader className="flex flex-col items-center ">
-            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-              <img src={trashImg} className="w-20  rounded-full" />
-            </div>
 
-            <DialogTitle className="text-lg font-semibold">
+      {/* Delete Dialog */}
+      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+        <DialogContent className="flex flex-col items-center text-center dark:bg-slate-900 dark:border-slate-800">
+          <DialogHeader className="flex flex-col items-center">
+            <div className="w-14 h-14 border-2 dark:border-slate-800 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-900/20">
+              <img src={trashImg} className="w-10 rounded-full" />
+            </div>
+            <DialogTitle className="text-lg font-semibold dark:text-slate-100">
               Delete Product
             </DialogTitle>
-            <DialogDescription className="text-gray-500">
+            <DialogDescription className="text-gray-500 dark:text-slate-400">
               Are you sure you want to delete this product?
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="mt-1 flex justify-center space-x-1">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </Button>
             </DialogClose>
             <Button variant="destructive" onClick={handleDelete}>
               Delete
@@ -670,8 +710,9 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -680,7 +721,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <Button
             variant="outline"
             size="sm"
-            //onClick={() => table.previousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={pageMeteData.hasPrevPage == false}
           >
@@ -689,7 +730,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <Button
             variant="outline"
             size="sm"
-            // onClick={() => table.nextPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
               setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }

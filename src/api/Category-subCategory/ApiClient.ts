@@ -1,5 +1,5 @@
 import { axiosClient } from "../index";
-
+import api from "@/utils/axios";
 const endPoint = {
   createCetogory: "/v1/category/create",
   getAllCategoryPage: "/v1/category/getCategoryPage",
@@ -17,7 +17,7 @@ const endPoint = {
 
 export const createCategory = async (payload: object) => {
   try {
-    const res = axiosClient.post(endPoint.createCetogory, payload);
+    const res = api.post(endPoint.createCetogory, payload);
     return (await res).data;
   } catch (error) {
     console.error(error);
@@ -27,7 +27,7 @@ export const createCategory = async (payload: object) => {
 
 export const getAllCategory = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(endPoint.getAllCategoryPage, {
+    const res = await api.get(endPoint.getAllCategoryPage, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -42,7 +42,7 @@ export const getAllCategory = async (pageNo: number, pageSize: number) => {
 
 export const getAllCategoryall = async () => {
   try {
-    const res = await axiosClient.get(endPoint.getAllCategorall);
+    const res = await api.get(endPoint.getAllCategorall);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -52,7 +52,7 @@ export const getAllCategoryall = async () => {
 
 export const createSubCategory = async (payload: object) => {
   try {
-    const res = axiosClient.post(endPoint.subCategory, payload);
+    const res = api.post(endPoint.subCategory, payload);
     return (await res).data;
   } catch (error) {
     console.error(error);
@@ -62,7 +62,7 @@ export const createSubCategory = async (payload: object) => {
 
 export const getAllSubCategory = async (pageNo: number, pageSize: number) => {
   try {
-    const res = await axiosClient.get(endPoint.getAllSubCategory, {
+    const res = await api.get(endPoint.getAllSubCategory, {
       params: {
         page: pageNo,
         limit: pageSize,
@@ -76,9 +76,7 @@ export const getAllSubCategory = async (pageNo: number, pageSize: number) => {
 };
 export const getAllSubcategoryByCategory = async (id: string) => {
   try {
-    const res = await axiosClient.get(
-      `${endPoint.getAllSubcategoryByCategory}/${id}`
-    );
+    const res = await api.get(`${endPoint.getAllSubcategoryByCategory}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -87,10 +85,7 @@ export const getAllSubcategoryByCategory = async (id: string) => {
 };
 export const updateCategory = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${endPoint.updateCategory}/${id}`,
-      payload
-    );
+    const res = await api.put(`${endPoint.updateCategory}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -99,10 +94,7 @@ export const updateCategory = async (id: string, payload: object) => {
 };
 export const updateSubCategory = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${endPoint.updateSubCategory}/${id}`,
-      payload
-    );
+    const res = await api.put(`${endPoint.updateSubCategory}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -131,7 +123,7 @@ export const updateSubCategory = async (id: string, payload: object) => {
 // };
 export const deleteCategory = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${endPoint.deleteCategory}/${id}`);
+    const res = await api.delete(`${endPoint.deleteCategory}/${id}`);
     return res;
   } catch (error) {
     console.error(error);

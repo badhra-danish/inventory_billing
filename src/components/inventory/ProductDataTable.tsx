@@ -939,34 +939,40 @@ export default function Products() {
   const categoryOptions = [{ name: "All", category_id: 0 }, ...categories];
   const brandOptions = [{ brandName: "All", brand_id: 0 }, ...brand];
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4">
-      {/*  Top Toolbar */}
+    <div className="w-full bg-white dark:bg-slate-900 rounded-md shadow-md p-4 transition-colors">
+      {/* Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Search....."
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm border-gray-300 focus-visible:ring-gray-500"
+          className="max-w-sm border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-gray-500"
         />
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Toggle Columns
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize dark:text-slate-300 dark:focus:bg-slate-700"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -981,9 +987,12 @@ export default function Products() {
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Category: {selectedCategory}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -991,16 +1000,17 @@ export default function Products() {
 
             <DropdownMenuContent
               align="end"
-              className="shadow-lg custom-scrollbar"
+              className="shadow-lg custom-scrollbar dark:bg-slate-800 dark:border-slate-700"
             >
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Filter by Category
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
 
               {categoryOptions.map((cat) => (
                 <DropdownMenuItem
                   key={cat.category_id}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("categoryName");
@@ -1020,22 +1030,29 @@ export default function Products() {
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 dark:hover:bg-blue-600 hover:text-white transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Brand: {selectedBrand} <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Filter By Brand
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
 
               {brandOptions.map((brand) => (
                 <DropdownMenuItem
                   key={brand.brand_id}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedBrand(brand.brandName);
                     const brandColumn = table.getColumn("brandName");
@@ -1054,16 +1071,19 @@ export default function Products() {
         </div>
       </div>
 
-      {/*  Data Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200">
+      {/* Data Table */}
+      <div className="overflow-hidden rounded-md border border-gray-200 dark:border-slate-800 transition-colors">
         <Table>
-          <TableHeader className="bg-blue-500 text-white">
+          <TableHeader className="bg-blue-500 dark:bg-blue-700 text-white">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="hover:bg-transparent border-none"
+              >
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="text-sm font-semibold text-gray-800  tracking-wide px-4 py-3"
+                    className="text-sm font-semibold text-white dark:text-slate-100 tracking-wide px-4 py-3"
                   >
                     {header.isPlaceholder
                       ? null
@@ -1077,38 +1097,32 @@ export default function Products() {
             ))}
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="dark:bg-slate-900 transition-colors">
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={columns.length}>
+                <TableCell
+                  colSpan={columns.length}
+                  className="dark:border-slate-800"
+                >
                   <Loader />
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => {
                 const product = row.original;
-                console.log(product);
-
-                const isExpanded = expandedRows[product.product_id]; // <-- state to track expanded rows
-                const attributeHeaders = Array.from(
-                  new Set(
-                    variantsMap[product.product_id]?.flatMap((variant) =>
-                      variant.attributes?.map((attr) => attr.attributeName),
-                    ) || [],
-                  ),
-                );
+                const isExpanded = expandedRows[product.product_id];
 
                 return (
                   <React.Fragment key={row.id}>
                     {/* Main product row */}
                     <TableRow
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors capitalize"
+                      className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors capitalize border-gray-200 dark:border-slate-800"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 capitalize"
+                          className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 capitalize"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -1120,10 +1134,10 @@ export default function Products() {
 
                     {/* Expanded variant row */}
                     {isExpanded && (
-                      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                      <TableRow className="bg-slate-50/50 dark:bg-slate-950/50 hover:bg-slate-50/50 dark:hover:bg-slate-950/50 border-none transition-colors">
                         <TableCell
                           colSpan={columns.length}
-                          className="p-0 border-b border-slate-200"
+                          className="p-0 border-b border-slate-200 dark:border-slate-800"
                         >
                           <div className="px-10 py-6 animate-in fade-in slide-in-from-top-2 duration-300 ease-out">
                             {loadingVariants[product.product_id] ? (
@@ -1131,11 +1145,9 @@ export default function Products() {
                                 <Loader />
                               </div>
                             ) : variantsMap[product.product_id]?.length ? (
-                              <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                                {/* Table Header 
-               Adjusted Grid: 3 (Attr) + 2 (SKU) + 2 (Price) + 2 (Tax) + 1 (Disc) + 2 (Actions) = 12
-            */}
-                                <div className="grid grid-cols-12 gap-4 bg-slate-50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-colors">
+                                {/* Table Header */}
+                                <div className="grid grid-cols-12 gap-4 bg-slate-50 dark:bg-slate-800/50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                   <div className="col-span-3">
                                     Attribute Details
                                   </div>
@@ -1149,61 +1161,55 @@ export default function Products() {
                                 </div>
 
                                 {/* Table Rows Container */}
-                                <div className="divide-y divide-slate-100 max-h-[450px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 custom-scrollbar">
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[450px] overflow-y-auto custom-scrollbar">
                                   {variantsMap[product.product_id].map(
                                     (variant) => (
                                       <div
                                         key={variant.product_variant_id}
-                                        className="grid grid-cols-12 gap-4 items-center px-6 py-4 text-sm hover:bg-slate-50 transition-colors duration-150 group"
+                                        className="grid grid-cols-12 gap-4 items-center px-6 py-4 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-150 group"
                                       >
-                                        {/* Label / Attribute (Col Span 3) */}
                                         <div className="col-span-3">
-                                          <span className="inline-flex items-center font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100 text-xs">
+                                          <span className="inline-flex items-center font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-800 text-xs">
                                             {variant.variant_label}
                                           </span>
                                         </div>
 
-                                        {/* SKU (Col Span 2) */}
-                                        <div className="col-span-2 font-mono text-xs text-slate-500 font-medium">
+                                        <div className="col-span-2 font-mono text-xs text-slate-500 dark:text-slate-400 font-medium">
                                           {variant.skuCode}
                                         </div>
 
-                                        {/* Price (Col Span 2) */}
-                                        <div className="col-span-2 font-semibold text-slate-900">
+                                        <div className="col-span-2 font-semibold text-slate-900 dark:text-slate-200">
                                           ₹{variant.price.toLocaleString()}
                                         </div>
 
-                                        {/* Tax (Col Span 2) */}
                                         <div className="col-span-2">
                                           <div className="flex flex-col">
-                                            <span className="text-slate-700 font-medium text-xs">
+                                            <span className="text-slate-700 dark:text-slate-300 font-medium text-xs">
                                               {variant.tax_value}%
                                             </span>
-                                            <span className="text-[10px] text-slate-400 uppercase leading-none mt-0.5">
+                                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase leading-none mt-0.5">
                                               {variant.tax_type}
                                             </span>
                                           </div>
                                         </div>
 
-                                        {/* Discount (Col Span 1) */}
                                         <div className="col-span-1">
                                           {variant.discount_value > 0 ? (
-                                            <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded-full">
+                                            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
                                               -{variant.discount_value}%
                                             </span>
                                           ) : (
-                                            <span className="text-slate-300 font-medium">
+                                            <span className="text-slate-300 dark:text-slate-600 font-medium">
                                               —
                                             </span>
                                           )}
                                         </div>
 
-                                        {/* Actions (Col Span 2 - Right Aligned) */}
                                         <div className="col-span-2 flex justify-end items-center gap-2">
                                           <Button
                                             variant="outline"
                                             size="sm"
-                                            className="h-7 px-3 text-[10px] font-bold uppercase border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+                                            className="h-7 px-3 text-[10px] font-bold uppercase border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
                                             onClick={() => {
                                               setOpenBarcode(true);
                                               getSelectedVariant(
@@ -1222,11 +1228,11 @@ export default function Products() {
                                             Barcode
                                           </Button>
 
-                                          <div className="flex items-center border-l border-slate-200 pl-2 gap-1">
+                                          <div className="flex items-center border-l border-slate-200 dark:border-slate-700 pl-2 gap-1">
                                             <Button
                                               variant="ghost"
                                               size="icon"
-                                              className="h-7 w-7 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95"
+                                              className="h-7 w-7 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-95"
                                               onClick={() => {
                                                 setOpenVariant(true);
                                                 getSelectedVariant(
@@ -1250,7 +1256,7 @@ export default function Products() {
                                               <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-7 w-7 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all active:scale-95"
+                                                className="h-7 w-7 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
                                                 onClick={() => {
                                                   setOpenDeleteVariant(true);
                                                   getSelectedVariant(
@@ -1277,7 +1283,7 @@ export default function Products() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center py-12 rounded-xl border-2 border-dashed border-slate-200 bg-white">
+                              <div className="flex flex-col items-center justify-center py-12 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                                 <p className="text-sm font-medium text-slate-400">
                                   No variants found for this product.
                                 </p>
@@ -1294,7 +1300,7 @@ export default function Products() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-gray-500 capitalize"
+                  className="h-24 text-center text-gray-500 dark:text-slate-400 capitalize dark:border-slate-800"
                 >
                   No results found.
                 </TableCell>
@@ -1304,8 +1310,8 @@ export default function Products() {
         </Table>
       </div>
 
-      {/*  Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      {/* Pagination + Footer Info */}
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -1314,6 +1320,7 @@ export default function Products() {
           <Button
             variant="outline"
             size="sm"
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={pageMeteData.hasPrevPage === false}
           >
@@ -1322,6 +1329,7 @@ export default function Products() {
           <Button
             variant="outline"
             size="sm"
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
               setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
@@ -1332,22 +1340,22 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Dialog Box for the Variant Updated */}
+      {/* Dialog Box for Variant Edit */}
       <Dialog open={openVariant} onOpenChange={setOpenVariant}>
-        <DialogContent>
+        <DialogContent className="dark:bg-slate-900 dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle>
-              <p> Edit Variant Details..</p>
+            <DialogTitle className="dark:text-slate-100">
+              Edit Variant Details
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-5 pt-5 mt-3 border-t-2">
+          <div className="grid gap-5 pt-5 mt-3 border-t-2 dark:border-slate-800">
             <div className="flex gap-4 w-full">
-              {" "}
               <div className="grid gap-3 w-full">
-                <Label>SkuCode:</Label>
+                <Label className="dark:text-slate-300">SkuCode:</Label>
                 <Input
                   type="text"
                   name="skuCode"
+                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                   value={selectedVariant.skuCode}
                   onChange={(e) =>
                     setSelectedVariant((prev) => ({
@@ -1358,10 +1366,11 @@ export default function Products() {
                 />
               </div>
               <div className="grid gap-3 w-full">
-                <Label>Price:</Label>
+                <Label className="dark:text-slate-300">Price:</Label>
                 <Input
                   type="number"
                   name="price"
+                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                   value={selectedVariant.price}
                   onChange={(e) =>
                     setSelectedVariant((prev) => ({
@@ -1373,25 +1382,21 @@ export default function Products() {
               </div>
             </div>
             <div className="flex gap-4 w-full">
-              {" "}
               <div className="grid gap-3 w-full">
-                <Label>Tax Type:</Label>
+                <Label className="dark:text-slate-300">Tax Type:</Label>
                 <Select
                   value={selectedVariant?.tax_type}
                   onValueChange={(value) =>
                     setSelectedVariant((prev) => {
                       if (!prev) return prev;
-                      return {
-                        ...prev,
-                        tax_type: value,
-                      };
+                      return { ...prev, tax_type: value };
                     })
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                     <SelectValue placeholder="Select Tax Type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                     <SelectItem value="INCLUSIVE">Inclusive</SelectItem>
                     <SelectItem value="EXCLUSIVE">Exclusive</SelectItem>
                     <SelectItem value="NONE">None</SelectItem>
@@ -1399,9 +1404,10 @@ export default function Products() {
                 </Select>
               </div>
               <div className="grid gap-3 w-full">
-                <Label>Tax Value:</Label>
+                <Label className="dark:text-slate-300">Tax Value:</Label>
                 <Input
                   type="text"
+                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                   disabled={selectedVariant.tax_type === "NONE"}
                   value={selectedVariant.tax_value}
                   onChange={(e) =>
@@ -1414,25 +1420,21 @@ export default function Products() {
               </div>
             </div>
             <div className="flex gap-4 w-full">
-              {" "}
               <div className="grid gap-3 w-full">
-                <Label>Discount Type:</Label>
+                <Label className="dark:text-slate-300">Discount Type:</Label>
                 <Select
                   value={selectedVariant?.discount_type}
                   onValueChange={(value) =>
                     setSelectedVariant((prev) => {
                       if (!prev) return prev;
-                      return {
-                        ...prev,
-                        discount_type: value,
-                      };
+                      return { ...prev, discount_type: value };
                     })
                   }
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                     <SelectValue placeholder="Select Discount Type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                     <SelectItem value="FIXED">Fixed</SelectItem>
                     <SelectItem value="PERCENTAGE">Percentage</SelectItem>
                     <SelectItem value="NONE">None</SelectItem>
@@ -1440,9 +1442,10 @@ export default function Products() {
                 </Select>
               </div>
               <div className="grid gap-3 w-full">
-                <Label>Discount value:</Label>
+                <Label className="dark:text-slate-300">Discount value:</Label>
                 <Input
                   type="text"
+                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                   disabled={selectedVariant?.discount_type === "NONE"}
                   value={selectedVariant.discount_value}
                   onChange={(e) =>
@@ -1455,28 +1458,37 @@ export default function Products() {
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <DialogClose>
-              <Button variant="outline">Cancel</Button>
+          <DialogFooter className="dark:border-slate-800">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button onClick={handleupdateVariant}>Update Variant</Button>
+            <Button
+              onClick={handleupdateVariant}
+              className="dark:bg-blue-600 dark:hover:bg-blue-700"
+            >
+              Update Variant
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* For the Add the Variants of the Products */}
 
+      {/* Add Variant Configuration Dialog */}
       <Dialog open={openAddVariant} onOpenChange={setOpenAddVariant}>
-        <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-50/50">
-          {/* Header */}
-          <DialogHeader className="px-6 py-4 bg-white border-b border-slate-200 shrink-0">
+        <DialogContent className="max-w-[95vw] w-full lg:max-w-7xl h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-50/50 dark:bg-slate-950 transition-colors">
+          <DialogHeader className="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
             <div className="flex items-center justify-between">
               <div>
-                <DialogTitle className="text-xl font-semibold text-slate-900">
+                <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                   Variant Configuration
                 </DialogTitle>
-                <DialogDescription className="mt-1">
+                <DialogDescription className="mt-1 dark:text-slate-400">
                   Configure attributes and generate SKUs for{" "}
-                  <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                  <span className="font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded border border-blue-100 dark:border-blue-800">
                     {selectedProduct.product_name}
                   </span>
                 </DialogDescription>
@@ -1484,20 +1496,19 @@ export default function Products() {
             </div>
           </DialogHeader>
 
-          {/* Scrollable Main Content */}
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* LEFT SIDE: Attribute Manager (Takes 4 cols on large screens) */}
               <div className="lg:col-span-4 space-y-6">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 transition-colors">
                   <div className="flex items-center justify-between mb-4">
-                    <Label className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                    <Label className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wide">
                       1. Define Attributes
                     </Label>
-                    <span className="text-xs text-slate-400">Step 1 of 2</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                      Step 1 of 2
+                    </span>
                   </div>
 
-                  {/* Add Attribute Controls */}
                   <div className="flex gap-2 mb-6">
                     <Select
                       value={
@@ -1505,15 +1516,12 @@ export default function Products() {
                           ? JSON.stringify(selectedAttribute)
                           : ""
                       }
-                      onValueChange={(value) => {
-                        const attrObj = JSON.parse(value);
-                        setSelectedAttribute(attrObj);
-                      }}
+                      onValueChange={(v) => setSelectedAttribute(JSON.parse(v))}
                     >
-                      <SelectTrigger className="w-full h-10 bg-slate-50 border-slate-200 focus:ring-blue-500">
-                        <SelectValue placeholder="Select Attribute (e.g., Color)" />
+                      <SelectTrigger className="w-full h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 dark:text-slate-200">
+                        <SelectValue placeholder="Select Attribute" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                         {AllAttribute.map((attr) => (
                           <SelectItem
                             key={attr.attribute_id}
@@ -1530,58 +1538,43 @@ export default function Products() {
                         addAttribute(selectedAttribute);
                         setSelectedAttribute(null);
                       }}
-                      className="h-10 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                      className="h-10 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add
                     </Button>
                   </div>
 
-                  {/* Active Attributes List */}
                   <div className="space-y-4">
-                    {attribute?.length === 0 && (
-                      <div className="text-center py-8 border-2 border-dashed border-slate-100 rounded-lg bg-slate-50/50">
-                        <p className="text-sm text-slate-500">
-                          No attributes selected.
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Select an attribute above to start.
-                        </p>
-                      </div>
-                    )}
-
                     {attribute?.map((attr) => (
                       <div
                         key={attr.attribute_id}
-                        className="group border border-slate-200 rounded-lg overflow-hidden transition-all hover:border-blue-300 hover:shadow-md bg-white"
+                        className="group border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white dark:bg-slate-800/50"
                       >
-                        <div className="flex items-center justify-between bg-slate-50 px-3 py-2 border-b border-slate-100">
-                          <span className="font-semibold text-sm text-slate-700">
+                        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 px-3 py-2">
+                          <span className="font-semibold text-sm text-slate-700 dark:text-slate-200">
                             {attr.attributeName}
                           </span>
                           <Button
-                            onClick={() => removeAttribute(attr.attribute_id)}
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
+                            onClick={() => removeAttribute(attr.attribute_id)}
+                            className="h-7 w-7 p-0 text-slate-400 hover:text-red-600"
                           >
                             <Trash size={14} />
                           </Button>
                         </div>
-
-                        <div className="p-3 bg-white">
+                        <div className="p-3">
                           <Select
-                            onValueChange={(value) => {
-                              const obj = JSON.parse(value);
-                              addValues(attr.attribute_id, obj);
-                            }}
+                            onValueChange={(v) =>
+                              addValues(attr.attribute_id, JSON.parse(v))
+                            }
                           >
-                            <SelectTrigger className="w-full h-9 text-xs mb-3 border-slate-200">
+                            <SelectTrigger className="w-full h-9 text-xs mb-3 border-slate-200 dark:border-slate-700 dark:bg-slate-800">
                               <SelectValue
-                                placeholder={`+ Add ${attr.attributeName} option`}
+                                placeholder={`+ Add ${attr.attributeName}`}
                               />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                               {attr.attributeValues?.map((val) => (
                                 <SelectItem
                                   key={val.attribute_value_id}
@@ -1592,17 +1585,11 @@ export default function Products() {
                               ))}
                             </SelectContent>
                           </Select>
-
                           <div className="flex flex-wrap gap-2">
-                            {attr.valuesList?.length === 0 && (
-                              <span className="text-[10px] text-slate-400 italic">
-                                No options selected
-                              </span>
-                            )}
                             {attr.valuesList?.map((opt) => (
                               <span
                                 key={opt.attribute_value_id}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
                               >
                                 {opt.value}
                                 <button
@@ -1612,10 +1599,9 @@ export default function Products() {
                                       opt.attribute_value_id,
                                     )
                                   }
-                                  className="text-slate-400 hover:text-red-500 transition-colors focus:outline-none"
+                                  className="text-slate-400 hover:text-red-500"
                                 >
-                                  <span className="sr-only">Remove</span>
-                                  <span aria-hidden="true">×</span>
+                                  ×
                                 </button>
                               </span>
                             ))}
@@ -1623,329 +1609,251 @@ export default function Products() {
                         </div>
                       </div>
                     ))}
-
-                    {attribute && attribute?.length > 0 && (
-                      <Button
-                        onClick={generateVariants}
-                        className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white shadow-md h-11"
-                      >
-                        Generate Combinations
-                      </Button>
-                    )}
                   </div>
+                  {attribute && attribute?.length > 0 && (
+                    <Button
+                      onClick={generateVariants}
+                      className="w-full mt-4 bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-500 text-white shadow-md h-11"
+                    >
+                      Generate Combinations
+                    </Button>
+                  )}
                 </div>
               </div>
 
-              {/* RIGHT SIDE: Variants Table (Takes 8 cols) */}
               <div className="lg:col-span-8 h-full">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm h-full flex flex-col overflow-hidden">
-                  <div className="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white shrink-0">
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                        2. Variant Pricing & SKU
-                      </Label>
-                      <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                        {variants?.length || 0} Generated
-                      </span>
-                    </div>
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-full flex flex-col overflow-hidden transition-colors">
+                  <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 shrink-0">
+                    <Label className="text-sm font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wide">
+                      2. Variant Pricing & SKU
+                    </Label>
+                    <span className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
+                      {variants?.length || 0} Generated
+                    </span>
                   </div>
 
-                  {variants?.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center p-10 text-center bg-slate-50/30">
-                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                        <svg
-                          className="w-8 h-8 text-slate-300"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                          />
-                        </svg>
-                      </div>
-                      <h3 className="text-sm font-semibold text-slate-900">
-                        No Combinations Yet
-                      </h3>
-                      <p className="text-sm text-slate-500 mt-1 max-w-xs">
-                        Add attributes and options on the left, then click
-                        "Generate Combinations".
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex-1 overflow-auto custom-scrollbar relative">
-                      <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
-                          <tr>
-                            {attribute?.map((a) => (
-                              <th
-                                key={a.attribute_id}
-                                className="px-4 py-3 font-semibold whitespace-nowrap bg-slate-50"
-                              >
-                                {a.attributeName}
-                              </th>
-                            ))}
-                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
-                              Price <span className="text-red-500">*</span>
+                  <div className="flex-1 overflow-auto custom-scrollbar relative">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700 sticky top-0 z-10">
+                        <tr>
+                          {attribute?.map((a) => (
+                            <th key={a.attribute_id} className="px-4 py-3">
+                              {a.attributeName}
                             </th>
-                            <th className="px-4 py-3 font-semibold min-w-[120px] bg-slate-50">
-                              SKU Code
-                            </th>
-                            <th className="px-4 py-3 font-semibold min-w-[140px] bg-slate-50">
-                              Tax Details
-                            </th>
-                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
-                              Tax %
-                            </th>
-                            <th className="px-4 py-3 font-semibold min-w-[140px] bg-slate-50">
-                              Discount Type
-                            </th>
-                            <th className="px-4 py-3 font-semibold min-w-[100px] bg-slate-50">
-                              Value
-                            </th>
-                            <th className="px-4 py-3 font-semibold text-center bg-slate-50 w-[50px]"></th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 bg-white">
-                          {variants?.map((v) => (
-                            <tr
-                              key={v.id}
-                              className="hover:bg-blue-50/30 transition-colors group"
-                            >
-                              {attribute?.map((a) => (
-                                <td
-                                  key={a.attribute_id}
-                                  className="px-4 py-3 whitespace-nowrap"
-                                >
-                                  <span className="font-medium text-slate-700 bg-slate-100 px-2 py-1 rounded text-xs">
-                                    {
-                                      v.attributeDetails?.find(
-                                        (d) =>
-                                          d.attribute_id === a.attribute_id,
-                                      )?.attributeValueName
-                                    }
-                                  </span>
-                                </td>
-                              ))}
-
-                              {/* Price Input */}
-                              <td className="px-4 py-3">
-                                <div className="relative">
-                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400">
-                                    ₹
-                                  </span>
-                                  <Input
-                                    type="number"
-                                    value={v.price}
-                                    onChange={(e) =>
-                                      updateVariantField(
-                                        v.id,
-                                        "price",
-                                        e.target.value === ""
-                                          ? ""
-                                          : Number(e.target.value),
-                                      )
-                                    }
-                                    className="w-24 pl-6 h-9 focus-visible:ring-blue-500"
-                                    placeholder="0.00"
-                                  />
-                                </div>
-                              </td>
-
-                              {/* SKU Input */}
-                              <td className="px-4 py-3">
-                                <Input
-                                  value={v.sku}
-                                  onChange={(e) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "sku",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-32 h-9 font-mono text-xs uppercase"
-                                  placeholder="AUTO-GEN"
-                                />
-                              </td>
-
-                              {/* Tax Type */}
-                              <td className="px-4 py-3">
-                                <Select
-                                  onValueChange={(val) =>
-                                    updateVariantField(v.id, "taxType", val)
-                                  }
-                                >
-                                  <SelectTrigger className="w-32 h-9 text-xs">
-                                    <SelectValue
-                                      placeholder={v.taxType || "Select"}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="inclusive">
-                                      Inclusive
-                                    </SelectItem>
-                                    <SelectItem value="exclusive">
-                                      Exclusive
-                                    </SelectItem>
-                                    <SelectItem value="none">No Tax</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </td>
-
-                              {/* Tax Value */}
-                              <td className="px-4 py-3">
-                                <Input
-                                  type="number"
-                                  value={v.taxValue}
-                                  onChange={(e) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "taxValue",
-                                      e.target.value === ""
-                                        ? ""
-                                        : Number(e.target.value),
-                                    )
-                                  }
-                                  className="w-20 h-9"
-                                  disabled={v.taxType === "none"}
-                                />
-                              </td>
-
-                              {/* Discount Type */}
-                              <td className="px-4 py-3">
-                                <Select
-                                  onValueChange={(val) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "discountType",
-                                      val,
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger className="w-32 h-9 text-xs">
-                                    <SelectValue
-                                      placeholder={v.discountType || "None"}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="percentage">
-                                      % Percentage
-                                    </SelectItem>
-                                    <SelectItem value="fixed">
-                                      ₹ Fixed
-                                    </SelectItem>
-                                    <SelectItem value="none">
-                                      No Discount
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </td>
-
-                              {/* Discount Value */}
-                              <td className="px-4 py-3">
-                                <Input
-                                  type="number"
-                                  value={v.discountValue}
-                                  onChange={(e) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "discountValue",
-                                      e.target.value === ""
-                                        ? ""
-                                        : Number(e.target.value),
-                                    )
-                                  }
-                                  className="w-20 h-9"
-                                  disabled={v.discountType === "none"}
-                                />
-                              </td>
-
-                              {/* Delete Action */}
-                              <td className="px-4 py-3 text-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  onClick={() => deleteVariants(v.id)}
-                                  tabIndex={-1}
-                                >
-                                  <Trash className="w-4 h-4" />
-                                </Button>
-                              </td>
-                            </tr>
                           ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                          <th className="px-4 py-3 min-w-[100px]">Price *</th>
+                          <th className="px-4 py-3 min-w-[120px]">SKU Code</th>
+                          <th className="px-4 py-3 min-w-[140px]">
+                            Tax Details
+                          </th>
+                          <th className="px-4 py-3">Tax %</th>
+                          <th className="px-4 py-3">Discount Type</th>
+                          <th className="px-4 py-3">Value</th>
+                          <th className="px-4 py-3"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900 transition-colors">
+                        {variants?.map((v) => (
+                          <tr
+                            key={v.id}
+                            className="hover:bg-blue-50/30 dark:hover:bg-slate-800/50 transition-colors group"
+                          >
+                            {attribute?.map((a) => (
+                              <td key={a.attribute_id} className="px-4 py-3">
+                                <span className="font-medium dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs">
+                                  {
+                                    v.attributeDetails?.find(
+                                      (d) => d.attribute_id === a.attribute_id,
+                                    )?.attributeValueName
+                                  }
+                                </span>
+                              </td>
+                            ))}
+                            <td className="px-4 py-3">
+                              <Input
+                                type="number"
+                                value={v.price}
+                                onChange={(e) =>
+                                  updateVariantField(
+                                    v.id,
+                                    "price",
+                                    e.target.value === ""
+                                      ? ""
+                                      : Number(e.target.value),
+                                  )
+                                }
+                                className="w-24 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <Input
+                                value={v.sku}
+                                onChange={(e) =>
+                                  updateVariantField(
+                                    v.id,
+                                    "sku",
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-32 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 uppercase"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <Select
+                                onValueChange={(val) =>
+                                  updateVariantField(v.id, "taxType", val)
+                                }
+                              >
+                                <SelectTrigger className="w-32 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                                  <SelectValue
+                                    placeholder={v.taxType || "Select"}
+                                  />
+                                </SelectTrigger>
+                                <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                                  <SelectItem value="inclusive">
+                                    Inclusive
+                                  </SelectItem>
+                                  <SelectItem value="exclusive">
+                                    Exclusive
+                                  </SelectItem>
+                                  <SelectItem value="none">No Tax</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="px-4 py-3">
+                              <Input
+                                type="number"
+                                value={v.taxValue}
+                                disabled={v.taxType === "none"}
+                                onChange={(e) =>
+                                  updateVariantField(
+                                    v.id,
+                                    "taxValue",
+                                    e.target.value === ""
+                                      ? ""
+                                      : Number(e.target.value),
+                                  )
+                                }
+                                className="w-20 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <Select
+                                onValueChange={(val) =>
+                                  updateVariantField(v.id, "discountType", val)
+                                }
+                              >
+                                <SelectTrigger className="w-32 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                                  <SelectValue
+                                    placeholder={v.discountType || "None"}
+                                  />
+                                </SelectTrigger>
+                                <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
+                                  <SelectItem value="percentage">
+                                    % Percentage
+                                  </SelectItem>
+                                  <SelectItem value="fixed">₹ Fixed</SelectItem>
+                                  <SelectItem value="none">None</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="px-4 py-3">
+                              <Input
+                                type="number"
+                                value={v.discountValue}
+                                disabled={v.discountType === "none"}
+                                onChange={(e) =>
+                                  updateVariantField(
+                                    v.id,
+                                    "discountValue",
+                                    e.target.value === ""
+                                      ? ""
+                                      : Number(e.target.value),
+                                  )
+                                }
+                                className="w-20 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <Button
+                                variant="ghost"
+                                onClick={() => deleteVariants(v.id)}
+                                className="text-slate-400 hover:text-red-600"
+                              >
+                                <Trash className="w-4 h-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <DialogFooter className="px-6 py-4 bg-white border-t border-slate-200 shrink-0">
+          <DialogFooter className="px-6 py-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
             <DialogClose asChild>
               <Button
                 variant="outline"
-                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Cancel
               </Button>
             </DialogClose>
             <Button
               onClick={handleCreateVariant}
-              className="bg-blue-600 hover:bg-blue-700 text-white min-w-[140px] shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
               disabled={!variants || variants.length === 0}
             >
               {(variants?.length ?? 0) > 0
-                ? `Save ${variants?.length ?? 0} Variants`
+                ? `Save ${variants?.length} Variants`
                 : "Save Variants"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* UPDATE PRODUCT INFO  */}
+      {/* Update Product Info Dialog */}
       <Dialog open={openUpdateProduct} onOpenChange={setOpenUpdateProduct}>
-        <DialogContent className="max-w-[90vw] w-full lg:max-w-5xl h-[90vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>Update Product</DialogTitle>
+        <DialogContent className="max-w-[90vw] w-full lg:max-w-5xl h-[90vh] overflow-hidden bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 transition-colors">
+          <DialogHeader className="border-b dark:border-slate-800 pb-4">
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-slate-100">
+              Update Product
+            </DialogTitle>
           </DialogHeader>
+
           <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
-            {/* product Info */}
-            <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
-              <button
-                // onClick={() => setIsOpen((o) => !o)}
-                className="flex items-center justify-between w-full mb-6 group"
-                type="button"
-              >
+            {/* Product Information Section */}
+            <div className="bg-white dark:bg-slate-900 p-4 border border-gray-200 dark:border-slate-800 rounded-sm mt-5">
+              <div className="flex items-center justify-between w-full mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <CircleAlert className="w-4 h-4 text-blue-500" />
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <CircleAlert className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                     Product Information
                   </h2>
                 </div>
-              </button>
+              </div>
 
               {/* Detail section */}
-
-              <div className="w-full max-w-7xl mx-auto  bg-white border-t pt-5">
+              <div className="w-full max-w-7xl mx-auto bg-white dark:bg-slate-900 border-t dark:border-slate-800 pt-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Product Name */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="productName">
+                    <Label
+                      htmlFor="productName"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Product Name <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="productName"
                       placeholder="Enter product name"
                       name="productName"
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500"
                       value={productInformation?.productName}
                       onChange={handleProductInfoChange}
                     />
@@ -1953,13 +1861,17 @@ export default function Products() {
 
                   {/* Slug */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="slug">
+                    <Label
+                      htmlFor="slug"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Slug <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="slug"
                       placeholder="Enter slug"
                       name="slugName"
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500"
                       value={productInformation.slugName}
                       onChange={handleProductInfoChange}
                     />
@@ -1967,7 +1879,10 @@ export default function Products() {
 
                   {/* Selling Type */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="sellingType">
+                    <Label
+                      htmlFor="sellingType"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Selling Type <span className="text-red-500">*</span>
                     </Label>
                     <Select
@@ -1979,10 +1894,13 @@ export default function Products() {
                         }))
                       }
                     >
-                      <SelectTrigger id="sellingType" className="w-full">
+                      <SelectTrigger
+                        id="sellingType"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      >
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                         <SelectItem value="RETAIL">Retail</SelectItem>
                         <SelectItem value="WHOLESALE">Wholesale</SelectItem>
                         <SelectItem value="BOTH">Both</SelectItem>
@@ -1993,13 +1911,15 @@ export default function Products() {
                   {/* Category */}
                   <div className="space-y-2 grid">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="category">
+                      <Label
+                        htmlFor="category"
+                        className="text-sm font-medium dark:text-slate-300"
+                      >
                         Category <span className="text-red-500">*</span>
                       </Label>
                       <button
                         type="button"
-                        //   onClick={() => setOpenCreateCategory(true)}
-                        className="flex items-center gap-1 text-sm text-blue-500 hover:text-orange-600"
+                        className="flex items-center gap-1 text-sm text-blue-500 hover:text-orange-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         Add New
@@ -2014,7 +1934,10 @@ export default function Products() {
                         }))
                       }
                     >
-                      <SelectTrigger id="category" className="w-full">
+                      <SelectTrigger
+                        id="category"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      >
                         <SelectValue placeholder="Select Category">
                           {categories.find(
                             (c) =>
@@ -2023,9 +1946,12 @@ export default function Products() {
                           )?.name || "Select Category"}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                         {categories.map((cat) => (
-                          <SelectItem value={cat.category_id}>
+                          <SelectItem
+                            key={cat.category_id}
+                            value={cat.category_id}
+                          >
                             {cat.name}
                           </SelectItem>
                         ))}
@@ -2035,7 +1961,10 @@ export default function Products() {
 
                   {/* Sub Category */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="subCategory">
+                    <Label
+                      htmlFor="subCategory"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Sub Category <span className="text-red-500">*</span>
                     </Label>
                     <Select
@@ -2048,30 +1977,32 @@ export default function Products() {
                       }
                       disabled={!productInformation.category}
                     >
-                      <SelectTrigger id="subCategory" className="w-full">
+                      <SelectTrigger
+                        id="subCategory"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      >
                         <SelectValue placeholder="Select SubCategory">
                           {subCategories.find(
                             (c) =>
                               String(c.subCategory_id) ===
                               productInformation.subCategory,
-                          )?.subCategoryName || "Select SUbCategory"}
+                          )?.subCategoryName || "Select SubCategory"}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                         {subCategories.length > 0 ? (
-                          <>
-                            {subCategories.map((subcat) => (
-                              <SelectItem value={subcat.subCategory_id}>
-                                {subcat.subCategoryName}
-                              </SelectItem>
-                            ))}
-                          </>
+                          subCategories.map((subcat) => (
+                            <SelectItem
+                              key={subcat.subCategory_id}
+                              value={subcat.subCategory_id}
+                            >
+                              {subcat.subCategoryName}
+                            </SelectItem>
+                          ))
                         ) : (
-                          <>
-                            <div className="px-4 py-2 text-sm  text-red-500">
-                              No SubCategory Found
-                            </div>
-                          </>
+                          <div className="px-4 py-2 text-sm text-red-500">
+                            No SubCategory Found
+                          </div>
                         )}
                       </SelectContent>
                     </Select>
@@ -2079,7 +2010,10 @@ export default function Products() {
 
                   {/* Brand */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="brand">
+                    <Label
+                      htmlFor="brand"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Brand <span className="text-red-500">*</span>
                     </Label>
                     <Select
@@ -2091,13 +2025,16 @@ export default function Products() {
                         }))
                       }
                     >
-                      <SelectTrigger id="brand" className="w-full">
+                      <SelectTrigger
+                        id="brand"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      >
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {brand.map((brand) => (
-                          <SelectItem value={brand.brand_id}>
-                            {brand.brandName}
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                        {brand.map((b) => (
+                          <SelectItem key={b.brand_id} value={b.brand_id}>
+                            {b.brandName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -2106,7 +2043,10 @@ export default function Products() {
 
                   {/* Unit */}
                   <div className="space-y-2 grid">
-                    <Label htmlFor="unit">
+                    <Label
+                      htmlFor="unit"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Unit <span className="text-red-500">*</span>
                     </Label>
                     <Select
@@ -2118,7 +2058,10 @@ export default function Products() {
                         }))
                       }
                     >
-                      <SelectTrigger id="unit" className="w-full">
+                      <SelectTrigger
+                        id="unit"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                      >
                         <SelectValue placeholder="Select">
                           {unit.find(
                             (c) =>
@@ -2126,9 +2069,9 @@ export default function Products() {
                           )?.unitName || "Select unit"}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                         {unit.map((u) => (
-                          <SelectItem value={u.unit_id}>
+                          <SelectItem key={u.unit_id} value={u.unit_id}>
                             {u.unitName}
                           </SelectItem>
                         ))}
@@ -2136,92 +2079,84 @@ export default function Products() {
                     </Select>
                   </div>
 
+                  {/* Descriptions */}
                   <div className="w-full md:col-span-2 grid gap-2">
-                    <Label htmlFor="itemBarcode">
+                    <Label
+                      htmlFor="description"
+                      className="text-sm font-medium dark:text-slate-300"
+                    >
                       Descriptions<span className="text-red-500">*</span>
                     </Label>
-                    <div className="flex gap-2 ">
-                      <Textarea
-                        placeholder="Enter Your Descriptions"
-                        rows={6}
-                        value={productInformation.description}
-                        name="description"
-                        onChange={handleProductInfoChange}
-                      />
-                    </div>
+                    <Textarea
+                      id="description"
+                      placeholder="Enter Your Descriptions"
+                      rows={6}
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500"
+                      value={productInformation.description}
+                      name="description"
+                      onChange={handleProductInfoChange}
+                    />
                   </div>
                 </div>
               </div>
             </div>
-            {/* customFeild Info Change */}
-            <div className="bg-white p-4 border-1 border-gray-300 rounded-sm mt-5">
-              <button
-                // onClick={() => setIsCustomOpen((o) => !o)}
-                className="flex items-center justify-between w-full mb-6 group"
-                type="button"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <List className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Custom Feild
-                  </h2>
+
+            {/* Custom Field Section */}
+            <div className="bg-white dark:bg-slate-900 p-4 border border-gray-200 dark:border-slate-800 rounded-sm mt-5">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <List className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                 </div>
-                {/* <ChevronDown
-                  className={`w-5 h-5 text-gray-400 transition-transform ${
-                    isCustomOpen ? "transform rotate-180" : ""
-                  }`}
-                /> */}
-              </button>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                  Custom Field
+                </h2>
+              </div>
 
-              <div className="p-6 pt-2 border-t border-gray-100">
-                {/* Tabs */}
-
-                {/* Form Fields */}
+              <div className="p-6 pt-2 border-t dark:border-slate-800 transition-colors">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Warranty Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Warranty <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <Select
-                        value={customFeild.warranty_id}
-                        onValueChange={(val) =>
-                          setcustomFeild((prev) => ({
-                            ...prev,
-                            warranty_id: val,
-                          }))
-                        }
+                    <Select
+                      value={customFeild.warranty_id}
+                      onValueChange={(val) =>
+                        setcustomFeild((prev) => ({
+                          ...prev,
+                          warranty_id: val,
+                        }))
+                      }
+                    >
+                      <SelectTrigger
+                        id="warrantyType"
+                        className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                       >
-                        <SelectTrigger
-                          id="warrantyType"
-                          className="w-full"
-                          name="warranty"
-                        >
-                          <SelectValue placeholder="Select Warranty" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {warranty?.map((war) => (
-                            <SelectItem value={war.warranty_id}>
-                              {war.warrantyName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <SelectValue placeholder="Select Warranty" />
+                      </SelectTrigger>
+                      <SelectContent className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
+                        {warranty?.map((war) => (
+                          <SelectItem
+                            key={war.warranty_id}
+                            value={war.warranty_id}
+                          >
+                            {war.warrantyName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Manufacturer Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Manufacturer <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="text"
                       placeholder="Enter manufacturer"
                       name="manufacturer"
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500"
                       value={customFeild.manufacturer}
                       onChange={handleCustomFeildChange}
                     />
@@ -2229,68 +2164,77 @@ export default function Products() {
 
                   {/* Manufactured Date Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Manufactured Date <span className="text-red-500">*</span>
                     </label>
-                    <div className="">
-                      <Input
-                        type="date"
-                        name="manufacturer_date"
-                        value={customFeild.manufacturer_date}
-                        onChange={handleCustomFeildChange}
-                      />
-                    </div>
+                    <Input
+                      type="date"
+                      name="manufacturer_date"
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500 [color-scheme:dark]"
+                      value={customFeild.manufacturer_date}
+                      onChange={handleCustomFeildChange}
+                    />
                   </div>
 
                   {/* Expiry Date Field */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                       Expiry On <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <Input
-                        type="Date"
-                        name="expiry_date"
-                        value={customFeild.expiry_date}
-                        onChange={handleCustomFeildChange}
-
-                        //className="w-full px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-10"
-                        // placeholder="DD-MM-YYYY"
-                      />
-                    </div>
+                    <Input
+                      type="date"
+                      name="expiry_date"
+                      className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 focus-visible:ring-blue-500 [color-scheme:dark]"
+                      value={customFeild.expiry_date}
+                      onChange={handleCustomFeildChange}
+                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <DialogClose>
-              <Button variant={"outline"}>Cancel</Button>
+
+          <DialogFooter className="border-t dark:border-slate-800 pt-4">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button onClick={handleUpdateProduct}>Update Category</Button>
+            <Button
+              onClick={handleUpdateProduct}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white transition-colors"
+            >
+              Update Product
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* doaliog for the Delete Varaint */}
-      <Dialog open={openDeleteVariant} onOpenChange={setOpenDeleteVariant}>
-        {" "}
-        <DialogContent className="flex flex-col items-center text-center">
-          <DialogHeader className="flex flex-col items-center ">
-            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-              <img src={trashImg} className="w-20  rounded-full" />
-            </div>
 
-            <DialogTitle className="text-lg font-semibold">
+      {/* Delete Variant/Product Dialogs */}
+      <Dialog open={openDeleteProduct} onOpenChange={setOpenDeleteProduct}>
+        <DialogContent className="flex flex-col items-center text-center dark:bg-slate-900 dark:border-slate-800">
+          <DialogHeader className="flex flex-col items-center">
+            <div className="w-14 h-14 border-2 dark:border-slate-800 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-900/20">
+              <img src={trashImg} className="w-10 rounded-full" />
+            </div>
+            <DialogTitle className="text-lg font-semibold dark:text-white">
               Delete Variant
             </DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Are you sure you want to delete this Variant{" "}
+            <DialogDescription className="dark:text-slate-400">
+              Are you sure you want to delete this Variant?
             </DialogDescription>
           </DialogHeader>
-
-          <DialogFooter className="mt-1 flex justify-center space-x-1">
+          <DialogFooter className="mt-4 flex gap-2">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300"
+              >
+                Cancel
+              </Button>
             </DialogClose>
             <Button variant="destructive" onClick={handleDeleteVariant}>
               Delete
@@ -2298,68 +2242,41 @@ export default function Products() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* delete Product Dialog Box */}
-      <Dialog open={openDeleteProduct} onOpenChange={setOpenDeleteProduct}>
-        <DialogContent className="flex flex-col items-center text-center">
-          <DialogHeader className="flex flex-col items-center ">
-            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-              <img src={trashImg} className="w-20  rounded-full" />
-            </div>
 
-            <DialogTitle className="text-lg font-semibold">
-              Delete Product
-            </DialogTitle>
-            <DialogDescription className="text-gray-500">
-              Are you sure you want to delete this product?
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter className="mt-1 flex justify-center space-x-1">
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button variant="destructive" onClick={handleDeleteProduct}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Barcode Dialog */}
       <Dialog open={openBarcode} onOpenChange={setOpenBarcode}>
-        <DialogContent className="max-w-[400px] rounded-2xl p-0 overflow-hidden border-none shadow-2xl">
-          {/* Screen-Only Header */}
-          <DialogHeader className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 print:hidden">
+        <DialogContent className="max-w-[400px] rounded-2xl p-0 overflow-hidden border-none shadow-2xl dark:bg-slate-900">
+          <DialogHeader className="bg-slate-50/80 dark:bg-slate-800/80 px-6 py-4 border-b dark:border-slate-700 print:hidden transition-colors">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
-                <Barcode className="w-4 h-4 text-slate-600" />
+              <div className="h-8 w-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                <Barcode className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               </div>
               <div>
-                <DialogTitle className="text-base font-semibold text-slate-900">
+                <DialogTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
                   Product Barcode
                 </DialogTitle>
-                <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium uppercase">
                   SKU: {selectedVariant.skuCode}
                 </p>
               </div>
             </div>
           </DialogHeader>
-
-          {/* The Printable Area */}
           <div
             id="barcode-print"
             className="flex flex-col items-center justify-center p-10 bg-white"
           >
-            {/* Visual Wrapper for Screen (removed on print via CSS below) */}
             <div className="print:p-0 p-6 rounded-xl border-2 border-dashed border-slate-100 bg-slate-50/30 print:bg-white print:border-none">
-              <div className="bg-white p-4 print:p-0 rounded-lg shadow-sm border border-slate-100 print:border-none print:shadow-none">
+              <div className="bg-white p-4 print:p-0 rounded-lg shadow-sm border border-slate-100 print:border-none print:shadow-none transition-all">
                 <BarcodeView value={selectedVariant.barcode} />
               </div>
             </div>
           </div>
-
-          {/* Screen-Only Footer */}
-          <DialogFooter className="bg-slate-50/80 px-6 py-4 border-t border-slate-100 flex gap-2 print:hidden">
+          <DialogFooter className="bg-slate-50/80 dark:bg-slate-800/80 px-6 py-4 border-t dark:border-slate-700 flex gap-2 print:hidden transition-colors">
             <DialogClose asChild>
-              <Button variant="ghost" className="flex-1 text-slate-600">
+              <Button
+                variant="ghost"
+                className="flex-1 text-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
+              >
                 Close
               </Button>
             </DialogClose>
@@ -2367,8 +2284,7 @@ export default function Products() {
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white gap-2 transition-all active:scale-95"
               onClick={handlePrint}
             >
-              <Printer className="w-4 h-4" />
-              Print Label
+              <Printer className="w-4 h-4" /> Print Label
             </Button>
           </DialogFooter>
         </DialogContent>

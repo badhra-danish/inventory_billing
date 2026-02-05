@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const brandEndPoint = {
   getAllbrand: "/v1/brand/getbrandpage",
   createBrand: "/v1/brand/create",
@@ -10,7 +10,7 @@ const brandEndPoint = {
 
 export const createBrand = async (payload: object) => {
   try {
-    const res = await axiosClient.post(brandEndPoint.createBrand, payload);
+    const res = await api.post(brandEndPoint.createBrand, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -20,7 +20,7 @@ export const createBrand = async (payload: object) => {
 
 export const getAllBrand = async (pageNo: number, pageSize: number) => {
   try {
-    const res = axiosClient.get(brandEndPoint.getAllbrand, {
+    const res = api.get(brandEndPoint.getAllbrand, {
       params: {
         pageNumber: pageNo,
         pageSize: pageSize,
@@ -36,7 +36,7 @@ export const getAllBrand = async (pageNo: number, pageSize: number) => {
 };
 export const getAllBrandActive = async () => {
   try {
-    const res = axiosClient.get(brandEndPoint.getAllBrandActive);
+    const res = api.get(brandEndPoint.getAllBrandActive);
     return (await res).data;
   } catch (error) {
     console.error(error);
@@ -45,10 +45,7 @@ export const getAllBrandActive = async () => {
 };
 export const upadateBrand = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${brandEndPoint.updateBrand}/${id}`,
-      payload
-    );
+    const res = await api.put(`${brandEndPoint.updateBrand}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -58,7 +55,7 @@ export const upadateBrand = async (id: string, payload: object) => {
 
 export const deleteBrand = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${brandEndPoint.deleteBrand}/${id}`);
+    const res = await api.delete(`${brandEndPoint.deleteBrand}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

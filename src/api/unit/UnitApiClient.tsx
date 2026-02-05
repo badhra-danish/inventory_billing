@@ -1,5 +1,5 @@
 import { axiosClient } from "..";
-
+import api from "@/utils/axios";
 const unitEndpoint = {
   createUnit: "/v1/unit/create",
   getAllUnitPage: "/v1/unit/getunitpage",
@@ -9,7 +9,7 @@ const unitEndpoint = {
 };
 export const createUnit = async (payload: object) => {
   try {
-    const res = await axiosClient.post(unitEndpoint.createUnit, payload);
+    const res = await api.post(unitEndpoint.createUnit, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -18,7 +18,7 @@ export const createUnit = async (payload: object) => {
 };
 export const getAllUnit = async (pageNo: number, pageSize: number) => {
   try {
-    const res = axiosClient.get(unitEndpoint.getAllUnitPage, {
+    const res = api.get(unitEndpoint.getAllUnitPage, {
       params: {
         pageNumber: pageNo,
         pageSize: pageSize,
@@ -34,7 +34,7 @@ export const getAllUnit = async (pageNo: number, pageSize: number) => {
 };
 export const getAllUnitActive = async () => {
   try {
-    const res = axiosClient.get(unitEndpoint.getAllUnitActive);
+    const res = api.get(unitEndpoint.getAllUnitActive);
     return (await res).data;
   } catch (error) {
     console.error(error);
@@ -44,10 +44,7 @@ export const getAllUnitActive = async () => {
 
 export const updateUnit = async (id: string, payload: object) => {
   try {
-    const res = await axiosClient.put(
-      `${unitEndpoint.updateUnit}/${id}`,
-      payload
-    );
+    const res = await api.put(`${unitEndpoint.updateUnit}/${id}`, payload);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -56,7 +53,7 @@ export const updateUnit = async (id: string, payload: object) => {
 };
 export const deleteUnit = async (id: string) => {
   try {
-    const res = await axiosClient.delete(`${unitEndpoint.deleteUnit}/${id}`);
+    const res = await api.delete(`${unitEndpoint.deleteUnit}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

@@ -268,7 +268,7 @@ export default function SubCategoryDatatable({
 }: SubCategoryDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
@@ -326,7 +326,7 @@ export default function SubCategoryDatatable({
   }, [refresh, page]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setSelectesSubcategoryUpdate((prev) => {
@@ -340,16 +340,18 @@ export default function SubCategoryDatatable({
     try {
       const payload = {
         category_id: selectesSubcategoryUpdate?.category_id,
-        categoryName: selectesSubcategoryUpdate?.categoryName,
+        subCategoryName: selectesSubcategoryUpdate?.subCategoryName,
         categoryCode: selectesSubcategoryUpdate?.categoryCode,
         description: selectesSubcategoryUpdate?.description,
         status: selectesSubcategoryUpdate?.status,
       };
+      console.log(payload);
+
       const res = await updateSubCategory(
         selectesSubcategoryUpdate?.subCategory_id ?? "",
-        payload
+        payload,
       );
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         toast.success(res.message);
         setOpenEdit(false);
         getallSubCategory();
@@ -590,34 +592,40 @@ export default function SubCategoryDatatable({
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4 custom-scrollbar">
+    <div className="w-full bg-white dark:bg-slate-900 rounded-md shadow-md p-4 custom-scrollbar transition-colors">
       {/* 🔍 Top Toolbar */}
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between py-4 ">
         <Input
           placeholder="Search....."
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm border-gray-300 focus-visible:ring-gray-500"
+          className="max-w-sm border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus-visible:ring-gray-500"
         />
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Toggle Columns
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize dark:text-slate-300 dark:focus:bg-slate-700"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -632,29 +640,36 @@ export default function SubCategoryDatatable({
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Category: {selectedCategory}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="shadow-lg">
-              <DropdownMenuLabel className="font-semibold text-gray-700">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
+              <DropdownMenuLabel className="font-semibold text-gray-700 dark:text-slate-200">
                 Filter by Category
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="dark:bg-slate-700" />
 
               {categoryOptions?.map((cat) => (
                 <DropdownMenuItem
                   key={cat.category_id}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedCategory(cat.name);
                     const categoryColumn = table.getColumn("categoryName");
                     if (categoryColumn) {
                       categoryColumn.setFilterValue(
-                        cat.name === "All" ? "" : cat.name
+                        cat.name === "All" ? "" : cat.name,
                       );
                     }
                   }}
@@ -668,24 +683,31 @@ export default function SubCategoryDatatable({
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="hover:bg-blue-500 hover:text-white"
+              className="hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-colors"
             >
-              <Button variant="outline" className="ml-auto">
+              <Button
+                variant="outline"
+                className="ml-auto dark:border-slate-700 dark:text-slate-300"
+              >
                 Status: {selectedStatus}{" "}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="shadow-lg">
+            <DropdownMenuContent
+              align="end"
+              className="shadow-lg dark:bg-slate-800 dark:border-slate-700"
+            >
               {["All", "active", "inactive"].map((status) => (
                 <DropdownMenuItem
-                  //key={status}
+                  key={status}
+                  className="dark:text-slate-300 dark:focus:bg-slate-700"
                   onClick={() => {
                     setSelectedStatus(status);
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -698,22 +720,25 @@ export default function SubCategoryDatatable({
         </div>
       </div>
 
-      {/*  Data Table */}
-      <div className="overflow-hidden rounded-md border border-gray-200 custom-scrollbar">
+      {/* Data Table */}
+      <div className="overflow-hidden rounded-md border border-gray-200 dark:border-slate-800 custom-scrollbar transition-colors">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="bg-gray-100 dark:bg-slate-800">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.depth}>
+              <TableRow
+                key={headerGroup.depth}
+                className="dark:border-slate-700"
+              >
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.index}
-                    className="text-sm font-semibold text-gray-800  tracking-wide px-4 py-3"
+                    className="text-sm font-semibold text-gray-800 dark:text-slate-200 tracking-wide px-4 py-3"
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -721,15 +746,16 @@ export default function SubCategoryDatatable({
             ))}
           </TableHeader>
 
-          <TableBody>
+          <TableBody className="dark:bg-slate-900 transition-colors">
             {isLoading ? (
-              <>
-                <TableRow>
-                  <TableCell colSpan={columns.length}>
-                    <Loader />
-                  </TableCell>
-                </TableRow>
-              </>
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="dark:border-slate-800"
+                >
+                  <Loader />
+                </TableCell>
+              </TableRow>
             ) : (
               <>
                 {table.getRowModel().rows?.length ? (
@@ -737,16 +763,16 @@ export default function SubCategoryDatatable({
                     <TableRow
                       key={row.index}
                       data-state={row.getIsSelected() && "selected"}
-                      className="hover:bg-gray-50 transition-colors capitalize"
+                      className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors capitalize border-gray-200 dark:border-slate-800"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.column.id}
-                          className="px-4 py-3 text-sm text-gray-700 capitalize"
+                          className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 capitalize"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
@@ -756,7 +782,7 @@ export default function SubCategoryDatatable({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center text-gray-500 capitalize"
+                      className="h-24 text-center text-gray-500 dark:text-slate-400 capitalize dark:border-slate-800"
                     >
                       No results found.
                     </TableCell>
@@ -768,8 +794,8 @@ export default function SubCategoryDatatable({
         </Table>
       </div>
 
-      {/*  Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      {/* Pagination + Footer Info */}
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -778,7 +804,7 @@ export default function SubCategoryDatatable({
           <Button
             variant="outline"
             size="sm"
-            // onClick={() => table.previousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={pageMeteData.hasPrevPage == false}
           >
@@ -787,10 +813,10 @@ export default function SubCategoryDatatable({
           <Button
             variant="outline"
             size="sm"
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
               setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
-            // onClick={() => table.nextPage()}
             disabled={pageMeteData.hasnextPage == false}
           >
             Next
@@ -798,15 +824,17 @@ export default function SubCategoryDatatable({
         </div>
       </div>
 
-      {/* Update Delete Dialog Box */}
+      {/* Update Sub Category Dialog Box */}
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto custom-scrollbar dark:bg-slate-900 dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle>Update Sub Category</DialogTitle>
+            <DialogTitle className="dark:text-slate-100">
+              Update Sub Category
+            </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-8 pt-5 mt-3 border-t-2">
+          <div className="grid gap-8 pt-5 mt-3 border-t-2 dark:border-slate-800">
             <div className="grid gap-4">
-              <Label>
+              <Label className="dark:text-slate-300">
                 {" "}
                 Category <span className="text-red-500">*</span>
               </Label>
@@ -816,21 +844,20 @@ export default function SubCategoryDatatable({
                     if (!prev) return prev;
                     return {
                       ...prev,
-                      categoryID: value,
+                      category_id: value,
                     };
                   })
                 }
-                name="categoryID"
+                name="category_id"
                 value={selectesSubcategoryUpdate?.category_id}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
                   {categories?.map((cat) => (
-                    <SelectItem value={cat?.category_id}>
-                      {" "}
-                      {cat?.name}{" "}
+                    <SelectItem key={cat?.category_id} value={cat?.category_id}>
+                      {cat?.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -838,33 +865,35 @@ export default function SubCategoryDatatable({
             </div>
 
             <div className="grid gap-4">
-              <Label>
+              <Label className="dark:text-slate-300">
                 {" "}
                 Sub Category <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
                 name="subCategoryName"
+                className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 value={selectesSubcategoryUpdate?.subCategoryName}
                 onChange={handleChange}
               />
             </div>
 
             <div className="grid gap-4">
-              <Label>
+              <Label className="dark:text-slate-300">
                 {" "}
                 Category Code <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
                 name="categoryCode"
+                className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 value={selectesSubcategoryUpdate?.categoryCode}
                 onChange={handleChange}
               />
             </div>
 
             <div className="grid gap-4">
-              <Label>
+              <Label className="dark:text-slate-300">
                 {" "}
                 Descriptions <span className="text-red-500">*</span>
               </Label>
@@ -872,14 +901,14 @@ export default function SubCategoryDatatable({
                 id="description"
                 name="description"
                 placeholder="Enter category description..."
-                className="min-h-[80px] resize-y"
+                className="min-h-[80px] resize-y dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 value={selectesSubcategoryUpdate?.description}
                 onChange={handleChange}
               />
             </div>
 
-            <div className="flex items-center justify-between border-b-2 pb-7">
-              <Label>
+            <div className="flex items-center justify-between border-b-2 dark:border-slate-800 pb-7">
+              <Label className="dark:text-slate-300">
                 {" "}
                 Status <span className="text-red-500">*</span>
               </Label>
@@ -900,34 +929,48 @@ export default function SubCategoryDatatable({
             </div>
           </div>
           <DialogFooter>
-            <DialogClose>
-              <Button variant={"outline"}>Cancel</Button>
+            <DialogClose asChild>
+              <Button
+                variant={"outline"}
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-            <Button onClick={handleUpdateCategory}>Update Category</Button>
+            <Button
+              onClick={handleUpdateCategory}
+              className="dark:bg-blue-600 dark:hover:bg-blue-500 text-white"
+            >
+              Update Category
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* Delete Product Dialog Box */}
       <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-        <DialogTrigger></DialogTrigger>
-
-        <DialogContent className="flex flex-col items-center text-center">
+        <DialogContent className="flex flex-col items-center text-center dark:bg-slate-900 dark:border-slate-800 transition-colors">
           <DialogHeader className="flex flex-col items-center ">
-            <div className="w-14 h-14 border-2 rounded-full flex items-center justify-center">
-              <img src={trashImg} className="w-20  rounded-full" />
+            <div className="w-14 h-14 border-2 dark:border-slate-700 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-900/20">
+              <img src={trashImg} className="w-10  rounded-full" />
             </div>
 
-            <DialogTitle className="text-lg font-semibold">
+            <DialogTitle className="text-lg font-semibold dark:text-slate-100">
               Delete Product
             </DialogTitle>
-            <DialogDescription className="text-gray-500">
+            <DialogDescription className="text-gray-500 dark:text-slate-400">
               Are you sure you want to delete this product?
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="mt-1 flex justify-center space-x-1">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Cancel
+              </Button>
             </DialogClose>
             <Button variant="destructive" onClick={handleDeleteCategory}>
               Delete

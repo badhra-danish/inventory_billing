@@ -23,42 +23,111 @@ import { Customer } from "@/pages/People/Customer";
 import { Suppliers } from "@/pages/People/Supplier";
 import EditSales from "@/components/Sales/EditSale";
 import Invoice from "@/components/Sales/Invoice";
+import SignIn from "@/components/Login/login";
+import PrivateRoute from "./PrivateRoutes";
+import ProtectedLayout from "./ProtectedLayout";
 function Approutes() {
   return (
     <BrowserRouter>
       <main>
         <Routes>
-          <Route path="/" element={<OutletLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/create-product" element={<CreateProduct />} />
-            <Route path="/products" element={<ProductDataTablepage />} />
-            <Route
-              path="/product-detail/:product_id"
-              element={<ProductDetails />}
-            />
-            <Route path="/category" element={<CategoryPage />} />
-            <Route path="/sub-category" element={<SubCategorypage />} />
-            <Route path="/brand" element={<BrandPage />} />
-            <Route path="/units" element={<UnitsPage />} />
-            <Route path="/variant" element={<VariantPage />} />
-            <Route path="/warranties" element={<WarrantiesPage />} />
+          <Route path="/login" element={<SignIn />} />
 
-            {/* Stock Manage Sales. */}
-            <Route path="/manage-stock" element={<StockMangepage />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/sales-return" element={<SalesReturn />} />
-            <Route path="/add-sales" element={<AddSales />} />
-            <Route path="/add-sales-return" element={<AddSalesReturn />} />
-            <Route path="/invoices" element={<Invoives />} />
-            <Route path="/sales/update/:sale_id" element={<EditSales />} />
-            <Route path="/sales/invoice/:sale_id" element={<Invoice />} />
-            {/* Purchase , order , return*/}
-            <Route path="/purchase" element={<Purchase />} />
-            <Route path="/add-purchase" element={<AddPurchase />} />
+          <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
+            <Route element={<OutletLayout />}>
+              <Route path="/super/dashboard" element={<Dashboard />} />
+              <Route path="/super/create-product" element={<CreateProduct />} />
+              <Route
+                path="/super/products"
+                element={<ProductDataTablepage />}
+              />
+              <Route
+                path="/super/product-detail/:product_id"
+                element={<ProductDetails />}
+              />
+              <Route path="/super/category" element={<CategoryPage />} />
+              <Route path="/super/sub-category" element={<SubCategorypage />} />
+              <Route path="/super/brand" element={<BrandPage />} />
+              <Route path="/super/units" element={<UnitsPage />} />
+              <Route path="/super/variant" element={<VariantPage />} />
+              <Route path="/super/warranties" element={<WarrantiesPage />} />
 
-            {/* Customer  ,supplier ,Employees*/}
-            <Route path="/customer" element={<Customer />} />
-            <Route path="/supplier" element={<Suppliers />} />
+              {/* Stock Manage Sales. */}
+              <Route path="/super/manage-stock" element={<StockMangepage />} />
+              <Route path="/super/sales" element={<Sales />} />
+              <Route path="/super/sales-return" element={<SalesReturn />} />
+              <Route path="/super/add-sales" element={<AddSales />} />
+              <Route
+                path="/super/add-sales-return"
+                element={<AddSalesReturn />}
+              />
+              <Route path="/super/invoices" element={<Invoives />} />
+              <Route
+                path="/super/sales/update/:sale_id"
+                element={<EditSales />}
+              />
+              <Route
+                path="/super/sales/invoice/:sale_id"
+                element={<Invoice />}
+              />
+              {/* Purchase , order , return*/}
+              <Route path="/super/purchase" element={<Purchase />} />
+              <Route path="/super/add-purchase" element={<AddPurchase />} />
+
+              {/* Customer  ,supplier ,Employees*/}
+              <Route path="/super/customer" element={<Customer />} />
+              <Route path="/super/supplier" element={<Suppliers />} />
+
+              {/* Only super admin things */}
+              {/* <Route path="/super/shops" element={<ShopsPage />} />
+              <Route path="/super/shop-admins" element={<ShopAdminsPage />} /> */}
+            </Route>
+          </Route>
+
+          {/* ================= SHOP ADMIN ================= */}
+
+          <Route element={<ProtectedLayout roles={["SHOP_ADMIN"]} />}>
+            <Route element={<OutletLayout />}>
+              <Route path="/shop/dashboard" element={<Dashboard />} />
+              <Route path="/shop/create-product" element={<CreateProduct />} />
+              <Route path="/shop/products" element={<ProductDataTablepage />} />
+              <Route
+                path="/shop//product-detail/:product_id"
+                element={<ProductDetails />}
+              />
+              <Route path="/shop/category" element={<CategoryPage />} />
+              <Route path="/shop/sub-category" element={<SubCategorypage />} />
+              <Route path="/shop/brand" element={<BrandPage />} />
+              <Route path="/shop/units" element={<UnitsPage />} />
+              <Route path="/shop/variant" element={<VariantPage />} />
+              <Route path="/shop/warranties" element={<WarrantiesPage />} />
+
+              {/* Stock Manage Sales. */}
+              <Route path="/shop/manage-stock" element={<StockMangepage />} />
+              <Route path="/shop/sales" element={<Sales />} />
+              <Route path="/shop/sales-return" element={<SalesReturn />} />
+              <Route path="/shop/add-sales" element={<AddSales />} />
+              <Route
+                path="/shop/add-sales-return"
+                element={<AddSalesReturn />}
+              />
+              <Route path="/shop/invoices" element={<Invoives />} />
+              <Route
+                path="/shop/sales/update/:sale_id"
+                element={<EditSales />}
+              />
+              <Route
+                path="/shop/sales/invoice/:sale_id"
+                element={<Invoice />}
+              />
+              {/* Purchase , order , return*/}
+              <Route path="/shop/purchase" element={<Purchase />} />
+              <Route path="/shop/add-purchase" element={<AddPurchase />} />
+
+              {/* Customer  ,supplier ,Employees*/}
+              <Route path="/shop/customer" element={<Customer />} />
+              <Route path="/shop/supplier" element={<Suppliers />} />
+            </Route>
           </Route>
         </Routes>
       </main>
