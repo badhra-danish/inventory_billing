@@ -32,7 +32,7 @@ function Sales() {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Button onClick={() => navigate("/add-sales")}>
+          <Button onClick={() => navigate("/shop/add-sales")}>
             <CirclePlus />
             Add Sales
           </Button>

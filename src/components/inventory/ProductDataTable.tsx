@@ -27,11 +27,13 @@ import {
   ArrowUpDown,
   Barcode,
   ChevronDown,
+  ChevronUp,
   CircleAlert,
   CirclePlus,
   Edit,
   Eye,
   List,
+  PackageSearch,
   Plus,
   PlusCircle,
   Printer,
@@ -855,10 +857,19 @@ export default function Products() {
               size="sm"
               onClick={() => handleViewClick(product.product_id)}
               className={`transition-transform ${
-                expandedRows ? "rotate-180" : ""
+                expandedRows[product.product_id] ? "bg-blue-500 text-white" : ""
               }`}
             >
-              <Eye />
+              {expandedRows[product.product_id] ? (
+                <>
+                  {" "}
+                  <ChevronDown className="stroke-4" />{" "}
+                </>
+              ) : (
+                <>
+                  <ChevronUp className="stroke-4" />
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
@@ -1134,82 +1145,74 @@ export default function Products() {
 
                     {/* Expanded variant row */}
                     {isExpanded && (
-                      <TableRow className="bg-slate-50/50 dark:bg-slate-950/50 hover:bg-slate-50/50 dark:hover:bg-slate-950/50 border-none transition-colors">
+                      <TableRow className="bg-slate-50/50 dark:bg-slate-950/40 border-none transition-all">
                         <TableCell
                           colSpan={columns.length}
                           className="p-0 border-b border-slate-200 dark:border-slate-800"
                         >
-                          <div className="px-10 py-6 animate-in fade-in slide-in-from-top-2 duration-300 ease-out">
+                          {/* Container with a slide-down entrance and subtle inner depth. 
+          The shadow-[inset...] creates a professional "well" effect.
+      */}
+                          <div className="px-8 py-6 animate-in fade-in slide-in-from-top-3 duration-500 ease-out shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]">
                             {loadingVariants[product.product_id] ? (
-                              <div className="flex items-center justify-center py-10">
+                              <div className="flex flex-col items-center justify-center py-12 gap-3">
                                 <Loader />
+                                <span className="text-xs font-medium text-slate-400 animate-pulse uppercase tracking-widest">
+                                  Fetching Variants...
+                                </span>
                               </div>
                             ) : variantsMap[product.product_id]?.length ? (
-                              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-colors">
-                                {/* Table Header */}
-                                <div className="grid grid-cols-12 gap-4 bg-slate-50 dark:bg-slate-800/50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-                                  <div className="col-span-3">
+                              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl overflow-hidden transition-all duration-300">
+                                {/* Professional Grid Header 
+                Using text-[10px] and font-black for a high-end "Utility" dashboard aesthetic.
+            */}
+                                <div className="grid grid-cols-12 gap-4 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-sm px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                  <div className="col-span-3 flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                     Attribute Details
                                   </div>
                                   <div className="col-span-2">SKU Code</div>
                                   <div className="col-span-2">Base Price</div>
-                                  <div className="col-span-2">Tax/GST</div>
-                                  <div className="col-span-1">Discount</div>
                                   <div className="col-span-2 text-right">
                                     Actions
                                   </div>
                                 </div>
 
-                                {/* Table Rows Container */}
-                                <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[450px] overflow-y-auto custom-scrollbar">
+                                {/* Content Body with Scroll Limit */}
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800/50 max-h-[500px] overflow-y-auto custom-scrollbar transition-colors">
                                   {variantsMap[product.product_id].map(
                                     (variant) => (
                                       <div
                                         key={variant.product_variant_id}
-                                        className="grid grid-cols-12 gap-4 items-center px-6 py-4 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-150 group"
+                                        className="grid grid-cols-12 gap-4 items-center px-6 py-5 text-sm hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all group"
                                       >
+                                        {/* Highlighted Active Tab Style Badge */}
                                         <div className="col-span-3">
-                                          <span className="inline-flex items-center font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-800 text-xs">
+                                          <span className="inline-flex items-center font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-500/20 text-[13px] shadow-sm">
                                             {variant.variant_label}
                                           </span>
                                         </div>
 
-                                        <div className="col-span-2 font-mono text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                        {/* SKU Code with Mono Font for readability */}
+                                        <div className="col-span-2 font-mono text-[12px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded w-fit border border-slate-100 dark:border-slate-800">
                                           {variant.skuCode}
                                         </div>
 
-                                        <div className="col-span-2 font-semibold text-slate-900 dark:text-slate-200">
+                                        {/* Price Display */}
+                                        <div className="col-span-2 font-bold text-slate-900 dark:text-slate-100 text-base tracking-tight">
                                           ₹{variant.price.toLocaleString()}
                                         </div>
 
-                                        <div className="col-span-2">
-                                          <div className="flex flex-col">
-                                            <span className="text-slate-700 dark:text-slate-300 font-medium text-xs">
-                                              {variant.tax_value}%
-                                            </span>
-                                            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase leading-none mt-0.5">
-                                              {variant.tax_type}
-                                            </span>
-                                          </div>
-                                        </div>
+                                        {/* Tax Information */}
 
-                                        <div className="col-span-1">
-                                          {variant.discount_value > 0 ? (
-                                            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full">
-                                              -{variant.discount_value}%
-                                            </span>
-                                          ) : (
-                                            <span className="text-slate-300 dark:text-slate-600 font-medium">
-                                              —
-                                            </span>
-                                          )}
-                                        </div>
+                                        {/* Discount Badge */}
 
+                                        {/* Action Group with Original Logic */}
                                         <div className="col-span-2 flex justify-end items-center gap-2">
                                           <Button
                                             variant="outline"
                                             size="sm"
-                                            className="h-7 px-3 text-[10px] font-bold uppercase border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+                                            className="h-7 px-3 text-[10px] font-bold uppercase border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all rounded-lg active:scale-95 shadow-sm"
                                             onClick={() => {
                                               setOpenBarcode(true);
                                               getSelectedVariant(
@@ -1232,7 +1235,7 @@ export default function Products() {
                                             <Button
                                               variant="ghost"
                                               size="icon"
-                                              className="h-7 w-7 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-95"
+                                              className="h-8 w-8 rounded-lg text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all"
                                               onClick={() => {
                                                 setOpenVariant(true);
                                                 getSelectedVariant(
@@ -1256,7 +1259,7 @@ export default function Products() {
                                               <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-7 w-7 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+                                                className="h-8 w-8 rounded-lg text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all"
                                                 onClick={() => {
                                                   setOpenDeleteVariant(true);
                                                   getSelectedVariant(
@@ -1283,9 +1286,10 @@ export default function Products() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center justify-center py-12 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                                <p className="text-sm font-medium text-slate-400">
-                                  No variants found for this product.
+                              <div className="flex flex-col items-center justify-center py-16 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+                                <PackageSearch className="w-10 h-10 text-slate-300 dark:text-slate-700 mb-3" />
+                                <p className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                  No configurations found
                                 </p>
                               </div>
                             )}
@@ -1376,82 +1380,6 @@ export default function Products() {
                     setSelectedVariant((prev) => ({
                       ...prev,
                       price: Number(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex gap-4 w-full">
-              <div className="grid gap-3 w-full">
-                <Label className="dark:text-slate-300">Tax Type:</Label>
-                <Select
-                  value={selectedVariant?.tax_type}
-                  onValueChange={(value) =>
-                    setSelectedVariant((prev) => {
-                      if (!prev) return prev;
-                      return { ...prev, tax_type: value };
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
-                    <SelectValue placeholder="Select Tax Type" />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                    <SelectItem value="INCLUSIVE">Inclusive</SelectItem>
-                    <SelectItem value="EXCLUSIVE">Exclusive</SelectItem>
-                    <SelectItem value="NONE">None</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-3 w-full">
-                <Label className="dark:text-slate-300">Tax Value:</Label>
-                <Input
-                  type="text"
-                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
-                  disabled={selectedVariant.tax_type === "NONE"}
-                  value={selectedVariant.tax_value}
-                  onChange={(e) =>
-                    setSelectedVariant((prev) => ({
-                      ...prev,
-                      tax_value: Number(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex gap-4 w-full">
-              <div className="grid gap-3 w-full">
-                <Label className="dark:text-slate-300">Discount Type:</Label>
-                <Select
-                  value={selectedVariant?.discount_type}
-                  onValueChange={(value) =>
-                    setSelectedVariant((prev) => {
-                      if (!prev) return prev;
-                      return { ...prev, discount_type: value };
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-full dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100">
-                    <SelectValue placeholder="Select Discount Type" />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-slate-800 dark:border-slate-700">
-                    <SelectItem value="FIXED">Fixed</SelectItem>
-                    <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-                    <SelectItem value="NONE">None</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-3 w-full">
-                <Label className="dark:text-slate-300">Discount value:</Label>
-                <Input
-                  type="text"
-                  className="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
-                  disabled={selectedVariant?.discount_type === "NONE"}
-                  value={selectedVariant.discount_value}
-                  onChange={(e) =>
-                    setSelectedVariant((prev) => ({
-                      ...prev,
-                      discount_value: Number(e.target.value),
                     }))
                   }
                 />
@@ -2213,8 +2141,37 @@ export default function Products() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Variant/Product Dialogs */}
+      {/* Delete Product Dialogs */}
       <Dialog open={openDeleteProduct} onOpenChange={setOpenDeleteProduct}>
+        <DialogContent className="flex flex-col items-center text-center dark:bg-slate-900 dark:border-slate-800">
+          <DialogHeader className="flex flex-col items-center">
+            <div className="w-14 h-14 border-2 dark:border-slate-800 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-900/20">
+              <img src={trashImg} className="w-10 rounded-full" />
+            </div>
+            <DialogTitle className="text-lg font-semibold dark:text-white">
+              Delete Variant
+            </DialogTitle>
+            <DialogDescription className="dark:text-slate-400">
+              Are you sure you want to delete this Variant?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex gap-2">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="dark:border-slate-700 dark:text-slate-300"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleDeleteProduct}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Delete Variant/Product Dialogs */}
+      <Dialog open={openDeleteVariant} onOpenChange={setOpenDeleteVariant}>
         <DialogContent className="flex flex-col items-center text-center dark:bg-slate-900 dark:border-slate-800">
           <DialogHeader className="flex flex-col items-center">
             <div className="w-14 h-14 border-2 dark:border-slate-800 rounded-full flex items-center justify-center bg-red-50 dark:bg-red-900/20">
@@ -2242,7 +2199,6 @@ export default function Products() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Barcode Dialog */}
       <Dialog open={openBarcode} onOpenChange={setOpenBarcode}>
         <DialogContent className="max-w-[400px] rounded-2xl p-0 overflow-hidden border-none shadow-2xl dark:bg-slate-900">

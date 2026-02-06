@@ -97,13 +97,6 @@ function CreateProduct() {
     price?: number | "";
     quantity?: number | "";
     sku?: string;
-    taxType?: string;
-    taxValue?: string;
-    discountType?: string;
-    discountValue?: number | "";
-    quantityAlert?: number | "";
-    imageUrl?: string;
-    image?: File;
   }
   interface VariantAttribute {
     attribute_id: string;
@@ -382,10 +375,6 @@ function CreateProduct() {
             {
               skuCode: singleProductInfo.skuCode,
               price: Number(singleProductInfo.price),
-              tax_type: singleProductInfo.taxType?.toUpperCase(),
-              tax_value: Number(singleProductInfo.taxValue || 0),
-              discount_type: singleProductInfo.discountType?.toUpperCase(),
-              discount_value: Number(singleProductInfo.discountValue || 0),
             },
           ],
         };
@@ -449,10 +438,6 @@ function CreateProduct() {
           productVariants: variants?.map((v) => ({
             skuCode: v.sku,
             price: Number(v.price),
-            tax_type: v.taxType?.toUpperCase() || "NONE",
-            tax_value: Number(v.taxValue || 0),
-            discount_type: v.discountType?.toUpperCase() || "NONE",
-            discount_value: Number(v.discountValue || 0),
             attribute_value_ids: v.attributeDetails?.map(
               (d) => d.attribute_value_id,
             ),
@@ -1176,8 +1161,6 @@ function CreateProduct() {
                             ))}
                             <th className="px-4 py-3">Price *</th>
                             <th className="px-4 py-3">SKU</th>
-                            <th className="px-4 py-3">Tax Val</th>
-                            <th className="px-4 py-3">Disc Val</th>
                             <th></th>
                           </tr>
                         </thead>
@@ -1226,34 +1209,7 @@ function CreateProduct() {
                                   }
                                 />
                               </td>
-                              <td className="px-4 py-2">
-                                <Input
-                                  type="number"
-                                  className="h-8 w-20 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
-                                  value={v.taxValue}
-                                  onChange={(e) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "taxValue",
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td className="px-4 py-2">
-                                <Input
-                                  type="number"
-                                  className="h-8 w-20 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
-                                  value={v.discountValue}
-                                  onChange={(e) =>
-                                    updateVariantField(
-                                      v.id,
-                                      "discountValue",
-                                      e.target.value,
-                                    )
-                                  }
-                                />
-                              </td>
+
                               <td>
                                 <Button
                                   variant="ghost"

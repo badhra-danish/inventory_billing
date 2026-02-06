@@ -26,13 +26,14 @@ import Invoice from "@/components/Sales/Invoice";
 import SignIn from "@/components/Login/login";
 import PrivateRoute from "./PrivateRoutes";
 import ProtectedLayout from "./ProtectedLayout";
+import RoleRedirect from "./IndexRedirect";
 function Approutes() {
   return (
     <BrowserRouter>
       <main>
         <Routes>
+          <Route path="/" element={<RoleRedirect />} />
           <Route path="/login" element={<SignIn />} />
-
           <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
             <Route element={<OutletLayout />}>
               <Route path="/super/dashboard" element={<Dashboard />} />

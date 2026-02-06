@@ -162,7 +162,7 @@ export default function AppSidebar({
           </div>
         </SidebarHeader>
 
-        <SidebarSeparator className="mx-8 opacity-50 dark:opacity-20" />
+        <SidebarSeparator className="m-0   opacity-50 dark:opacity-20" />
 
         <SidebarContent className="px-2 py-2 custom-scrollbar transition-colors">
           {role === "SUPER_ADMIN" && (
