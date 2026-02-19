@@ -31,6 +31,10 @@ import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import Loader from "@/components/commen/loader";
 import { createStock } from "@/api/Stock/Stockclinet";
 import toast from "react-hot-toast";
+import {
+  getAllWarehouse,
+  getAllWarehousePage,
+} from "@/api/WareHouse/WareHouse";
 type Product = {
   product_variant_id: string;
   skuCode: string;
@@ -62,9 +66,29 @@ function StockMangepage() {
     productName: "",
   });
   const [quantityStatus, setQuantityStatus] = React.useState({
+    warehouse_id: "",
     quantity: "",
     status: "INSTOCK",
   });
+
+  const [warehouse, setWarehouse] = React.useState<
+    Array<{ warehouse_id: string; warehouseName: string }>
+  >([]);
+  const getallWarehouse = async () => {
+    try {
+      const res = await getAllWarehouse();
+      if (res.status === "OK") {
+        setWarehouse(res.data || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  React.useEffect(() => {
+    getallWarehouse();
+  }, []);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -124,9 +148,11 @@ function StockMangepage() {
   const handleCreateStock = () => {
     const payload = {
       product_variant_id: selectedVariant?.product_variant_id,
+      warehouse_id: quantityStatus.warehouse_id,
       quantity: Number(quantityStatus?.quantity),
       status: quantityStatus?.status,
     };
+    console.log(payload);
 
     const stockPromise = createStock(payload);
 
@@ -176,6 +202,31 @@ function StockMangepage() {
                 <DialogTitle>Add Stock</DialogTitle>
               </DialogHeader>
               <div className="grid gap-8 pt-5 mt-3 border-t-1 pb-3">
+                <div className="grid gap-4">
+                  <Label>
+                    {" "}
+                    Select Warehouse <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    onValueChange={(value) =>
+                      setQuantityStatus((prev) => ({
+                        ...prev,
+                        warehouse_id: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a Warehouse" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {warehouse?.map((war) => (
+                        <SelectItem value={war.warehouse_id}>
+                          {war.warehouseName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="grid gap-4">
                   <Label>
                     {" "}

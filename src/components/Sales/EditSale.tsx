@@ -48,7 +48,7 @@ import {
 } from "../ui/dialog";
 import { DialogContent } from "@radix-ui/react-dialog";
 type ProductRow = {
-  sale_item_id?: string;
+  sales_item_id?: string;
   varint_id: string;
   skuCode: string;
   ProductName: string;
@@ -134,7 +134,7 @@ export default function EditSales() {
     if (!sales?.sales_items?.length) return;
 
     const formattedRows: ProductRow[] = sales.sales_items.map((item) => ({
-      sale_item_id: item.sales_item_id,
+      sales_item_id: item.sales_item_id,
       varint_id: item.product_variant_id,
 
       skuCode: item.variant?.skuCode ?? "",
@@ -318,7 +318,7 @@ export default function EditSales() {
       discount: Number(formData.discount || 0),
 
       sales_items: rows.map((row) => ({
-        ...(row.sale_item_id && { sale_item_id: row.sale_item_id }),
+        ...(row.sales_item_id && { sales_item_id: row.sales_item_id }),
         product_variant_id: row.varint_id,
         price: row.price,
         quantity: row.quantity,

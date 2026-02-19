@@ -31,7 +31,6 @@ const SignIn: React.FC = () => {
 
       await superAdminlogin(email, password);
 
-      // 🔥 role based redirect
       const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
       switch (storedUser.role) {

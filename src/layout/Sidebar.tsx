@@ -27,6 +27,7 @@ import {
   PackageSearch,
   LogOut,
   ChevronRight,
+  Warehouse,
 } from "lucide-react";
 import {
   Sidebar,
@@ -70,12 +71,13 @@ const SalesItems = [
 ];
 const PurchaseItem = [
   { title: "Purchase", url: "/shop/purchase", icon: Handbag },
-  { title: "Purchase Order", url: "/shop/invoices", icon: ShoppingBag },
+  { title: "Purchase Order", url: "/shop/purchase_order", icon: ShoppingBag },
   { title: "Purchase Return", url: "/shop/sales-return", icon: Undo2 },
 ];
 const PeoplesItem = [
   { title: "Customer", url: "/shop/customer", icon: Users },
   { title: "Supplier", url: "/shop/supplier", icon: UserLock },
+  { title: "Warehouse", url: "/shop/warehouse", icon: Warehouse },
   { title: "Employees", url: "/shop/sales-return", icon: User },
 ];
 const ReportsItem = [

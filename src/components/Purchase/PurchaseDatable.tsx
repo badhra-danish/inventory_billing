@@ -26,6 +26,7 @@ import {
   ReceiptIndianRupeeIcon,
   BadgeIndianRupee,
   CirclePlus,
+  RefreshCcw,
 } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -50,77 +51,145 @@ import {
 } from "@/components/ui/table";
 
 import { Badge } from "../ui/badge";
-const data: PurchaseDetails[] = [
-  {
-    supplierName: "Travel Mart",
-    date: "10 Sep 2024",
-    total: "1700",
-    paid: "1700",
-    due: "0.00",
-    paymentStatus: "paid",
-    status: "pending",
-  },
-  {
-    supplierName: "Global Supplies",
-    date: "15 Sep 2024",
-    total: "3200",
-    paid: "1000",
-    due: "2200",
-    paymentStatus: "overdue",
-    status: "ordered",
-  },
-  {
-    supplierName: "Smart Traders",
-    date: "19 Sep 2024",
-    total: "2800",
-    paid: "0.00",
-    due: "2800",
-    paymentStatus: "unpaid",
-    status: "pending",
-  },
-  {
-    supplierName: "Metro Wholesale",
-    date: "25 Sep 2024",
-    total: "5600",
-    paid: "5600",
-    due: "0.00",
-    paymentStatus: "paid",
-    status: "received",
-  },
-  {
-    supplierName: "Value Connect",
-    date: "30 Sep 2024",
-    total: "4100",
-    paid: "1500",
-    due: "2600",
-    paymentStatus: "overdue",
-    status: "pending",
-  },
-  {
-    supplierName: "Prime Industries",
-    date: "04 Oct 2024",
-    total: "2400",
-    paid: "0.00",
-    due: "2400",
-    paymentStatus: "unpaid",
-    status: "pending",
-  },
-];
+import { getAllPurchaseOrder } from "@/api/PurchaseOrder/PurchaseOrderClient";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from "../ui/menubar";
+import { PurchaseOrderDetailsDialog } from "./PurchaseOrderDetail";
+// const data: PurchaseDetails[] = [
+//   {
+//     supplierName: "Travel Mart",
+//     date: "10 Sep 2024",
+//     total: "1700",
+//     paid: "1700",
+//     due: "0.00",
+//     paymentStatus: "paid",
+//     status: "pending",
+//   },
+//   {
+//     supplierName: "Global Supplies",
+//     date: "15 Sep 2024",
+//     total: "3200",
+//     paid: "1000",
+//     due: "2200",
+//     paymentStatus: "overdue",
+//     status: "ordered",
+//   },
+//   {
+//     supplierName: "Smart Traders",
+//     date: "19 Sep 2024",
+//     total: "2800",
+//     paid: "0.00",
+//     due: "2800",
+//     paymentStatus: "unpaid",
+//     status: "pending",
+//   },
+//   {
+//     supplierName: "Metro Wholesale",
+//     date: "25 Sep 2024",
+//     total: "5600",
+//     paid: "5600",
+//     due: "0.00",
+//     paymentStatus: "paid",
+//     status: "received",
+//   },
+//   {
+//     supplierName: "Value Connect",
+//     date: "30 Sep 2024",
+//     total: "4100",
+//     paid: "1500",
+//     due: "2600",
+//     paymentStatus: "overdue",
+//     status: "pending",
+//   },
+//   {
+//     supplierName: "Prime Industries",
+//     date: "04 Oct 2024",
+//     total: "2400",
+//     paid: "0.00",
+//     due: "2400",
+//     paymentStatus: "unpaid",
+//     status: "pending",
+//   },
+// ];
+export interface Variant {
+  product_variant_id: string;
+  skuCode: string;
+  price: number;
+  variant_label: string;
+  product: {
+    productName: string;
+  };
+}
 
-export type PurchaseDetails = {
-  supplierName: string;
-  date: string;
-  total: string;
-  paid: string;
-  due: string;
-  status: "pending" | "ordered" | "received";
-  paymentStatus: "unpaid" | "paid" | "overdue";
-};
+// ===============================
+// Purchase Order Item
+// ===============================
+export interface PurchaseOrderItem {
+  purchase_order_item_id: string;
+  purchase_order_id: string;
+  product_variant_id: string;
+  quantity: number;
+  received_quantity: number;
+  unit_price: string; // coming as string from backend
+  tax: string;
+  tax_amount: string;
+  discount: string;
+  total_amount: string;
+  shop_id: string;
+  createdAt: string;
+  updatedAt: string;
+  variant: Variant;
+}
+
+// ===============================
+// Supplier
+// ===============================
+export interface Supplier {
+  supplierID: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+// ===============================
+// Warehouse
+// ===============================
+export interface Warehouse {
+  warehouse_id: string;
+  warehouseName: string;
+}
+
+export interface PurchaseOrder {
+  purchase_order_id: string;
+  po_number: string;
+  supplier_id: string;
+  warehouse_id: string;
+  po_date: string;
+  order_tax: string;
+  discount_amt: string;
+  shipping: string;
+  sub_total: string;
+  grand_total: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  shop_id: string;
+  createdAt: string;
+  updatedAt: string;
+  supplier: Supplier;
+  warehouse: Warehouse;
+  items: PurchaseOrderItem[];
+}
 
 export default function PurchaseDataTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   //const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
@@ -129,7 +198,45 @@ export default function PurchaseDataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<PurchaseDetails>[] = [
+  const [page, setPage] = React.useState(1);
+
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPage: 0,
+    currentPage: 0,
+    totalItems: 0,
+    pageSize: 0,
+    hasnextPage: false,
+    hasPrevPage: false,
+  });
+
+  const [purchaseOrderData, setPurchaseOrderData] = React.useState<
+    PurchaseOrder[]
+  >([]);
+
+  const [selectedPurchaseOrder, setSelectedPurchaseOrder] =
+    React.useState<PurchaseOrder | null>(null);
+
+  const [openPurchaseOrderDetail, setOpenPurchaseOrderDetail] =
+    React.useState(false);
+
+  const getAllPurchasaeOrders = async () => {
+    try {
+      const res = await getAllPurchaseOrder(page, 10);
+      if (res.status == "OK") {
+        setPurchaseOrderData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    getAllPurchasaeOrders();
+  }, []);
+
+  const data: PurchaseOrder[] = purchaseOrderData;
+  const columns: ColumnDef<PurchaseOrder>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -153,25 +260,34 @@ export default function PurchaseDataTable() {
       enableHiding: false,
     },
     {
+      accessorKey: "po_number",
+      header: () => <div className="text-left text-white">Order No</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left text-blue-600">
+            {row.getValue("po_number")}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "supplierName",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="text-white"
           >
-            Customer
+            Supplier
             <ArrowUpDown />
           </Button>
         );
       },
+      accessorFn: (row) => `${row.supplier.firstName} ${row.supplier.lastName}`,
       cell: ({ row }) => {
-        //const sales = row.original;
         return (
           <div className="flex items-center gap-3">
-            {/* Customer Image */}
-
-            {/* Customer Name */}
             <span className="capitalize font-bold">
               {row.getValue("supplierName")}
             </span>
@@ -179,39 +295,74 @@ export default function PurchaseDataTable() {
         );
       },
     },
-
     {
-      accessorKey: "date",
-      header: () => <div className="text-left">Supplier Name</div>,
+      accessorKey: "warehouseName",
+      header: () => <div className="text-left text-white">Warehouse</div>,
+      accessorFn: (row) => `${row.warehouse.warehouseName}`,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("date")}</div>
+          <div className="flex items-center gap-3">
+            <span className="capitalize ">{row.getValue("warehouseName")}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "po_date",
+      header: () => <div className="text-left text-white">Order Date</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">{row.getValue("po_date")}</div>
         );
       },
     },
 
     {
       accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
+      header: () => (
+        <div className="text-left font-semibold text-white">Status</div>
+      ),
       cell: ({ row }) => {
-        const status = String(row.getValue("status")).toLowerCase();
+        const status = String(row.getValue("status")).toUpperCase();
 
-        let color = "bg-gray-500";
-        let label = status;
+        // Professional semantic colors
+        let color = "bg-gray-100 text-gray-700 border-gray-200";
 
-        if (status === "received") {
-          color = "bg-green-400";
-        } else if (status === "pending") {
-          color = "bg-blue-400";
-        } else if (status === "ordered") {
-          color = "bg-yellow-400 ";
+        if (status === "APPROVED") {
+          color = "bg-green-400 text-white border-green-200";
+        } else if (status === "PENDING") {
+          color = "bg-blue-500 text-white border-blue-200";
+        } else if (status === "CANCELLED") {
+          color = "bg-red-200 text-white border-red-200";
         }
+
+        const label = status.replace("_", " ");
+
         return (
-          <div className="lowercase text-left">
+          <div className="flex justify-start">
             <Badge
-              className={`${color} px-3 py-1 rounded-md capitalize text-[10px]`}
+              className={`
+               ${color} 
+               flex items-center gap-1.5 
+               pl-3 pr-3.5 py-1.5   
+               rounded-lg 
+               font-bold 
+               text-[10px] 
+               uppercase 
+               tracking-wider
+               border
+               shadow-sm
+               transition-all
+               hover:opacity-90
+             `}
             >
-              {label}
+              {/* Dot Indicator */}
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-current"></span>
+              </span>
+
+              <span className="truncate">{label}</span>
             </Badge>
           </div>
         );
@@ -219,78 +370,57 @@ export default function PurchaseDataTable() {
     },
 
     {
-      accessorKey: "total",
-      header: () => <div className="text-left">Total</div>,
+      accessorKey: "grand_total",
+      header: () => <div className="text-left text-white">Total Amt</div>,
       cell: ({ row }) => {
         return (
-          <div className=" text-left capitalize">{row.getValue("total")}</div>
-        );
-      },
-    },
-
-    {
-      accessorKey: "paid",
-      header: () => <div className="text-left">Paid</div>,
-      cell: ({ row }) => {
-        return (
-          <div className=" text-left capitalize">{row.getValue("paid")}</div>
-        );
-      },
-    },
-
-    {
-      accessorKey: "due",
-      header: () => <div className="text-left"> Due</div>,
-      cell: ({ row }) => {
-        return (
-          <div className=" text-left capitalize">{row.getValue("due")}</div>
-        );
-      },
-    },
-
-    {
-      accessorKey: "paymentStatus",
-      header: () => <div className="text-left"> Status</div>,
-      cell: ({ row }) => {
-        const status = String(row.getValue("paymentStatus")).toLowerCase();
-
-        let color = "bg-gray-500";
-        let label = status;
-
-        if (status === "paid") {
-          color = "bg-green-100 text-green-400 ";
-        } else if (status === "overdue") {
-          color = "bg-yellow-50 text-yellow-400";
-        } else if (status === "unpaid") {
-          color = "bg-red-50 text-red-400";
-        }
-        return (
-          <div className="lowercase text-left">
-            <Badge
-              className={`${color} px-3 py-1 rounded-md capitalize font-semibold flex items-center`}
-            >
-              {label}
-            </Badge>
+          <div className=" text-left capitalize">
+            {row.getValue("grand_total")}
           </div>
         );
       },
     },
+
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
-      cell: () => {
-        // const product = row.original;
+      cell: ({ row }) => {
+        const purchaseOrder = row.original;
         return (
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Eye />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Edit />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Trash />
-            </Button>
+            <Menubar className="border-none bg-transparent shadow-none p-0 h-auto">
+              <MenubarMenu>
+                <MenubarTrigger className="focus:bg-gray-100 data-[state=open]:bg-gray-100 p-1.5 rounded-md cursor-pointer transition-colors">
+                  <EllipsisVertical className="w-4 h-4 text-gray-500" />
+                </MenubarTrigger>
+                <MenubarContent align="end" className="min-w-[180px]">
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setSelectedPurchaseOrder(purchaseOrder);
+                      setOpenPurchaseOrderDetail(true);
+                    }}
+                  >
+                    <Eye className="w-4 h-4 text-gray-500" />
+                    Purchase Details
+                  </MenubarItem>
+                  <MenubarItem className="gap-2 text-gray-700 cursor-pointer">
+                    <Edit className="w-4 h-4 text-gray-500" />
+                    Edit Purchase Order
+                  </MenubarItem>
+                  <MenubarItem className="gap-2 text-gray-700 cursor-pointer">
+                    <RefreshCcw className="w-4 h-4 text-gray-500" />
+                    Convert to Purchase
+                  </MenubarItem>
+                  <MenubarSeparator />
+
+                  <MenubarItem className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                    <Trash className="w-4 h-4" />
+                    Delete Purchase
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           </div>
         );
       },
@@ -423,7 +553,7 @@ export default function PurchaseDataTable() {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -439,7 +569,7 @@ export default function PurchaseDataTable() {
       {/* 🧾 Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="bg-blue-500">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -451,7 +581,7 @@ export default function PurchaseDataTable() {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -474,7 +604,7 @@ export default function PurchaseDataTable() {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -519,6 +649,11 @@ export default function PurchaseDataTable() {
           </Button>
         </div>
       </div>
+      <PurchaseOrderDetailsDialog
+        open={openPurchaseOrderDetail}
+        onClose={() => setOpenPurchaseOrderDetail(false)}
+        purchaseOrder={selectedPurchaseOrder}
+      />
     </div>
   );
 }

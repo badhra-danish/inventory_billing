@@ -24,11 +24,17 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
+  ArrowDownRight,
   ArrowUpDown,
+  ArrowUpRight,
+  Calendar,
   ChevronDown,
   Edit,
   Eye,
+  HelpCircle,
   Layers,
+  Package,
+  RefreshCw,
   Trash,
 } from "lucide-react";
 //import { useNavigate } from "react-router-dom";
@@ -65,6 +71,7 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Textarea } from "../ui/textarea";
 import {
   deleteStock,
+  getAllStockMovement,
   getAllStockPage,
   updateStockQuantity,
 } from "@/api/Stock/Stockclinet";
@@ -86,11 +93,20 @@ interface SelectedVariant {
   stock_id: string;
   skuCode: string;
   price: number;
+  warehouseName: string;
   variant_label: string;
   productName: string;
   quantity: string;
 }
-
+interface stockMovement {
+  stock_movement_id: string;
+  type: string;
+  reason: string;
+  quantity: string;
+  before_qty: string;
+  after_qty: string;
+  createdAt: string;
+}
 export default function StockMangeDatatable({ refresh }: stockDatatable) {
   // const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -105,22 +121,30 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
+  const [stockhistoryPage, setStockhistoryPage] = React.useState(1);
+
   // DialogBox State Variable
   const [openStockIn, setOpenStockIn] = React.useState(false);
   const [openStockOut, setOpenStockOut] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [openHistory, setOpenHistory] = React.useState(false);
+  const [resion, setResion] = React.useState("");
   //hggk
   const [stockVariantData, setStockVariantData] = React.useState<
     StockVariant[]
   >([]);
+  const [stockMovemetData, setStockMovementData] = React.useState<
+    stockMovement[]
+  >([]);
+
   const [selectedVariant, setSelectedVariant] = React.useState<SelectedVariant>(
     {
       stock_id: "",
       productName: "",
       price: 0,
       skuCode: "",
+      warehouseName: "",
       variant_label: "",
       quantity: "",
     },
@@ -139,10 +163,37 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
       console.error(error);
     }
   };
+  const getAllStockHistory = async () => {
+    try {
+      const res = await getAllStockMovement(
+        page,
+        10,
+        selectedVariant?.stock_id,
+      );
+      if (res.status == "OK") {
+        setStockMovementData(res.data || []);
+      }
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message);
+      }
+      console.error(error);
+    }
+  };
   React.useEffect(() => {
     getAllStockData();
   }, [refresh]);
 
+  React.useEffect(() => {
+    if (openHistory && selectedVariant) {
+      getAllStockHistory();
+    }
+  }, [openHistory, selectedVariant]);
+
+  const handleOpenHistory = async (product: StockVariant) => {
+    setVariantValue(product);
+    setOpenHistory(true);
+  };
   const handleUpdateStockQuantity = async () => {
     const stock_id = selectedVariant.stock_id;
 
@@ -154,8 +205,9 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     const payload = {
       quantity: Number(selectedVariant.quantity),
       type: quantityUpdateType,
+      reason: resion,
     };
-    // console.log(payload);
+    console.log(payload);
 
     const updatePromise = updateStockQuantity(stock_id, payload);
 
@@ -172,6 +224,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
             productName: "",
             price: 0,
             skuCode: "",
+            warehouseName: "",
             variant_label: "",
             quantity: "",
           });
@@ -211,6 +264,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
           stock_id: "",
           productName: "",
           price: 0,
+          warehouseName: "",
           skuCode: "",
           variant_label: "",
           quantity: "",
@@ -240,6 +294,45 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     }));
   };
 
+  const getMovementConfig = (type: any) => {
+    const normalizedType = type?.toLowerCase() || "";
+
+    if (
+      normalizedType.includes("in") ||
+      normalizedType.includes("purchase") ||
+      normalizedType.includes("return")
+    ) {
+      return {
+        color: "text-emerald-600 dark:text-emerald-400",
+        bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+        sign: "+",
+        icon: <ArrowUpRight className="w-3 h-3 mr-1" />,
+        label: "Stock In",
+      };
+    }
+
+    if (
+      normalizedType.includes("out") ||
+      normalizedType.includes("sale") ||
+      normalizedType.includes("damage")
+    ) {
+      return {
+        color: "text-rose-600 dark:text-rose-400",
+        bgColor: "bg-rose-100 dark:bg-rose-900/30",
+        sign: "-",
+        icon: <ArrowDownRight className="w-3 h-3 mr-1" />,
+        label: "Stock Out",
+      };
+    }
+
+    return {
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-100 dark:bg-blue-900/30",
+      sign: "",
+      icon: <HelpCircle className="w-3 h-3 mr-1" />,
+      label: type,
+    };
+  };
   const data: StockVariant[] = stockVariantData;
   const columns: ColumnDef<StockVariant>[] = [
     {
@@ -300,10 +393,21 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     },
     {
       accessorKey: "skuCode",
-      header: () => <div className="text-left">Unit</div>,
+      header: () => <div className="text-left">SkuCode</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">{row.getValue("skuCode")}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "warehouseName",
+      header: () => <div className="text-left">Warehouse</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="capitalize text-left ">
+            {row.getValue("warehouseName")}
+          </div>
         );
       },
     },
@@ -363,7 +467,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
               variant="outline"
               size="sm"
               className="bg-gray-200"
-              onClick={() => setOpenHistory(true)}
+              onClick={() => handleOpenHistory(product)}
             >
               <Eye />
             </Button>
@@ -669,17 +773,131 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
 
       {/* All Dialog Box of the Table */}
       <Dialog open={openHistory} onOpenChange={setOpenHistory}>
-        <DialogContent className="">
-          <DialogHeader className=" border-b-2  pb-4">
-            <DialogTitle className="">Product History</DialogTitle>
+        <DialogContent className="sm:max-w-4xl">
+          {" "}
+          {/* Increased width slightly for better breathing room */}
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+              <Package className="w-5 h-5 text-gray-500" />
+              Stock History Log -{" "}
+              <span className="text-blue-500 font-bold">
+                {selectedVariant.variant_label}
+              </span>
+            </DialogTitle>
           </DialogHeader>
-          Something here
-          {/* <DialogFooter className="mt-1 flex justify-center space-x-1">
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button>Add Quantity</Button>
-                </DialogFooter> */}
+          {/* Scrollable Table Container */}
+          <div className="max-h-[500px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-800">
+            <table className="w-full text-sm text-left">
+              {/* Professional Neutral Header */}
+              <thead className="sticky top-0 bg-blue-500 dark:bg-gray-900 text-white dark:text-gray-300 uppercase text-xs font-bold shadow-sm z-10">
+                <tr>
+                  <th className="px-5 py-3 border-b dark:border-gray-800">
+                    Date
+                  </th>
+                  <th className="px-5 py-3 border-b dark:border-gray-800">
+                    Type
+                  </th>
+                  <th className="px-5 py-3 border-b dark:border-gray-800">
+                    Reason
+                  </th>
+                  <th className="px-5 py-3 border-b dark:border-gray-800 text-right">
+                    Before
+                  </th>
+                  <th className="px-5 py-3 border-b dark:border-gray-800 text-center">
+                    Change
+                  </th>
+                  <th className="px-5 py-3 border-b dark:border-gray-800 text-right">
+                    After
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-black">
+                {stockMovemetData?.length > 0 ? (
+                  stockMovemetData.map((data) => {
+                    const config = getMovementConfig(data.type);
+
+                    return (
+                      <tr
+                        key={data.stock_movement_id}
+                        className="group hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors duration-200"
+                      >
+                        {/* Date Column */}
+                        <td className="px-5 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                            {new Date(data.createdAt).toLocaleDateString(
+                              undefined,
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              },
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Badge Type Column */}
+                        <td className="px-5 py-3 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-transparent ${config.bgColor} ${config.color}`}
+                          >
+                            {config.icon}
+                            {config.label || data.type}
+                          </span>
+                        </td>
+
+                        {/* Reason Column */}
+                        <td
+                          className="px-5 py-3 text-gray-600 dark:text-gray-400 max-w-[200px] truncate"
+                          title={data.reason}
+                        >
+                          {data.reason || "-"}
+                        </td>
+
+                        {/* Before Qty */}
+                        <td className="px-5 py-3 text-right font-mono text-gray-500 dark:text-gray-500 tabular-nums">
+                          {data.before_qty}
+                        </td>
+
+                        {/* CHANGE QTY (Highlighted) */}
+                        <td className="px-5 py-3 text-center">
+                          <span
+                            className={`inline-block min-w-[3rem] px-2 py-1 rounded-md text-xs font-bold tabular-nums ${config.bgColor} ${config.color}`}
+                          >
+                            {config.sign}
+                            {data.quantity}
+                          </span>
+                        </td>
+
+                        {/* After Qty */}
+                        <td className="px-5 py-3 text-right font-mono font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
+                          {data.after_qty}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-12 text-center text-gray-500 flex-col items-center justify-center"
+                    >
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Package className="w-8 h-8 opacity-20" />
+                        <p>No stock movement history found.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <DialogFooter className="mt-4 pt-4 border-t dark:border-gray-800 flex justify-end gap-2">
+            <DialogClose asChild>
+              <Button>Close</Button>
+            </DialogClose>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       {/* Dialog for StockIn */}
@@ -763,6 +981,26 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
                   }))
                 }
               />
+            </div>
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Resion <span className="text-red-500">*</span>
+              </Label>
+              <Select onValueChange={(value) => setResion(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a Warehouse" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
+                  <SelectItem value="TRANSFER">Transfer</SelectItem>
+                  <SelectItem value="SALE">Sale</SelectItem>
+                  <SelectItem value="RETURN">RETURN</SelectItem>
+                  <SelectItem value="INITIAL">INITIAL</SelectItem>
+                  <SelectItem value="DAMAGE">DAMAGE</SelectItem>
+                  <SelectItem value="PURCHASE">PURCHASE</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {/* *** */}
           </div>
@@ -858,6 +1096,26 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
                   }))
                 }
               />
+            </div>{" "}
+            <div className="grid gap-4">
+              <Label>
+                {" "}
+                Resion <span className="text-red-500">*</span>
+              </Label>
+              <Select onValueChange={(value) => setResion(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a Resion" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
+                  <SelectItem value="TRANSFER">Transfer</SelectItem>
+                  <SelectItem value="SALE">Sale</SelectItem>
+                  <SelectItem value="RETURN">RETURN</SelectItem>
+                  <SelectItem value="INITIAL">INITIAL</SelectItem>
+                  <SelectItem value="DAMAGE">DAMAGE</SelectItem>
+                  <SelectItem value="PURCHASE">PURCHASE</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {/* *** */}
           </div>

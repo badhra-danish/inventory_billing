@@ -1,11 +1,3 @@
-// import React from "react";
-
-// function Invoives() {
-//   return <div>Invoives</div>;
-// }
-
-// export default Invoives;
-
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 // import pdfImg from "../../assets/images/pdf.jpg";
@@ -66,7 +58,7 @@ export default function AddPurchase() {
     }
 
     const match = products.filter((p) =>
-      p.code.toLowerCase().includes(value.toLowerCase())
+      p.code.toLowerCase().includes(value.toLowerCase()),
     );
 
     setFiltered(match);
@@ -106,8 +98,8 @@ export default function AddPurchase() {
                 (row.discount || 0) +
                 (row.price * row.qty * row.tax) / 100,
             }
-          : row
-      )
+          : row,
+      ),
     );
   };
   const removeRows = (id: number) => {

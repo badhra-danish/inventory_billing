@@ -129,6 +129,7 @@ export type CustomerDetails = {
   firstName: string;
   lastName: string;
   email: string;
+
   address: string;
   phone: string;
   postalCode: string;
@@ -142,7 +143,7 @@ interface refreshTable {
 export default function SupplierDataTable({ refresh }: refreshTable) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All");
@@ -160,18 +161,21 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
   const [openCustomerDetail, setOpenCustomerdetails] = React.useState(false);
   const [openUpdate, setOpenUpdate] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
-  const getAllCustomer = async () => {
+  const getAllSupplier = async () => {
     try {
       const res = await getAllSupplierPage(page, 10);
-      if (res.statusCode === 200) {
+      if (res.status === "OK") {
         setSupplierData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
     } catch (error) {}
   };
+
   React.useEffect(() => {
-    getAllCustomer();
+    getAllSupplier();
   }, [refresh]);
+  console.log(supplierData);
+
   const handleUpdateSuppliers = () => {
     try {
       const payload = {
@@ -180,21 +184,24 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
         email: selectedSupplier?.email,
         phone: selectedSupplier?.phone,
         address: selectedSupplier?.address,
-        city: selectedSupplier?.city,
-        state: selectedSupplier?.state,
-        postalCode: selectedSupplier?.postalCode,
+        location: {
+          city: selectedSupplier?.city,
+          state: selectedSupplier?.state,
+          postalCode: selectedSupplier?.postalCode,
+          country: "india",
+        },
         status: selectedSupplier?.status,
       };
       if (!selectedSupplier?.supplierID) return;
       const updatePromise = updateSupplier(
         payload,
-        selectedSupplier?.supplierID
+        selectedSupplier?.supplierID,
       );
       toast.promise(updatePromise, {
         loading: "Upadating Customer",
         success: (res) => {
           setOpenUpdate(false);
-          getAllCustomer();
+          getAllSupplier();
           return res.message;
         },
         error: (err) => {
@@ -214,7 +221,7 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
         loading: "Deleting Customer",
         success: () => {
           setOpenDelete(false);
-          getAllCustomer();
+          getAllSupplier();
           return "Delete Successfully";
         },
         error: (err) => {
@@ -227,28 +234,16 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
     }
   };
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    let finalValue = value;
-
-    if (name === "phone") {
-      const digits = value.replace(/\D/g, "");
-      if (!digits) {
-        finalValue = "+91 ";
-      } else {
-        finalValue = digits.startsWith("91")
-          ? `+91 ${digits.slice(2)}`
-          : `+91 ${digits}`;
-      }
-    }
 
     setSelectecdSupplier((prev) => {
       if (!prev) return prev; // <- prevents error when prev is undefined
 
       return {
         ...prev,
-        [name]: finalValue,
+        [name]: value,
       };
     });
   };
@@ -522,7 +517,7 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -550,7 +545,7 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -573,7 +568,7 @@ export default function SupplierDataTable({ refresh }: refreshTable) {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

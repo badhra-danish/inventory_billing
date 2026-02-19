@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import api from "../utils/axios";
+import { jwtDecode } from "jwt-decode";
 
 /* ===============================
    Types
@@ -88,6 +89,18 @@ export const AuthProvider = ({ children }: Props) => {
     setUser(null);
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      const decoded = jwtDecode<{ exp: number }>(token);
+      const currentTime = Date.now() / 1000;
+
+      if (decoded.exp && decoded.exp < currentTime) {
+        logout();
+      }
+    }
+  }, []);
   const value: AuthContextType = {
     user,
     superAdminlogin,

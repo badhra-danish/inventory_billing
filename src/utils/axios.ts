@@ -15,4 +15,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// let isLoggingOut = false;
+
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 401 && !isLoggingOut) {
+//       isLoggingOut = true;
+
+//       localStorage.removeItem("token");
+
+//       window.location.href = "/login";
+//     }
+
+//     return Promise.reject(error);
+//   },
+// );
+
 export default api;

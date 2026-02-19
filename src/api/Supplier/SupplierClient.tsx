@@ -1,10 +1,10 @@
 import { axiosClient } from "..";
 import api from "@/utils/axios";
 const EndPoint = {
-  createSupplier: "/v1/suppliers/create",
-  getAllSupplierPage: "/v1/suppliers/page",
-  updateSuppliers: "/v1/suppliers/update",
-  deleteSupplier: "/v1/suppliers/delete",
+  createSupplier: "/v1/supplier/create",
+  getAllSupplierPage: "/v1/supplier/getsupplierpage",
+  updateSuppliers: "/v1/supplier/update",
+  deleteSupplier: "/v1/supplier/delete",
 };
 
 export const createSupplier = async (payload: object) => {
@@ -20,10 +20,8 @@ export const getAllSupplierPage = async (pageNo: number, pageSize: number) => {
   try {
     const res = await api.get(EndPoint.getAllSupplierPage, {
       params: {
-        pageNumber: pageNo,
-        pageSize: pageSize,
-        sortParameter: "firstName",
-        sortDesc: false,
+        page: pageNo,
+        limit: pageSize,
       },
     });
     return res.data;
@@ -32,7 +30,15 @@ export const getAllSupplierPage = async (pageNo: number, pageSize: number) => {
     throw error;
   }
 };
-
+export const getAllSupplier = async () => {
+  try {
+    const res = await api.get(EndPoint.getAllSupplierPage);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export const updateSupplier = async (payload: object, id: string) => {
   try {
     const res = await api.put(`${EndPoint.updateSuppliers}/${id}`, payload);

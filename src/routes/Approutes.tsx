@@ -23,10 +23,13 @@ import { Customer } from "@/pages/People/Customer";
 import { Suppliers } from "@/pages/People/Supplier";
 import EditSales from "@/components/Sales/EditSale";
 import Invoice from "@/components/Sales/Invoice";
+import WareHouse from "@/pages/People/WareHouse";
 import SignIn from "@/components/Login/login";
 import PrivateRoute from "./PrivateRoutes";
 import ProtectedLayout from "./ProtectedLayout";
 import RoleRedirect from "./IndexRedirect";
+import { PurchaseOrder } from "@/pages/Purchase/purchaseOrder";
+import AddPurchaseOrder from "@/pages/Purchase/AddPurchaseOrder";
 function Approutes() {
   return (
     <BrowserRouter>
@@ -93,7 +96,7 @@ function Approutes() {
               <Route path="/shop/create-product" element={<CreateProduct />} />
               <Route path="/shop/products" element={<ProductDataTablepage />} />
               <Route
-                path="/shop//product-detail/:product_id"
+                path="/shop/product-detail/:product_id"
                 element={<ProductDetails />}
               />
               <Route path="/shop/category" element={<CategoryPage />} />
@@ -107,6 +110,8 @@ function Approutes() {
               <Route path="/shop/manage-stock" element={<StockMangepage />} />
               <Route path="/shop/sales" element={<Sales />} />
               <Route path="/shop/sales-return" element={<SalesReturn />} />
+              <Route path="/shop/warehouse" element={<WareHouse />} />
+
               <Route path="/shop/add-sales" element={<AddSales />} />
               <Route
                 path="/shop/add-sales-return"
@@ -124,6 +129,11 @@ function Approutes() {
               {/* Purchase , order , return*/}
               <Route path="/shop/purchase" element={<Purchase />} />
               <Route path="/shop/add-purchase" element={<AddPurchase />} />
+              <Route path="/shop/purchase_order" element={<PurchaseOrder />} />
+              <Route
+                path="/shop/add_purchase_order"
+                element={<AddPurchaseOrder />}
+              />
 
               {/* Customer  ,supplier ,Employees*/}
               <Route path="/shop/customer" element={<Customer />} />

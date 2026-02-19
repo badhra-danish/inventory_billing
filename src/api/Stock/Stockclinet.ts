@@ -6,6 +6,7 @@ const endPoint = {
   updateStockQuantity: "v1/stock/updatequantity",
   deleteStock: "v1/stock/delete",
   searchVarintInstock: "v1/stock/getvariantinstock",
+  getAllStockMovement: "v1/stock/getallstockmovementbyid",
 };
 
 export const createStock = async (payload: object) => {
@@ -20,6 +21,23 @@ export const createStock = async (payload: object) => {
 export const getAllStockPage = async (pageNo: number, pageSize: number) => {
   try {
     const res = await api.get(endPoint.getAllStockPage, {
+      params: {
+        page: pageNo,
+        limit: pageSize,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const getAllStockMovement = async (
+  pageNo: number,
+  pageSize: number,
+  id: string,
+) => {
+  try {
+    const res = await api.get(`${endPoint.getAllStockMovement}/${id}`, {
       params: {
         page: pageNo,
         limit: pageSize,

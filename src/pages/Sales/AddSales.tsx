@@ -67,7 +67,6 @@ export default function AddSales() {
   const [query, setQuery] = useState("");
   const [variant, setVariant] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
-  //const [filtered, setFiltered] = useState<Product[]>([]);
   const [rows, setRows] = useState<ProductRow[]>([]);
   const [customer, setCustomer] = React.useState<customer[]>([]);
   const [selectedVariant, setSelectedVariant] = React.useState({
@@ -77,6 +76,7 @@ export default function AddSales() {
     variant_label: "",
     productName: "",
   });
+
   const [formData, setFormData] = React.useState({
     customer_id: "",
     date: "",
@@ -341,6 +341,7 @@ export default function AddSales() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select The Customer" />
               </SelectTrigger>
+
               <SelectContent>
                 {customer?.map((cus) => (
                   <SelectItem value={cus.customer_id}>

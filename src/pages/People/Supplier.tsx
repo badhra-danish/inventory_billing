@@ -45,26 +45,13 @@ export const Suppliers = () => {
     status: "INACTIVE",
   });
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    let finalValue = value;
-
-    if (name === "phone") {
-      const digits = value.replace(/\D/g, "");
-
-      if (!digits) {
-        finalValue = "+91 ";
-      } else {
-        finalValue = digits.startsWith("91")
-          ? `+91 ${digits.slice(2)}`
-          : `+91 ${digits}`;
-      }
-    }
 
     setSupplierFormData((prev: Supplier) => ({
       ...prev,
-      [name]: finalValue,
+      [name]: value,
     }));
   };
 
@@ -75,10 +62,13 @@ export const Suppliers = () => {
         lastName: supplierFormData.lastName,
         email: supplierFormData.email,
         phone: supplierFormData.phone,
+        location: {
+          city: supplierFormData.city,
+          state: supplierFormData.state,
+          country: "india",
+          postalCode: supplierFormData.postalCode,
+        },
         address: supplierFormData.address,
-        city: supplierFormData.city,
-        state: supplierFormData.state,
-        postalCode: supplierFormData.postalCode,
         status: supplierFormData.status,
       };
       const createPromise = createSupplier(payload);
