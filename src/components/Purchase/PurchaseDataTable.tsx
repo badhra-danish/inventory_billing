@@ -61,6 +61,7 @@ import {
   MenubarTrigger,
 } from "../ui/menubar";
 import { PurchaseOrderDetailsDialog } from "./PurchaseOrderDetail";
+import { useNavigate, useNavigation } from "react-router-dom";
 // const data: PurchaseDetails[] = [
 //   {
 //     supplierName: "Travel Mart",
@@ -187,6 +188,7 @@ export interface PurchaseOrder {
 }
 
 export default function PurchaseDataTable() {
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -404,7 +406,14 @@ export default function PurchaseDataTable() {
                     <Eye className="w-4 h-4 text-gray-500" />
                     Purchase Details
                   </MenubarItem>
-                  <MenubarItem className="gap-2 text-gray-700 cursor-pointer">
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/shop/purchase_order/update/${purchaseOrder.purchase_order_id}`,
+                      )
+                    }
+                  >
                     <Edit className="w-4 h-4 text-gray-500" />
                     Edit Purchase Order
                   </MenubarItem>

@@ -19,7 +19,9 @@ import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
 import SupplierDataTable from "@/components/People/SupplierDataTable";
 import { createSupplier } from "@/api/Supplier/SupplierClient";
-export const Suppliers = () => {
+
+
+export default  function Suppliers  (){
   interface Supplier {
     firstName: string;
     lastName: string;

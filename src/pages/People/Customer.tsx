@@ -21,7 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { createCustomer } from "@/api/Coustomer/CustomerClient";
 import toast from "react-hot-toast";
 
-export const Customer = () => {
+export default  function Customer() {
   interface Customer {
     firstName: string;
     lastName: string;

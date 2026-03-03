@@ -9,10 +9,10 @@ import { CirclePlus, RefreshCcw } from "lucide-react";
 //   DialogTrigger,
 //   DialogContent,
 // } from "@/components/ui/dialog";
-import PurchaseDataTable from "@/components/Purchase/PurchaseDatable";
+import PurchaseDataTable from "@/components/Purchase/PurchaseDataTable";
 import { useNavigate } from "react-router-dom";
 
-export const Purchase = () => {
+export default function Purchase() {
   const navigate = useNavigate();
   // const [open, setOpen] = React.useState(false);
   // const [refresh, setRefresh] = React.useState(false);
@@ -33,7 +33,7 @@ export const Purchase = () => {
           <Button className="bg-white text-gray-600 border-1 border-gray p-2 hover:bg-gray-100">
             <RefreshCcw />
           </Button>
-          <Button onClick={() => navigate("/add-purchase")}>
+          <Button onClick={() => navigate("/shop/add-purchase")}>
             <CirclePlus />
             Add Purchase
           </Button>
@@ -42,4 +42,4 @@ export const Purchase = () => {
       <PurchaseDataTable />
     </>
   );
-};
+}

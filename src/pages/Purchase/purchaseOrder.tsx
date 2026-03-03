@@ -3,10 +3,10 @@ import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { CirclePlus, RefreshCcw } from "lucide-react";
 
-import PurchaseDataTable from "@/components/Purchase/PurchaseDatable";
+import PurchaseOrderDataTable from "@/components/Purchase/PurchaseOrderDatable";
 import { useNavigate } from "react-router-dom";
 
-export const PurchaseOrder = () => {
+export default function PurchaseOrder() {
   const navigate = useNavigate();
   // const [open, setOpen] = React.useState(false);
   // const [refresh, setRefresh] = React.useState(false);
@@ -33,7 +33,7 @@ export const PurchaseOrder = () => {
           </Button>
         </div>
       </div>
-      <PurchaseDataTable />
+      <PurchaseOrderDataTable />
     </>
   );
-};
+}

@@ -29,6 +29,7 @@ import {
   Type,
   Calendar,
   FastForward,
+  KanbanSquareDashed,
 } from "lucide-react";
 import {
   Menubar,
@@ -959,7 +960,9 @@ export default function SalesDataTable() {
       <ShowPaymentDetail
         open={openShowPayment}
         onClose={() => setOpenShowPayment(false)}
+        
         sales={selectedSale}
+        
       />
     </div>
   );

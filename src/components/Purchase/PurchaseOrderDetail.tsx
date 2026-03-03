@@ -1,4 +1,4 @@
-import type { PurchaseOrder } from "./PurchaseDatable";
+import type { PurchaseOrder } from "./PurchaseOrderDatable";
 import { ArrowLeft, FileText, Printer } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -189,7 +189,7 @@ export const PurchaseOrderDetailsDialog = ({
                             {item.variant.variant_label})
                           </TableCell>
                           <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{item.variant.price}</TableCell>
+                          <TableCell>{item.unit_price}</TableCell>
                           <TableCell>{item.discount}</TableCell>
                           <TableCell>{item.tax} %</TableCell>
                           <TableCell>{item.tax_amount}</TableCell>

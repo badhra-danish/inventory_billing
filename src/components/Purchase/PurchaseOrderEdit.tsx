@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import {
   FileText,
@@ -20,16 +20,20 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import React from "react";
 import { getAllSupplier } from "@/api/Supplier/SupplierClient";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
-import { createPurchaseOrder } from "@/api/PurchaseOrder/PurchaseOrderClient";
+import {
+  createPurchaseOrder,
+  getPurchaseOrderByID,
+  updatePurchaseOrder,
+} from "@/api/PurchaseOrder/PurchaseOrderClient";
 import toast from "react-hot-toast";
 
 type ProductRow = {
-  varint_id: string;
+  purchase_order_item_id: string;
+  variant_id: string;
   skuCode: string;
   ProductName: string;
   variant_label: string;
@@ -49,6 +53,44 @@ type Product = {
   quantity: number;
   productName: string;
 };
+
+export interface PurchaseOrderData {
+  purchase_order_id: string;
+  po_number: string;
+  supplier_id: string;
+  warehouse_id: string;
+  po_date: string;
+  order_tax: string;
+  discount_amt: string;
+  shipping: string;
+  sub_total: string;
+  grand_total: string;
+  status: "PENDING" | "APPROVED" | "RECEIVED" | "CANCELLED";
+  shop_id: string;
+  createdAt: string;
+  updatedAt: string;
+  items: PurchaseOrderItem[];
+}
+export interface PurchaseOrderItem {
+  purchase_order_item_id: string;
+  purchase_order_id: string;
+  product_variant_id: string;
+  quantity: number;
+  received_quantity: number;
+  unit_price: string;
+  tax: string;
+  tax_amount: string;
+  discount: string;
+  total_amount: string;
+  shop_id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  product_variant_name: string;
+  skuCode: string;
+  productName: string;
+}
+
 type supplier = {
   supplierID: string;
   firstName: string;
@@ -58,7 +100,9 @@ type warehouse = {
   warehouse_id: string;
   warehouseName: string;
 };
-export default function AddPurchaseOrder() {
+
+export default function EditPurchaseOrder() {
+  const { purchase_order_id } = useParams();
   const navigate = useNavigate();
   const [supplier, setSupplier] = React.useState<supplier[]>([]);
   const [warehouse, setWareHouse] = React.useState<warehouse[]>([]);
@@ -77,6 +121,24 @@ export default function AddPurchaseOrder() {
     discount: 0,
     status: "PENDING",
   });
+  const [purchaseOrderData, setPurchaseOrderData] =
+    useState<PurchaseOrderData | null>(null);
+
+  const getPurchaseOrderData = async () => {
+    try {
+      if (!purchase_order_id) return;
+      const res = await getPurchaseOrderByID(purchase_order_id);
+      if (res.status == "OK") {
+        setPurchaseOrderData(res.data || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getPurchaseOrderData();
+  }, []);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -101,6 +163,34 @@ export default function AddPurchaseOrder() {
     getallSupplier();
   }, []);
 
+  useEffect(() => {
+    if (!purchaseOrderData) return;
+    const formattedRows: ProductRow[] =
+      purchaseOrderData.items?.map((item) => ({
+        purchase_order_item_id: item.purchase_order_item_id,
+        variant_id: item.product_variant_id,
+        skuCode: item.skuCode,
+        ProductName: item.productName,
+        variant_label: item.product_variant_name,
+        quantity: Number(item.quantity),
+        price: Number(item.unit_price),
+        discount: Number(item.discount),
+        tax: Number(item.tax),
+        tax_amount: Number(item.tax_amount),
+        total: Number(item.total_amount),
+      })) || [];
+    setFormData((prev) => ({
+      ...prev,
+      supplierID: purchaseOrderData.supplier_id,
+      po_date: purchaseOrderData.po_date,
+      warehouse_id: purchaseOrderData.warehouse_id,
+      order_tax: Number(purchaseOrderData.order_tax),
+      shipping: Number(purchaseOrderData.shipping),
+      discount: Number(purchaseOrderData.discount_amt),
+      status: purchaseOrderData.status,
+    }));
+    setRows(formattedRows);
+  }, [purchaseOrderData]);
   const getallWareHouse = async () => {
     try {
       const res = await getAllWarehouse();
@@ -146,12 +236,12 @@ export default function AddPurchaseOrder() {
   const addProductToTable = (product: Product) => {
     setRows((prev) => {
       const exists = prev.find(
-        (row) => row.varint_id === product.product_variant_id,
+        (row) => row.variant_id === product.product_variant_id,
       );
 
       if (exists) {
         return prev.map((row) =>
-          row.varint_id === product.product_variant_id
+          row.variant_id === product.product_variant_id
             ? {
                 ...row,
                 quantity: row.quantity + 1,
@@ -168,7 +258,8 @@ export default function AddPurchaseOrder() {
       return [
         ...prev,
         {
-          varint_id: product.product_variant_id,
+          purchase_order_item_id: "",
+          variant_id: product.product_variant_id,
           skuCode: product.skuCode,
           ProductName: product.productName,
           variant_label: product.variant_label,
@@ -192,7 +283,7 @@ export default function AddPurchaseOrder() {
   const updateRow = (id: string, field: keyof ProductRow, value: number) => {
     setRows((prev) =>
       prev.map((row) => {
-        if (row.varint_id !== id) return row;
+        if (row.variant_id !== id) return row;
 
         const updatedRow = {
           ...row,
@@ -212,7 +303,7 @@ export default function AddPurchaseOrder() {
   };
 
   const removeRows = (id: string) => {
-    setRows((prev) => prev.filter((row) => row.varint_id !== id));
+    setRows((prev) => prev.filter((row) => row.variant_id !== id));
   };
 
   const handleCancel = () => {
@@ -222,9 +313,8 @@ export default function AddPurchaseOrder() {
   // ==============================
   // TOTAL CALCULATION
   // ==============================
-  const subTotal = rows.reduce((acc, row) => acc + row.total, 0);
+  const subTotal = rows?.reduce((acc, row) => acc + row.total, 0);
   const orderTax = (subTotal * formData.order_tax) / 100;
-
   const grandTotal =
     subTotal -
     Number(formData.discount) +
@@ -239,8 +329,11 @@ export default function AddPurchaseOrder() {
     order_tax: Number(formData.order_tax || 0),
     shipping: Number(formData.shipping || 0),
     discount: Number(formData.discount || 0),
-    purchaseOrderItems: rows.map((row) => ({
-      product_variant_id: row.varint_id,
+    purchaseOrderItems: rows?.map((row) => ({
+      ...(row.purchase_order_item_id && {
+        purchase_order_item_id: row.purchase_order_item_id,
+      }),
+      product_variant_id: row.variant_id,
       price: row.price,
       quantity: row.quantity,
       received_quantity: 0,
@@ -251,8 +344,9 @@ export default function AddPurchaseOrder() {
     })),
   };
   console.log(payload);
-  const handleCreateOrder = () => {
+  const handlePurchaseOrder = () => {
     // Basic validation
+
     if (!formData.supplierID) {
       toast.error("Supplier is required");
       return;
@@ -262,29 +356,33 @@ export default function AddPurchaseOrder() {
       toast.error("Add at least one product");
       return;
     }
+    if (!purchase_order_id) return;
 
     const payload = {
       supplier_id: formData.supplierID,
       warehouse_id: formData.warehouse_id,
-      status: formData.status.toLocaleUpperCase() || "PENDING",
+      status: formData.status,
       po_date: formData.po_date,
       order_tax: Number(formData.order_tax || 0),
       shipping: Number(formData.shipping || 0),
       discount: Number(formData.discount || 0),
-      purchaseOrderItems: rows.map((row) => ({
-        product_variant_id: row.varint_id,
-        price: Number(row.price || 0),
-        quantity: Number(row.quantity || 0),
+      purchase_order_items: rows?.map((row) => ({
+        ...(row.purchase_order_item_id && {
+          purchase_order_item_id: row.purchase_order_item_id,
+        }),
+        product_variant_id: row.variant_id,
+        price: row.price,
+        quantity: row.quantity,
         received_quantity: 0,
-        tax: Number(row.tax || 0),
-        tax_amount: Number(row.tax_amount || 0),
-        discount: Number(row.discount || 0),
-        total: Number(row.total || 0),
+        tax: row.tax,
+        tax_amount: row.tax_amount,
+        discount: row.discount,
+        total: row.total,
       })),
     };
-    const createPromise = createPurchaseOrder(payload);
+    const createPromise = updatePurchaseOrder(purchase_order_id, payload);
     toast.promise(createPromise, {
-      loading: "Creating Purchase Order...",
+      loading: "Updating Purchase Order...",
       success: (res) => {
         if (res?.status === "OK") {
           navigate("/shop/purchase_order");
@@ -304,10 +402,10 @@ export default function AddPurchaseOrder() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Create Purchase Order
+            Update Purchase Order
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Add a new purchase order and manage supplier details.
+            Update a purchase order and manage supplier details.
           </p>
         </div>
         <div className="flex gap-2">
@@ -336,6 +434,17 @@ export default function AddPurchaseOrder() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid gap-2">
+                <Label className="text-gray-700 dark:text-gray-300">
+                  Order ID
+                </Label>
+                <Input
+                  type="text"
+                  disabled
+                  className="bg-gray-50 dark:bg-gray-900"
+                  value={purchaseOrderData?.po_number}
+                />
+              </div>
               <div className="grid gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Supplier Name
@@ -372,6 +481,7 @@ export default function AddPurchaseOrder() {
                   onChange={(e) =>
                     setFormData({ ...formData, po_date: e.target.value })
                   }
+                  value={formData.po_date}
                 />
               </div>
 
@@ -380,6 +490,7 @@ export default function AddPurchaseOrder() {
                   Status
                 </Label>
                 <Select
+                  value={formData.status}
                   onValueChange={(value) =>
                     setFormData({ ...formData, status: value })
                   }
@@ -401,6 +512,7 @@ export default function AddPurchaseOrder() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, warehouse_id: value })
                   }
+                  value={formData.warehouse_id}
                 >
                   <SelectTrigger className="w-full bg-gray-50 dark:bg-gray-900">
                     <SelectValue placeholder="Select Warehouse" />
@@ -437,7 +549,7 @@ export default function AddPurchaseOrder() {
               </div>
 
               {/* Search Results Dropdown */}
-              {variant.length > 0 && (
+              {variant?.length > 0 && (
                 <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-gray-900 border dark:border-gray-800 shadow-xl z-50 rounded-md overflow-hidden max-h-60 overflow-y-auto">
                   {variant.map((p) => (
                     <div
@@ -493,7 +605,7 @@ export default function AddPurchaseOrder() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-gray-700 dark:text-gray-300">
-                  {rows.length === 0 ? (
+                  {rows?.length === 0 ? (
                     <tr>
                       <td
                         colSpan={7}
@@ -503,9 +615,9 @@ export default function AddPurchaseOrder() {
                       </td>
                     </tr>
                   ) : (
-                    rows.map((row) => (
+                    rows?.map((row) => (
                       <tr
-                        key={row.varint_id}
+                        key={row.variant_id}
                         className="hover:bg-gray-50/50 dark:hover:bg-gray-900/20 transition-colors"
                       >
                         <td className="p-4 font-medium">
@@ -521,7 +633,7 @@ export default function AddPurchaseOrder() {
                             value={row.quantity}
                             onChange={(e) =>
                               updateRow(
-                                row.varint_id,
+                                row.variant_id,
                                 "quantity",
                                 Number(e.target.value),
                               )
@@ -535,7 +647,7 @@ export default function AddPurchaseOrder() {
                             value={row.price}
                             onChange={(e) =>
                               updateRow(
-                                row.varint_id,
+                                row.variant_id,
                                 "price",
                                 Number(e.target.value),
                               )
@@ -549,7 +661,7 @@ export default function AddPurchaseOrder() {
                             value={row.discount}
                             onChange={(e) =>
                               updateRow(
-                                row.varint_id,
+                                row.variant_id,
                                 "discount",
                                 Number(e.target.value),
                               )
@@ -563,7 +675,7 @@ export default function AddPurchaseOrder() {
                             value={row.tax}
                             onChange={(e) =>
                               updateRow(
-                                row.varint_id,
+                                row.variant_id,
                                 "tax",
                                 Number(e.target.value),
                               )
@@ -578,7 +690,7 @@ export default function AddPurchaseOrder() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeRows(row.varint_id)}
+                            onClick={() => removeRows(row.variant_id)}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/50 h-8 w-8 p-0"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -653,15 +765,9 @@ export default function AddPurchaseOrder() {
               <div className="flex justify-between">
                 <span>Items Subtotal:</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  ₹{subTotal.toFixed(2)}
+                  ₹{subTotal?.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>Order Tax:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  + ₹{orderTax || 0}
-                </span>
-              </div>{" "}
               <div className="flex justify-between text-red-500">
                 <span>Discount:</span>
                 <span>- ₹{formData.discount || 0}</span>
@@ -670,6 +776,12 @@ export default function AddPurchaseOrder() {
                 <span>Shipping:</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
                   + ₹{formData.shipping || 0}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Order Tax:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  + ₹{orderTax || 0}
                 </span>
               </div>
             </div>
@@ -688,7 +800,7 @@ export default function AddPurchaseOrder() {
             <Button
               className="w-full mt-6"
               size="lg"
-              onClick={handleCreateOrder}
+              onClick={handlePurchaseOrder}
             >
               Confirm Order
             </Button>
