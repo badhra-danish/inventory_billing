@@ -30,7 +30,7 @@ import { Textarea } from "../ui/textarea";
 export type SalesItemDetail = {
   sales_item_id: string;
   product_variant_id: string;
-
+  warehouse_id: string;
   quantity: number;
   discount: number;
   tax: number;

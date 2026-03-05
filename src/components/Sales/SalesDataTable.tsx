@@ -108,6 +108,7 @@ export type Location = {
 export type SalesItemDetail = {
   sales_item_id: string;
   product_variant_id: string;
+  warehouse_id: string;
 
   quantity: number;
   discount: number;
@@ -191,7 +192,6 @@ export default function SalesDataTable() {
       getAllSales();
     }
   }, [page, openCreatePayment, openShowPayment]);
-  console.log("sdasdsa", salesData);
 
   const data: SalesDetail[] = salesData;
   // const columns: ColumnDef<SalesDetail>[] = [
@@ -678,7 +678,9 @@ export default function SalesDataTable() {
                   </MenubarItem>
                   <MenubarItem
                     className="gap-2 text-gray-700 cursor-pointer"
-                    onClick={() => navigate(`/sales/update/${sales.sale_id}`)}
+                    onClick={() =>
+                      navigate(`/shop/sales/update/${sales.sale_id}`)
+                    }
                   >
                     <Edit className="w-4 h-4 text-gray-500" />
                     Edit Sales
@@ -960,9 +962,7 @@ export default function SalesDataTable() {
       <ShowPaymentDetail
         open={openShowPayment}
         onClose={() => setOpenShowPayment(false)}
-        
         sales={selectedSale}
-        
       />
     </div>
   );

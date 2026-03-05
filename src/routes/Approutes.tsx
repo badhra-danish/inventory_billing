@@ -148,7 +148,6 @@
 //
 // export default Approutes;
 
-
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectedLayout from "./ProtectedLayout";
@@ -157,143 +156,182 @@ import RoleRedirect from "./IndexRedirect";
 import SignIn from "@/components/Login/login";
 import Loader from "@/components/commen/loader.tsx";
 
-
 // 🔥 Lazy Imports
 const Dashboard = lazy(() => import("@/pages/Dashbord/Dashboard"));
 const CreateProduct = lazy(() => import("@/pages/inventory/CreateProduct"));
-const ProductDataTablepage = lazy(() =>
-    import("@/pages/inventory/Product")
-);
-const ProductDetails = lazy(() =>
-    import("@/components/inventory/ProductDetail")
+const ProductDataTablepage = lazy(() => import("@/pages/inventory/Product"));
+const ProductDetails = lazy(
+  () => import("@/components/inventory/ProductDetail"),
 );
 const CategoryPage = lazy(() => import("@/pages/inventory/Category"));
-const SubCategorypage = lazy(() =>
-    import("@/pages/inventory/SubCategory")
-);
+const SubCategorypage = lazy(() => import("@/pages/inventory/SubCategory"));
 const BrandPage = lazy(() => import("@/pages/inventory/Brand"));
 const UnitsPage = lazy(() => import("@/pages/inventory/Units"));
 const VariantPage = lazy(() => import("@/pages/inventory/Variant"));
-const WarrantiesPage = lazy(() =>
-    import("@/pages/inventory/Warranties")
-);
-const StockMangepage = lazy(() =>
-    import("@/pages/stock/StockMange")
-);
+const WarrantiesPage = lazy(() => import("@/pages/inventory/Warranties"));
+const StockMangepage = lazy(() => import("@/pages/stock/StockMange"));
 
 const Sales = lazy(() => import("@/pages/Sales/Sales"));
 const AddSales = lazy(() => import("@/pages/Sales/AddSales"));
-const AddSalesReturn = lazy(() =>
-    import("@/pages/Sales/AddSalesReturn")
-);
-const SalesReturn = lazy(() =>
-    import("@/pages/Sales/SalesReturn")
-);
+const AddSalesReturn = lazy(() => import("@/pages/Sales/AddSalesReturn"));
+const SalesReturn = lazy(() => import("@/pages/Sales/SalesReturn"));
 const Invoives = lazy(() => import("@/pages/Sales/Invoives"));
-const EditSales = lazy(() =>
-    import("@/components/Sales/EditSale")
-);
-const Invoice = lazy(() =>
-    import("@/components/Sales/Invoice")
-);
+const EditSales = lazy(() => import("@/components/Sales/EditSale"));
+const Invoice = lazy(() => import("@/components/Sales/Invoice"));
 
 const Purchase = lazy(() => import("@/pages/Purchase/purchase"));
-const AddPurchase = lazy(() =>
-    import("@/pages/Purchase/AddPurchase")
-);
-const PurchaseOrder = lazy(() =>
-    import("@/pages/Purchase/purchaseOrder.tsx")
-);
-const AddPurchaseOrder = lazy(() =>
-    import("@/pages/Purchase/AddPurchaseOrder")
+const AddPurchase = lazy(() => import("@/pages/Purchase/AddPurchase"));
+const PurchaseOrder = lazy(() => import("@/pages/Purchase/purchaseOrder.tsx"));
+const AddPurchaseOrder = lazy(
+  () => import("@/pages/Purchase/AddPurchaseOrder"),
 );
 
-const EditPurchaseOrder = lazy(() =>
-    import("@/components/Purchase/PurchaseOrderEdit.tsx")
+const EditPurchaseOrder = lazy(
+  () => import("@/components/Purchase/PurchaseOrderEdit.tsx"),
 );
 
+const EditPurchase = lazy(() => import("@/components/Purchase/EditPurchase"));
 const Customer = lazy(() => import("@/pages/People/Customer.tsx"));
 const Suppliers = lazy(() => import("@/pages/People/Supplier"));
 const WareHouse = lazy(() => import("@/pages/People/WareHouse"));
 
 function Approutes() {
   return (
-      <BrowserRouter>
-        <Suspense
-            fallback={
-              <div className="flex items-center justify-center h-screen">
-             <Loader/>
-              </div>
-            }
-        >
-          <main>
-            <Routes>
-              <Route path="/" element={<RoleRedirect />} />
-              <Route path="/login" element={<SignIn />} />
+    <BrowserRouter>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-screen">
+            <Loader />
+          </div>
+        }
+      >
+        <main>
+          <Routes>
+            <Route path="/" element={<RoleRedirect />} />
+            <Route path="/login" element={<SignIn />} />
 
-              {/* SUPER ADMIN */}
-              <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
-                <Route element={<OutletLayout />}>
-                  <Route path="/super/dashboard" element={<Dashboard />} />
-                  <Route path="/super/create-product" element={<CreateProduct />} />
-                  <Route path="/super/products" element={<ProductDataTablepage />} />
-                  <Route path="/super/product-detail/:product_id" element={<ProductDetails />} />
-                  <Route path="/super/category" element={<CategoryPage />} />
-                  <Route path="/super/sub-category" element={<SubCategorypage />} />
-                  <Route path="/super/brand" element={<BrandPage />} />
-                  <Route path="/super/units" element={<UnitsPage />} />
-                  <Route path="/super/variant" element={<VariantPage />} />
-                  <Route path="/super/warranties" element={<WarrantiesPage />} />
-                  <Route path="/super/manage-stock" element={<StockMangepage />} />
-                  <Route path="/super/sales" element={<Sales />} />
-                  <Route path="/super/sales-return" element={<SalesReturn />} />
-                  <Route path="/super/add-sales" element={<AddSales />} />
-                  <Route path="/super/add-sales-return" element={<AddSalesReturn />} />
-                  <Route path="/super/invoices" element={<Invoives />} />
-                  <Route path="/super/sales/update/:sale_id" element={<EditSales />} />
-                  <Route path="/super/sales/invoice/:sale_id" element={<Invoice />} />
-                  <Route path="/super/purchase" element={<Purchase />} />
-                  <Route path="/super/add-purchase" element={<AddPurchase />} />
-                  <Route path="/super/customer" element={<Customer />} />
-                  <Route path="/super/supplier" element={<Suppliers />} />
-                </Route>
+            {/* SUPER ADMIN */}
+            <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
+              <Route element={<OutletLayout />}>
+                <Route path="/super/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/super/create-product"
+                  element={<CreateProduct />}
+                />
+                <Route
+                  path="/super/products"
+                  element={<ProductDataTablepage />}
+                />
+                <Route
+                  path="/super/product-detail/:product_id"
+                  element={<ProductDetails />}
+                />
+                <Route path="/super/category" element={<CategoryPage />} />
+                <Route
+                  path="/super/sub-category"
+                  element={<SubCategorypage />}
+                />
+                <Route path="/super/brand" element={<BrandPage />} />
+                <Route path="/super/units" element={<UnitsPage />} />
+                <Route path="/super/variant" element={<VariantPage />} />
+                <Route path="/super/warranties" element={<WarrantiesPage />} />
+                <Route
+                  path="/super/manage-stock"
+                  element={<StockMangepage />}
+                />
+                <Route path="/super/sales" element={<Sales />} />
+                <Route path="/super/sales-return" element={<SalesReturn />} />
+                <Route path="/super/add-sales" element={<AddSales />} />
+                <Route
+                  path="/super/add-sales-return"
+                  element={<AddSalesReturn />}
+                />
+                <Route path="/super/invoices" element={<Invoives />} />
+                <Route
+                  path="/super/sales/update/:sale_id"
+                  element={<EditSales />}
+                />
+                <Route
+                  path="/super/sales/invoice/:sale_id"
+                  element={<Invoice />}
+                />
+                <Route path="/super/purchase" element={<Purchase />} />
+                <Route path="/super/add-purchase" element={<AddPurchase />} />
+                <Route path="/super/customer" element={<Customer />} />
+                <Route path="/super/supplier" element={<Suppliers />} />
               </Route>
+            </Route>
 
-              {/* SHOP ADMIN */}
-              <Route element={<ProtectedLayout roles={["SHOP_ADMIN"]} />}>
-                <Route element={<OutletLayout />}>
-                  <Route path="/shop/dashboard" element={<Dashboard />} />
-                  <Route path="/shop/create-product" element={<CreateProduct />} />
-                  <Route path="/shop/products" element={<ProductDataTablepage />} />
-                  <Route path="/shop/product-detail/:product_id" element={<ProductDetails />} />
-                  <Route path="/shop/category" element={<CategoryPage />} />
-                  <Route path="/shop/sub-category" element={<SubCategorypage />} />
-                  <Route path="/shop/brand" element={<BrandPage />} />
-                  <Route path="/shop/units" element={<UnitsPage />} />
-                  <Route path="/shop/variant" element={<VariantPage />} />
-                  <Route path="/shop/warranties" element={<WarrantiesPage />} />
-                  <Route path="/shop/manage-stock" element={<StockMangepage />} />
-                  <Route path="/shop/sales" element={<Sales />} />
-                  <Route path="/shop/sales-return" element={<SalesReturn />} />
-                  <Route path="/shop/warehouse" element={<WareHouse />} />
-                  <Route path="/shop/add-sales" element={<AddSales />} />
-                  <Route path="/shop/add-sales-return" element={<AddSalesReturn />} />
-                  <Route path="/shop/invoices" element={<Invoives />} />
-                  <Route path="/shop/sales/update/:sale_id" element={<EditSales />} />
-                  <Route path="/shop/sales/invoice/:sale_id" element={<Invoice />} />
-                  <Route path="/shop/purchase" element={<Purchase />} />
-                  <Route path="/shop/add-purchase" element={<AddPurchase />} />
-                  <Route path="/shop/purchase_order" element={<PurchaseOrder />} />
-                  <Route path="/shop/add_purchase_order" element={<AddPurchaseOrder />} />
-                  <Route path="/shop/purchase_order/update/:purchase_order_id" element={<EditPurchaseOrder />} />
-                  <Route path="/shop/customer" element={<Customer />} />
-                  <Route path="/shop/supplier" element={<Suppliers />} />
-                </Route>
+            {/* SHOP ADMIN */}
+            <Route element={<ProtectedLayout roles={["SHOP_ADMIN"]} />}>
+              <Route element={<OutletLayout />}>
+                <Route path="/shop/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/shop/create-product"
+                  element={<CreateProduct />}
+                />
+                <Route
+                  path="/shop/products"
+                  element={<ProductDataTablepage />}
+                />
+                <Route
+                  path="/shop/product-detail/:product_id"
+                  element={<ProductDetails />}
+                />
+                <Route path="/shop/category" element={<CategoryPage />} />
+                <Route
+                  path="/shop/sub-category"
+                  element={<SubCategorypage />}
+                />
+                <Route path="/shop/brand" element={<BrandPage />} />
+                <Route path="/shop/units" element={<UnitsPage />} />
+                <Route path="/shop/variant" element={<VariantPage />} />
+                <Route path="/shop/warranties" element={<WarrantiesPage />} />
+                <Route path="/shop/manage-stock" element={<StockMangepage />} />
+                <Route path="/shop/sales" element={<Sales />} />
+                <Route path="/shop/sales-return" element={<SalesReturn />} />
+                <Route path="/shop/warehouse" element={<WareHouse />} />
+                <Route path="/shop/add-sales" element={<AddSales />} />
+                <Route
+                  path="/shop/add-sales-return"
+                  element={<AddSalesReturn />}
+                />
+                <Route path="/shop/invoices" element={<Invoives />} />
+                <Route
+                  path="/shop/sales/update/:sale_id"
+                  element={<EditSales />}
+                />
+                <Route
+                  path="/shop/sales/invoice/:sale_id"
+                  element={<Invoice />}
+                />
+                <Route path="/shop/purchase" element={<Purchase />} />
+                <Route path="/shop/add-purchase" element={<AddPurchase />} />
+                <Route
+                  path="/shop/purchase_order"
+                  element={<PurchaseOrder />}
+                />
+                <Route
+                  path="/shop/add_purchase_order"
+                  element={<AddPurchaseOrder />}
+                />
+                <Route
+                  path="/shop/purchase_order/update/:purchase_order_id"
+                  element={<EditPurchaseOrder />}
+                />
+
+                <Route
+                  path="/shop/purchase/update/:purchase_id"
+                  element={<EditPurchase />}
+                />
+                <Route path="/shop/customer" element={<Customer />} />
+                <Route path="/shop/supplier" element={<Suppliers />} />
               </Route>
-            </Routes>
-          </main>
-        </Suspense>
-      </BrowserRouter>
+            </Route>
+          </Routes>
+        </main>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 

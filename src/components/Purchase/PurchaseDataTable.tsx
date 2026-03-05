@@ -62,129 +62,63 @@ import {
 } from "../ui/menubar";
 import { PurchaseOrderDetailsDialog } from "./PurchaseOrderDetail";
 import { useNavigate, useNavigation } from "react-router-dom";
-// const data: PurchaseDetails[] = [
-//   {
-//     supplierName: "Travel Mart",
-//     date: "10 Sep 2024",
-//     total: "1700",
-//     paid: "1700",
-//     due: "0.00",
-//     paymentStatus: "paid",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Global Supplies",
-//     date: "15 Sep 2024",
-//     total: "3200",
-//     paid: "1000",
-//     due: "2200",
-//     paymentStatus: "overdue",
-//     status: "ordered",
-//   },
-//   {
-//     supplierName: "Smart Traders",
-//     date: "19 Sep 2024",
-//     total: "2800",
-//     paid: "0.00",
-//     due: "2800",
-//     paymentStatus: "unpaid",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Metro Wholesale",
-//     date: "25 Sep 2024",
-//     total: "5600",
-//     paid: "5600",
-//     due: "0.00",
-//     paymentStatus: "paid",
-//     status: "received",
-//   },
-//   {
-//     supplierName: "Value Connect",
-//     date: "30 Sep 2024",
-//     total: "4100",
-//     paid: "1500",
-//     due: "2600",
-//     paymentStatus: "overdue",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Prime Industries",
-//     date: "04 Oct 2024",
-//     total: "2400",
-//     paid: "0.00",
-//     due: "2400",
-//     paymentStatus: "unpaid",
-//     status: "pending",
-//   },
-// ];
-export interface Variant {
-  product_variant_id: string;
-  skuCode: string;
-  price: number;
-  variant_label: string;
-  product: {
-    productName: string;
-  };
-}
+import { getAllPurchase } from "@/api/PurchaseOrder/PurchaseClient";
+import { PurchaseDetailsDialog } from "./PurchaseDetail";
+import { CreatePurchasePaymentDialog } from "./CreatePayment";
 
-// ===============================
-// Purchase Order Item
-// ===============================
-export interface PurchaseOrderItem {
-  purchase_order_item_id: string;
-  purchase_order_id: string;
-  product_variant_id: string;
-  quantity: number;
-  received_quantity: number;
-  unit_price: string; // coming as string from backend
-  tax: string;
-  tax_amount: string;
+export interface Purchase {
+  purchase_id: string;
+  reference_no: string;
+  purchase_date: string;
+  status: "PENDING" | "ORDERED" | "RECEIVED" | "PARTIAL";
+  grand_total: string;
+  order_tax: string;
+  shipping: string;
   discount: string;
-  total_amount: string;
-  shop_id: string;
-  createdAt: string;
-  updatedAt: string;
-  variant: Variant;
+  paid_amount: string;
+  due_amount: string;
+  payment_status: "UNPAID" | "PAID" | "PARTIAL";
+
+  supplier: Supplier;
+  purchase_items: PurchaseItem[];
 }
 
-// ===============================
-// Supplier
-// ===============================
 export interface Supplier {
   supplierID: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-}
-
-// ===============================
-// Warehouse
-// ===============================
-export interface Warehouse {
-  warehouse_id: string;
-  warehouseName: string;
-}
-
-export interface PurchaseOrder {
-  purchase_order_id: string;
-  po_number: string;
-  supplier_id: string;
-  warehouse_id: string;
-  po_date: string;
-  order_tax: string;
-  discount_amt: string;
-  shipping: string;
-  sub_total: string;
-  grand_total: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  address: string;
+  location: Location;
   shop_id: string;
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
-  supplier: Supplier;
-  warehouse: Warehouse;
-  items: PurchaseOrderItem[];
+}
+
+export interface Location {
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+}
+
+export interface PurchaseItem {
+  product_variant_id: string;
+  quantity: number;
+  discount: number;
+  tax: number;
+  tax_amount: string;
+  total: string;
+  variant: Variant;
+}
+
+export interface Variant {
+  skuCode: string;
+  variant_label: string;
+  price: number;
+  productName: string;
 }
 
 export default function PurchaseDataTable() {
@@ -211,21 +145,21 @@ export default function PurchaseDataTable() {
     hasPrevPage: false,
   });
 
-  const [purchaseOrderData, setPurchaseOrderData] = React.useState<
-    PurchaseOrder[]
-  >([]);
+  const [purchaseData, setPurchaseData] = React.useState<Purchase[]>([]);
 
-  const [selectedPurchaseOrder, setSelectedPurchaseOrder] =
-    React.useState<PurchaseOrder | null>(null);
+  const [selectedPurchase, setSelectedPurchase] =
+    React.useState<Purchase | null>(null);
 
-  const [openPurchaseOrderDetail, setOpenPurchaseOrderDetail] =
+  const [openPurchaseDetail, setOpenPurchaseDetail] = React.useState(false);
+  const [openCreatePurchasePayment, setOpenCreatePurchasePayment] =
     React.useState(false);
-
-  const getAllPurchasaeOrders = async () => {
+  const [openShowPurchasePayment, setOpenShowPurchasePayment] =
+    React.useState(false);
+  const getAllPurchasaeInfo = async () => {
     try {
-      const res = await getAllPurchaseOrder(page, 10);
+      const res = await getAllPurchase(page, 10);
       if (res.status == "OK") {
-        setPurchaseOrderData(res.data || []);
+        setPurchaseData(res.data || []);
         setPageMetaData(res.pageMetaData);
       }
     } catch (error) {
@@ -234,11 +168,16 @@ export default function PurchaseDataTable() {
   };
 
   React.useEffect(() => {
-    getAllPurchasaeOrders();
+    if (!openCreatePurchasePayment && !openShowPurchasePayment) {
+      getAllPurchasaeInfo();
+    }
+  }, [page, openCreatePurchasePayment, openShowPurchasePayment]);
+  React.useEffect(() => {
+    getAllPurchasaeInfo();
   }, []);
 
-  const data: PurchaseOrder[] = purchaseOrderData;
-  const columns: ColumnDef<PurchaseOrder>[] = [
+  const data: Purchase[] = purchaseData;
+  const columns: ColumnDef<Purchase>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -261,17 +200,7 @@ export default function PurchaseDataTable() {
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "po_number",
-      header: () => <div className="text-left text-white">Order No</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="capitalize text-left text-blue-600">
-            {row.getValue("po_number")}
-          </div>
-        );
-      },
-    },
+
     {
       accessorKey: "supplierName",
       header: ({ column }) => {
@@ -298,23 +227,36 @@ export default function PurchaseDataTable() {
       },
     },
     {
-      accessorKey: "warehouseName",
-      header: () => <div className="text-left text-white">Warehouse</div>,
-      accessorFn: (row) => `${row.warehouse.warehouseName}`,
+      accessorKey: "reference_no",
+      header: () => <div className="text-left text-white">Refrence No</div>,
       cell: ({ row }) => {
         return (
-          <div className="flex items-center gap-3">
-            <span className="capitalize ">{row.getValue("warehouseName")}</span>
+          <div className="capitalize text-left text-blue-600">
+            {row.getValue("reference_no")}
           </div>
         );
       },
     },
+    // {
+    //   accessorKey: "warehouseName",
+    //   header: () => <div className="text-left text-white">Warehouse</div>,
+    //   accessorFn: (row) => `${row.warehouse.warehouseName}`,
+    //   cell: ({ row }) => {
+    //     return (
+    //       <div className="flex items-center gap-3">
+    //         <span className="capitalize ">{row.getValue("warehouseName")}</span>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      accessorKey: "po_date",
-      header: () => <div className="text-left text-white">Order Date</div>,
+      accessorKey: "purchase_date",
+      header: () => <div className="text-left text-white">Purchase Date</div>,
       cell: ({ row }) => {
         return (
-          <div className="capitalize text-left ">{row.getValue("po_date")}</div>
+          <div className="capitalize text-left ">
+            {row.getValue("purchase_date")}
+          </div>
         );
       },
     },
@@ -382,12 +324,82 @@ export default function PurchaseDataTable() {
         );
       },
     },
+    {
+      accessorKey: "paid_amount",
+      header: () => (
+        <div className="text-left font-semibold text-white">Paid</div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left font-medium tabular-nums text-green-600">
+            ₹{row.getValue("paid_amount")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "due_amount",
+      header: () => (
+        <div className="text-left font-semibold text-white">Due</div>
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="text-left font-medium tabular-nums text-red-500">
+            ₹{row.getValue("due_amount")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "payment_status",
+      header: () => (
+        <div className="text-left font-semibold text-white">Payment Status</div>
+      ),
+      cell: ({ row }) => {
+        const status = String(row.getValue("payment_status")).toLowerCase();
 
+        let color = "bg-gray-100 text-gray-600 border-gray-200";
+
+        if (status === "paid") {
+          color = "bg-emerald-200 text-emerald-700 border-emerald-200";
+        } else if (status === "partially_paid") {
+          color = "bg-amber-50 text-amber-700 border-amber-200";
+        } else if (status === "unpaid") {
+          color = "bg-rose-100 text-rose-700 border-rose-200";
+        }
+
+        const label = status.replace("_", " ");
+
+        return (
+          <div className="flex justify-start items-center">
+            <Badge
+              className={`
+              ${color} 
+              pl-3 pr-3.5 py-2 
+              rounded-lg 
+              capitalize 
+              font-semibold 
+              text-[11px] 
+              tracking-wide
+              flex items-center 
+              gap-1.5
+              border
+              shadow-sm
+            `}
+            >
+              {/* Static Dot for payment status */}
+              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-70" />
+              <span className="leading-none">{label}</span>
+            </Badge>
+          </div>
+        );
+      },
+    },
     {
       id: "actions",
       // header: () => <div className="text-left">Action</div>,
       cell: ({ row }) => {
-        const purchaseOrder = row.original;
+        const purchase = row.original;
         return (
           <div className="flex gap-2">
             <Menubar className="border-none bg-transparent shadow-none p-0 h-auto">
@@ -399,8 +411,8 @@ export default function PurchaseDataTable() {
                   <MenubarItem
                     className="gap-2 text-gray-700 cursor-pointer"
                     onClick={() => {
-                      setSelectedPurchaseOrder(purchaseOrder);
-                      setOpenPurchaseOrderDetail(true);
+                      setSelectedPurchase(purchase);
+                      setOpenPurchaseDetail(true);
                     }}
                   >
                     <Eye className="w-4 h-4 text-gray-500" />
@@ -409,23 +421,37 @@ export default function PurchaseDataTable() {
                   <MenubarItem
                     className="gap-2 text-gray-700 cursor-pointer"
                     onClick={() =>
-                      navigate(
-                        `/shop/purchase_order/update/${purchaseOrder.purchase_order_id}`,
-                      )
+                      navigate(`/shop/purchase/update/${purchase.purchase_id}`)
                     }
                   >
                     <Edit className="w-4 h-4 text-gray-500" />
-                    Edit Purchase Order
+                    Edit Purchase
                   </MenubarItem>
-                  <MenubarItem className="gap-2 text-gray-700 cursor-pointer">
-                    <RefreshCcw className="w-4 h-4 text-gray-500" />
-                    Convert to Purchase
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setSelectedPurchase(purchase);
+                      setOpenCreatePurchasePayment(true);
+                    }}
+                    disabled={Number(purchase.due_amount) <= 0}
+                  >
+                    <CirclePlus className="w-4 h-4 text-blue-500" />
+                    Create Payment
+                  </MenubarItem>
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    // onClick={() => {
+                    //   setSelectedSale(sales);
+                    //   setOpenShowPayment(true);
+                    // }}
+                  >
+                    <BadgeIndianRupee className="w-4 h-4 text-green-500" />
+                    Show Payment
                   </MenubarItem>
                   <MenubarSeparator />
-
                   <MenubarItem className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
                     <Trash className="w-4 h-4" />
-                    Delete Purchase
+                    Delete Sales
                   </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
@@ -658,10 +684,16 @@ export default function PurchaseDataTable() {
           </Button>
         </div>
       </div>
-      <PurchaseOrderDetailsDialog
-        open={openPurchaseOrderDetail}
-        onClose={() => setOpenPurchaseOrderDetail(false)}
-        purchaseOrder={selectedPurchaseOrder}
+      <PurchaseDetailsDialog
+        open={openPurchaseDetail}
+        onClose={() => setOpenPurchaseDetail(false)}
+        purchase={selectedPurchase}
+      />
+      <CreatePurchasePaymentDialog
+        open={openCreatePurchasePayment}
+        onClose={() => setOpenCreatePurchasePayment(false)}
+        purchase={selectedPurchase}
+        payment={null}
       />
     </div>
   );

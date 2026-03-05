@@ -1,24 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  Ban,
-  Box,
-  Check,
-  FileText,
-  Loader2,
-  Minus,
-  Package,
-  PackageX,
-  Plus,
-  Save,
-  Search,
-  ShoppingCart,
-  Tag,
-  Trash2,
-  X,
-} from "lucide-react";
-import React, { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,23 +9,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
-import { getAllCustomer } from "@/api/Coustomer/CustomerClient";
+import { useNavigate, useParams } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Ban,
+  Check,
+  FileText,
+  Loader2,
+  Minus,
+  PackageX,
+  Plus,
+  Save,
+  Search,
+  ShoppingCart,
+  Tag,
+  Trash2,
+  X,
+} from "lucide-react";
 import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
-import Loader from "@/components/commen/loader";
-import { createSales } from "@/api/Sales/SalesClient";
-import toast from "react-hot-toast";
+import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
+import React from "react";
+import { getAllSupplier } from "@/api/Supplier/SupplierClient";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
+import {
+  createPurchaseOrder,
+  getAllPurchaseOrderNo,
+  getPurchaseOrderByID,
+} from "@/api/PurchaseOrder/PurchaseOrderClient";
+import toast from "react-hot-toast";
+import type { PurchaseOrderData } from "@/components/Purchase/PurchaseOrderEdit";
+import {
+  createPurchase,
+  getAllPurchase,
+  getPurchaseByID,
+  updatePurchase,
+} from "@/api/PurchaseOrder/PurchaseClient";
 import WarehouseSearch from "@/components/utils/WarehouseSerche";
-// type Product = {
-//   code: string;
-//   name: string;
-//   price: number;
-// };
-
 type ProductRow = {
+  purchase_item_id: string;
   variant_id: string;
-  warehouse_id: string;
   skuCode: string;
   ProductName: string;
   variant_label: string;
@@ -56,48 +59,102 @@ type ProductRow = {
   total: number;
 };
 
-type customer = {
-  customer_id: string;
-  firstName: string;
-  lastName: string;
-};
 type Product = {
   product_variant_id: string;
   skuCode: string;
   price: number;
   variant_label: string;
-  warehouse_id: string;
   quantity: number;
   productName: string;
 };
+
 type warehouse = {
   warehouse_id: string;
   warehouseName: string;
 };
-export default function AddSales() {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-  const [variant, setVariant] = React.useState<Product[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [rows, setRows] = useState<ProductRow[]>([]);
-  const [customer, setCustomer] = React.useState<customer[]>([]);
-  const [warehouse, setWareHouse] = React.useState<warehouse[]>([]);
-  const [selectedVariant, setSelectedVariant] = React.useState({
-    product_variant_id: "",
-    skuCode: "",
-    price: 0,
-    variant_label: "",
-    productName: "",
-  });
+type purchaseOrderNo = {
+  purchase_order_id: string;
+  po_number: string;
+};
 
-  const [formData, setFormData] = React.useState({
-    customer_id: "",
-    date: "",
-    warehouse_id: "",
+export interface PurchaseDetails {
+  purchase_id: string;
+  reference_no: string;
+  purchase_date: string;
+  status: "PENDING" | "ORDERED" | "RECEIVED" | "PARTIAL";
+  grand_total: string;
+  warehouse_id: string;
+  order_tax: string;
+  shipping: string;
+  discount: string;
+  paid_amount: string;
+  due_amount: string;
+  payment_status: "UNPAID" | "PAID" | "PARTIAL";
+
+  supplier: Supplier;
+  purchase_items: PurchaseItem[];
+}
+
+export interface Supplier {
+  supplierID: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  location: Location;
+  shop_id: string;
+  status: "ACTIVE" | "INACTIVE";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Location {
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+}
+
+export interface PurchaseItem {
+  purchase_item_id: string;
+  product_variant_id: string;
+  quantity: number;
+  discount: number;
+  tax: number;
+  tax_amount: string;
+  total: string;
+  variant: Variant;
+}
+
+export interface Variant {
+  skuCode: string;
+  variant_label: string;
+  price: number;
+  productName: string;
+}
+
+export default function EditPurchase() {
+  const navigate = useNavigate();
+  const { purchase_id } = useParams();
+  const [supplier, setSupplier] = React.useState<Supplier[]>([]);
+  const [warehouse, setWareHouse] = React.useState<warehouse[]>([]);
+  const [poNumber, setPoNumber] = React.useState<purchaseOrderNo[]>([]);
+  const [query, setQuery] = useState("");
+  const [variant, setVariant] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<ProductRow[]>([]);
+
+  const [formData, setFormData] = useState({
+    purchase_order_id: "",
+    supplierID: "",
+    po_date: "",
+    ref_no: "",
     order_tax: 0,
     shipping: 0,
+    warehouse_id: "",
     discount: 0,
-    status: "INPROGRESS",
+    status: "PENDING",
   });
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -109,6 +166,32 @@ export default function AddSales() {
       [name]: value,
     }));
   };
+  const getallSupplier = async () => {
+    try {
+      const res = await getAllSupplier();
+      if (res.status === "OK") {
+        setSupplier(res.data || []);
+      }
+    } catch (error) {
+      console.error;
+    }
+  };
+  React.useEffect(() => {
+    getallSupplier();
+  }, []);
+  const getallPurchaseOrderNo = async () => {
+    try {
+      const res = await getAllPurchaseOrderNo();
+      if (res.status === "OK") {
+        setPoNumber(res.data || []);
+      }
+    } catch (error) {
+      console.error;
+    }
+  };
+  React.useEffect(() => {
+    getallPurchaseOrderNo();
+  }, []);
   const getallWareHouse = async () => {
     try {
       const res = await getAllWarehouse();
@@ -122,52 +205,97 @@ export default function AddSales() {
   React.useEffect(() => {
     getallWareHouse();
   }, []);
-  // const handleClickVariant = (variant: Product) => {
-  //   try {
-  //     setSelectedVariant((prev) => ({
-  //       ...prev,
-  //       product_variant_id: variant.product_variant_id,
-  //       skuCode: variant.skuCode,
-  //       price: variant.price,
-  //       variant_label: variant.variant_label,
-  //       productName: variant.productName,
-  //     }));
-  //     setQuery("");
-  //     setVariant([]);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  const handleCancel = () => {
-    navigate("/sales");
+
+  const [purchaseData, setPurchaseData] = useState<PurchaseDetails | null>(
+    null,
+  );
+
+  const getPurchaseData = async () => {
+    try {
+      if (!purchase_id) return;
+      const res = await getPurchaseByID(purchase_id);
+      if (res.status == "OK") {
+        setPurchaseData(res.data || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
-  // Search logic
-  // const handleSearch = (value: string) => {
-  //   setQuery(value);
 
-  //   if (value.trim() === "") {
-  //     setFiltered([]);
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!purchase_id) return;
+    getPurchaseData();
+  }, [purchase_id]);
 
-  //   const match = products.filter((p) =>
-  //     p.code.toLowerCase().includes(value.toLowerCase()),
-  //   );
+  useEffect(() => {
+    if (!purchaseData) return;
+    const formattedRows: ProductRow[] =
+      purchaseData.purchase_items?.map((item) => ({
+        purchase_item_id: item.purchase_item_id,
+        variant_id: item.product_variant_id,
+        skuCode: item.variant.skuCode,
+        ProductName: item.variant.productName,
+        variant_label: item.variant.variant_label,
+        quantity: Number(item.quantity),
+        price: Number(item.variant.price),
+        discount: Number(item.discount),
+        tax: Number(item.tax),
+        tax_amount: Number(item.tax_amount),
+        total: Number(item.total),
+      })) || [];
+    setFormData((prev) => ({
+      ...prev,
+      supplierID: purchaseData.supplier.supplierID,
+      po_date: purchaseData.purchase_date,
+      ref_no: purchaseData.reference_no,
+      warehouse_id: purchaseData.warehouse_id,
+      order_tax: Number(purchaseData.order_tax),
+      shipping: Number(purchaseData.shipping),
+      discount: Number(purchaseData.discount),
+      status: purchaseData.status,
+    }));
+    setRows(formattedRows);
+  }, [purchaseData]);
+  // ==============================
+  // SEARCH PRODUCT
+  // ==============================
+  useEffect(() => {
+    if (!query.trim()) {
+      setVariant([]);
+      return;
+    }
 
-  //   setFiltered(match);
-  // };
+    const delay = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await getAllVariantBySearch(query);
+        if (res.status === "OK") {
+          setVariant(res.data);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }, 400);
 
-  // // Add row to table
-  const addProductToTable = (variant: Product) => {
+    return () => clearTimeout(delay);
+  }, [query]);
+
+  console.log(variant);
+
+  // ==============================
+  // ADD PRODUCT TO TABLE
+  // ==============================
+  const addProductToTable = (product: Product) => {
     setRows((prev) => {
       const exists = prev.find(
-        (row) => row.variant_id === variant.product_variant_id,
+        (row) => row.variant_id === product.product_variant_id,
       );
 
       if (exists) {
-        // Increase quantity instead of duplicate row
         return prev.map((row) =>
-          row.variant_id === variant.product_variant_id
+          row.variant_id === product.product_variant_id
             ? {
                 ...row,
                 quantity: row.quantity + 1,
@@ -181,33 +309,32 @@ export default function AddSales() {
         );
       }
 
-      // If not exists → add new row
       return [
         ...prev,
         {
-          variant_id: variant.product_variant_id,
-          skuCode: variant.skuCode,
-          ProductName: variant.productName,
-          warehouse_id: variant.warehouse_id,
-          variant_label: variant.variant_label,
+          purchase_item_id: "",
+          variant_id: product.product_variant_id,
+          skuCode: product.skuCode,
+          ProductName: product.productName,
+          variant_label: product.variant_label,
           quantity: 1,
-          price: variant.price,
+          price: product.price,
           discount: 0,
           tax: 0,
           tax_amount: 0,
-          total: variant.price,
+          total: product.price,
         },
       ];
     });
 
     setQuery("");
+    setVariant([]);
   };
 
-  const updateRow = (
-    id: string,
-    field: keyof ProductRow,
-    value: number | string | null,
-  ) => {
+  // ==============================
+  // UPDATE ROW
+  // ==============================
+  const updateRow = (id: string, field: keyof ProductRow, value: number) => {
     setRows((prev) =>
       prev.map((row) => {
         if (row.variant_id !== id) return row;
@@ -232,80 +359,69 @@ export default function AddSales() {
   const removeRows = (id: string) => {
     setRows((prev) => prev.filter((row) => row.variant_id !== id));
   };
-  React.useEffect(() => {
-    if (!query.trim()) {
-      setVariant([]);
-      return;
-    }
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await getAllVariantInstock(query);
-        if (res.status === "OK") {
-          setVariant(res.data);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
-    return () => clearTimeout(delayDebounce);
-  }, [query]);
 
-  const getallCustomer = async () => {
-    try {
-      const res = await getAllCustomer();
-      if (res.status === "OK") {
-        setCustomer(res.data || []);
-      }
-    } catch (error) {
-      console.error;
-    }
+  const handleCancel = () => {
+    navigate("/purchase-orders");
   };
-  React.useEffect(() => {
-    getallCustomer();
-  }, []);
-  console.log(rows);
 
-  const orderSummary = rows.reduce(
-    (acc, row) => {
-      acc.subtotal += row.price * row.quantity;
-      acc.tax += row.tax_amount;
-      acc.discount += row.discount;
-      acc.total += row.total;
-      return acc;
-    },
-    { subtotal: 0, tax: 0, discount: 0, total: 0 },
-  );
-  const orderTax = (orderSummary.total * Number(formData.order_tax)) / 100;
-  const grand_total =
-    orderSummary.total +
-    orderTax +
-    Number(formData.shipping) -
-    Number(formData.discount);
+  // ==============================
+  // TOTAL CALCULATION
+  // ==============================
+  const subTotal = rows.reduce((acc, row) => acc + row.total, 0);
+  const orderTax = (subTotal * formData.order_tax) / 100;
 
-  const handleCreateSale = () => {
-    if (!rows.length) {
-      toast.error("Add at least one product!");
+  const grandTotal =
+    subTotal -
+    Number(formData.discount) +
+    Number(formData.shipping) +
+    Number(orderTax);
+
+  const payload = {
+    supplier_id: formData.supplierID,
+    warehouse_id: formData.warehouse_id,
+    status: formData.status,
+    purchase_date: formData.po_date,
+    reference_no: formData.ref_no,
+    order_tax: Number(formData.order_tax || 0),
+    shipping: Number(formData.shipping || 0),
+    discount: Number(formData.discount || 0),
+    purchase_items: rows.map((row) => ({
+      ...(row.purchase_item_id && { purchase_item_id: row.purchase_item_id }),
+      product_variant_id: row.variant_id,
+      price: row.price,
+      quantity: row.quantity,
+      tax: row.tax,
+      tax_amount: row.tax_amount,
+      discount: row.discount,
+      total: row.total,
+    })),
+  };
+  console.log(payload);
+  const handleUpdatesPurchase = () => {
+    // Basic validation
+    if (!formData.supplierID) {
+      toast.error("Supplier is required");
       return;
     }
 
-    if (!formData.customer_id) {
-      toast.error("Select a customer!");
+    if (!rows || rows.length === 0) {
+      toast.error("Add at least one product");
       return;
     }
 
     const payload = {
-      ...formData,
+      supplier_id: formData.supplierID,
+      warehouse_id: formData.warehouse_id,
+      status: formData.status,
+      purchase_date: formData.po_date,
+      reference_no: formData.ref_no,
       order_tax: Number(formData.order_tax || 0),
       shipping: Number(formData.shipping || 0),
       discount: Number(formData.discount || 0),
-      salesItems: rows.map((row) => ({
+      purchase_items: rows.map((row) => ({
+        ...(row.purchase_item_id && { purchase_item_id: row.purchase_item_id }),
         product_variant_id: row.variant_id,
         price: row.price,
-        warehouse_id: row.warehouse_id,
         quantity: row.quantity,
         tax: row.tax,
         tax_amount: row.tax_amount,
@@ -313,32 +429,18 @@ export default function AddSales() {
         total: row.total,
       })),
     };
-
-    const salePromise = createSales(payload);
-
-    toast.promise(salePromise, {
-      loading: "Creating Sale ..",
+    if (!purchase_id) return;
+    const createPromise = updatePurchase(purchase_id, payload);
+    toast.promise(createPromise, {
+      loading: "Updateing Purchase...",
       success: (res) => {
-        setRows([]);
-        setQuery("");
-        setFormData({
-          customer_id: "",
-          date: "",
-          warehouse_id: "",
-          order_tax: 0,
-          shipping: 0,
-
-          discount: 0,
-          status: "",
-        });
-        navigate("/shop/sales");
-        return res.message || "Sale created successfully!";
+        if (res?.status === "OK") {
+          navigate("/shop/purchase");
+          return res.message;
+        }
+        throw new Error(res?.message || "Failed to create");
       },
-      error: (err) => {
-        return (
-          err.response?.data?.message || err.message || "Failed to create sale!"
-        );
-      },
+      error: (err) => err?.response?.data?.message || "Something went wrong",
     });
   };
 
@@ -352,10 +454,10 @@ export default function AddSales() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-              Create Sale
+              Edit Purchase
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Add a new Sales and manage Customer details.
+              Update a Purchase and manage Suppleir details.
             </p>
           </div>
           <div className="flex gap-2">
@@ -378,6 +480,7 @@ export default function AddSales() {
             ========================================= */}
           <div className="lg:col-span-2 space-y-6">
             {/* --- SECTION 1: ORDER DETAILS --- */}
+
             <div className="bg-white dark:bg-gray-950 border dark:border-gray-800 rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold flex items-center gap-2 mb-5 text-gray-900 dark:text-gray-100">
                 <FileText className="w-5 h-5 text-primary" /> Order Details
@@ -386,24 +489,24 @@ export default function AddSales() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="grid gap-2">
                   <Label className="text-gray-700 dark:text-gray-300">
-                    Customer Name
+                    Supplier Name
                   </Label>
                   <Select
-                    value={formData.customer_id}
+                    value={formData.supplierID}
                     onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, customer_id: value }))
+                      setFormData((prev) => ({ ...prev, supplierID: value }))
                     }
                   >
                     <SelectTrigger className="w-full bg-gray-50 dark:bg-gray-900">
                       <SelectValue placeholder="Select Supplier" />
                     </SelectTrigger>
                     <SelectContent>
-                      {customer?.map((cus) => (
+                      {supplier?.map((sup) => (
                         <SelectItem
-                          key={cus.customer_id}
-                          value={String(cus.customer_id)}
+                          key={sup.supplierID}
+                          value={String(sup.supplierID)}
                         >
-                          {cus.firstName} {cus.lastName}
+                          {sup.firstName} {sup.lastName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -411,15 +514,15 @@ export default function AddSales() {
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-gray-700 dark:text-gray-300">
-                    Sale Date
+                    Purchase Date
                   </Label>
                   <Input
                     type="date"
                     className="bg-gray-50 dark:bg-gray-900"
                     onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
+                      setFormData({ ...formData, po_date: e.target.value })
                     }
-                    value={formData.date}
+                    value={formData.po_date}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -436,8 +539,9 @@ export default function AddSales() {
                       <SelectValue placeholder="Select Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="INPROGRESS">Inprogress</SelectItem>
+                      <SelectItem value="PENDING">Pending</SelectItem>
                       <SelectItem value="COMPLETED">Completed</SelectItem>
+                      <SelectItem value="RECEIVED">Received</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -463,6 +567,19 @@ export default function AddSales() {
                     </SelectContent>
                   </Select>
                 </div>{" "}
+                <div className="grid gap-2">
+                  <Label className="text-gray-700 dark:text-gray-300">
+                    Refrence No
+                  </Label>
+                  <Input
+                    type="text"
+                    className="bg-gray-50 dark:bg-gray-900"
+                    onChange={(e) =>
+                      setFormData({ ...formData, ref_no: e.target.value })
+                    }
+                    value={formData.ref_no}
+                  />
+                </div>
               </div>
             </div>
 
@@ -509,36 +626,19 @@ export default function AddSales() {
                         ) : variant.length > 0 ? (
                           <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
                             {variant.map((item) => {
-                              const isSelected =
-                                selectedVariant?.product_variant_id ===
-                                item.product_variant_id;
-
-                              // --- STOCK LOGIC ---
-                              const stockCount = item.quantity || 0;
-                              const isOutOfStock = stockCount === 0;
-                              const isLowStock =
-                                stockCount > 0 && stockCount < 10;
-                              // -------------------
-
                               return (
                                 <li
                                   key={item.product_variant_id}
-                                  onClick={() =>
-                                    !isOutOfStock && addProductToTable(item)
-                                  }
+                                  onClick={() => addProductToTable(item)}
                                   className={`
                       group relative p-3.5 transition-all duration-200
-                      ${
-                        isOutOfStock
-                          ? "opacity-60 bg-neutral-50 dark:bg-neutral-900 cursor-not-allowed grayscale-[0.8]"
-                          : "cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
-                      }
-                      ${isSelected ? "bg-blue-50 dark:bg-blue-900/20" : ""}
+                      ${"cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/10"}
+
                     `}
                                 >
                                   {/* Active Left Border Indicator */}
                                   <div
-                                    className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-200 ${isSelected ? "bg-blue-600" : "bg-transparent group-hover:bg-blue-300"}`}
+                                    className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-200 bg-transparent group-hover:bg-blue-300`}
                                   />
 
                                   <div className="flex items-start justify-between gap-3 pl-2">
@@ -547,7 +647,7 @@ export default function AddSales() {
                                       {/* Row 1: Name & Variant Badge */}
                                       <div className="flex items-center flex-wrap gap-2 mb-1.5">
                                         <h4
-                                          className={`text-sm font-bold leading-tight ${isSelected ? "text-blue-700 dark:text-blue-400" : "text-neutral-900 dark:text-neutral-100"}`}
+                                          className={`text-sm font-bold leading-tight "text-neutral-900 dark:text-neutral-100"}`}
                                         >
                                           {item.productName}
                                         </h4>
@@ -556,11 +656,7 @@ export default function AddSales() {
                                         <span
                                           className={`
                             inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border
-                            ${
-                              isSelected
-                                ? "bg-blue-100 text-blue-700 border-blue-200"
-                                : "bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"
-                            }
+                            ${"bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"}
                           `}
                                         >
                                           <Tag className="w-3 h-3 mr-1 opacity-70" />
@@ -576,18 +672,6 @@ export default function AddSales() {
                                         </span>
 
                                         {/* Stock Indicator Dot */}
-                                        {!isOutOfStock && (
-                                          <div className="flex items-center gap-1.5">
-                                            <span
-                                              className={`block w-1.5 h-1.5 rounded-full ${isLowStock ? "bg-orange-500 animate-pulse" : "bg-green-500"}`}
-                                            />
-                                            <span
-                                              className={`text-xs font-medium ${isLowStock ? "text-orange-600" : "text-green-600"}`}
-                                            >
-                                              {stockCount} in stock
-                                            </span>
-                                          </div>
-                                        )}
                                       </div>
                                     </div>
 
@@ -600,29 +684,17 @@ export default function AddSales() {
 
                                       {/* Interactive Action State */}
                                       <div className="h-7 flex items-center justify-end">
-                                        {isOutOfStock ? (
-                                          <span className="flex items-center text-[10px] font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-100 dark:border-red-900">
-                                            <Ban className="w-3 h-3 mr-1" /> No
-                                            Stock
-                                          </span>
-                                        ) : isSelected ? (
-                                          <span className="flex items-center text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-right-2">
-                                            <Check className="w-3.5 h-3.5 mr-1" />{" "}
-                                            Added
-                                          </span>
-                                        ) : (
-                                          <button
-                                            className="
+                                        <button
+                                          className="
                                     flex items-center text-xs font-semibold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 
                                     px-3 py-1 rounded shadow-sm 
                                     opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 
                                     transition-all duration-200 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white
                                 "
-                                          >
-                                            <Plus className="w-3.5 h-3.5 mr-1" />{" "}
-                                            Add
-                                          </button>
-                                        )}
+                                        >
+                                          <Plus className="w-3.5 h-3.5 mr-1" />{" "}
+                                          Add
+                                        </button>
                                       </div>
                                     </div>
                                   </div>
@@ -676,9 +748,6 @@ export default function AddSales() {
                       <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 w-[150px]">
                         Product
                       </th>
-                      <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 w-[140px]">
-                        Warehouse
-                      </th>
                       <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-center w-[120px]">
                         Qty
                       </th>
@@ -719,7 +788,7 @@ export default function AddSales() {
                               {row.variant_label}
                             </span>
                           </td>
-                          <td className="px-2 py-2 w-[140px]">
+                          {/* <td className="px-2 py-2 w-[140px]">
                             <div className="w-full">
                               <WarehouseSearch
                                 warehouses={warehouse}
@@ -727,7 +796,7 @@ export default function AddSales() {
                                 updateRow={updateRow}
                               />
                             </div>
-                          </td>
+                          </td> */}
                           <td className="px-2 py-2 w-[120px]">
                             <div className="flex items-center justify-center">
                               <div className="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden bg-white dark:bg-neutral-900 shadow-sm">
@@ -897,9 +966,9 @@ export default function AddSales() {
               <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex justify-between">
                   <span>Items Subtotal:</span>
-                  {/* <span className="font-medium text-gray-900 dark:text-gray-100">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
                     ₹{subTotal.toFixed(2)}
-                  </span> */}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Order Tax:</span>
@@ -925,7 +994,7 @@ export default function AddSales() {
                     Grand Total
                   </span>
                   <span className="text-2xl font-bold text-primary tabular-nums">
-                    ₹{grand_total.toFixed(2)}
+                    ₹{grandTotal.toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -933,7 +1002,7 @@ export default function AddSales() {
               <Button
                 className="w-full mt-6"
                 size="lg"
-                onClick={handleCreateSale}
+                onClick={handleUpdatesPurchase}
               >
                 Confirm Order
               </Button>

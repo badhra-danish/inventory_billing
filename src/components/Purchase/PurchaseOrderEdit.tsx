@@ -13,10 +13,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import {
   FileText,
+  Loader2,
+  Minus,
+  PackageX,
   Plus,
   Save,
   Search,
   ShoppingCart,
+  Tag,
   Trash2,
   X,
 } from "lucide-react";
@@ -344,7 +348,7 @@ export default function EditPurchaseOrder() {
     })),
   };
   console.log(payload);
-  const handlePurchaseOrder = () => {
+  const handleUpdatePurchaseOrder = () => {
     // Basic validation
 
     if (!formData.supplierID) {
@@ -402,10 +406,10 @@ export default function EditPurchaseOrder() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Update Purchase Order
+            Create Sale
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Update a purchase order and manage supplier details.
+            Add a new Sales and manage Customer details.
           </p>
         </div>
         <div className="flex gap-2">
@@ -422,29 +426,19 @@ export default function EditPurchaseOrder() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* =========================================
             LEFT COLUMN: Main Form Elements (Takes up 2/3 width on large screens)
             ========================================= */}
         <div className="lg:col-span-2 space-y-6">
           {/* --- SECTION 1: ORDER DETAILS --- */}
+
           <div className="bg-white dark:bg-gray-950 border dark:border-gray-800 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-semibold flex items-center gap-2 mb-5 text-gray-900 dark:text-gray-100">
               <FileText className="w-5 h-5 text-primary" /> Order Details
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="grid gap-2">
-                <Label className="text-gray-700 dark:text-gray-300">
-                  Order ID
-                </Label>
-                <Input
-                  type="text"
-                  disabled
-                  className="bg-gray-50 dark:bg-gray-900"
-                  value={purchaseOrderData?.po_number}
-                />
-              </div>
               <div className="grid gap-2">
                 <Label className="text-gray-700 dark:text-gray-300">
                   Supplier Name
@@ -481,7 +475,6 @@ export default function EditPurchaseOrder() {
                   onChange={(e) =>
                     setFormData({ ...formData, po_date: e.target.value })
                   }
-                  value={formData.po_date}
                 />
               </div>
 
@@ -490,7 +483,6 @@ export default function EditPurchaseOrder() {
                   Status
                 </Label>
                 <Select
-                  value={formData.status}
                   onValueChange={(value) =>
                     setFormData({ ...formData, status: value })
                   }
@@ -512,7 +504,6 @@ export default function EditPurchaseOrder() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, warehouse_id: value })
                   }
-                  value={formData.warehouse_id}
                 >
                   <SelectTrigger className="w-full bg-gray-50 dark:bg-gray-900">
                     <SelectValue placeholder="Select Warehouse" />
@@ -536,112 +527,260 @@ export default function EditPurchaseOrder() {
             </h2>
 
             {/* Product Search Bar */}
-            <div className="relative mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search products by SKU or Name..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="pl-10 bg-gray-50 dark:bg-gray-900 focus-visible:ring-primary"
-                />
-              </div>
-
-              {/* Search Results Dropdown */}
-              {variant?.length > 0 && (
-                <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-gray-900 border dark:border-gray-800 shadow-xl z-50 rounded-md overflow-hidden max-h-60 overflow-y-auto">
-                  {variant.map((p) => (
-                    <div
-                      key={p.product_variant_id}
-                      className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer flex justify-between items-center border-b dark:border-gray-800 last:border-0 transition-colors"
-                      onClick={() => addProductToTable(p)}
-                    >
-                      <div>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {p.productName}
-                        </span>
-                        <span className="text-xs text-gray-500 block">
-                          SKU: {p.skuCode}
+            <div className="grid gap-4 relative mb-5">
+              <Label>Product Search</Label>
+              <Input
+                type="text"
+                placeholder="Search Product By Code or Name..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="bg-gray-50 dark:bg-gray-900"
+              />
+              {query && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-2 w-full transform transition-all duration-200 ease-in-out">
+                  <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden ring-1 ring-black/5">
+                    {/* Header */}
+                    {!loading && variant.length > 0 && (
+                      <div className="bg-neutral-50/90 dark:bg-neutral-800/90 backdrop-blur-md px-4 py-2.5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center sticky top-0 z-10">
+                        <p className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest">
+                          Inventory Search
+                        </p>
+                        <span className="text-[10px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                          {variant.length} RESULTS
                         </span>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-primary"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                    )}
+
+                    {/* List Container */}
+                    <div className="max-h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+                      {loading ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
+                          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+                          <p className="text-sm font-medium">
+                            Searching catalog...
+                          </p>
+                        </div>
+                      ) : variant.length > 0 ? (
+                        <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                          {variant.map((item) => {
+                            return (
+                              <li
+                                key={item.product_variant_id}
+                                onClick={() => addProductToTable(item)}
+                                className={`
+                      group relative p-3.5 transition-all duration-200
+                      ${"cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/10"}
+
+                    `}
+                              >
+                                {/* Active Left Border Indicator */}
+                                <div
+                                  className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-200 bg-transparent group-hover:bg-blue-300`}
+                                />
+
+                                <div className="flex items-start justify-between gap-3 pl-2">
+                                  {/* --- LEFT SIDE: Info --- */}
+                                  <div className="flex-1 min-w-0">
+                                    {/* Row 1: Name & Variant Badge */}
+                                    <div className="flex items-center flex-wrap gap-2 mb-1.5">
+                                      <h4
+                                        className={`text-sm font-bold leading-tight "text-neutral-900 dark:text-neutral-100"}`}
+                                      >
+                                        {item.productName}
+                                      </h4>
+
+                                      {/* Interactive Variant Badge */}
+                                      <span
+                                        className={`
+                            inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border
+                            ${"bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"}
+                          `}
+                                      >
+                                        <Tag className="w-3 h-3 mr-1 opacity-70" />
+                                        {item.variant_label}
+                                      </span>
+                                    </div>
+
+                                    {/* Row 2: SKU & Stock Status */}
+                                    <div className="flex items-center gap-3">
+                                      {/* SKU Chip */}
+                                      <span className="text-[10px] font-mono text-neutral-500 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 px-1.5 py-0.5 rounded shadow-sm">
+                                        SKU: {item.skuCode}
+                                      </span>
+
+                                      {/* Stock Indicator Dot */}
+                                    </div>
+                                  </div>
+
+                                  {/* --- RIGHT SIDE: Price & Action --- */}
+                                  <div className="text-right flex flex-col items-end gap-1 shrink-0">
+                                    {/* Price */}
+                                    <span className="text-base font-bold text-neutral-900 dark:text-white tabular-nums tracking-tight">
+                                      ₹{item.price.toLocaleString()}
+                                    </span>
+
+                                    {/* Interactive Action State */}
+                                    <div className="h-7 flex items-center justify-end">
+                                      <button
+                                        className="
+                                    flex items-center text-xs font-semibold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 
+                                    px-3 py-1 rounded shadow-sm 
+                                    opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 
+                                    transition-all duration-200 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white
+                                "
+                                      >
+                                        <Plus className="w-3.5 h-3.5 mr-1" />{" "}
+                                        Add
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        // Empty State
+                        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                          <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-full mb-3 ring-8 ring-neutral-50 dark:ring-neutral-800">
+                            <PackageX className="h-8 w-8 text-neutral-400" />
+                          </div>
+                          <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                            No products found
+                          </p>
+                          <p className="text-xs text-neutral-500 mt-1 max-w-[200px]">
+                            We couldn't find inventory matching "{query}"
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  ))}
+
+                    {/* Footer Hint */}
+                    {!loading && variant.length > 0 && (
+                      <div className="bg-neutral-50 dark:bg-neutral-800 px-4 py-2 border-t border-neutral-100 dark:border-neutral-800 flex justify-center gap-4 text-[10px] text-neutral-400">
+                        <span className="flex items-center">
+                          <kbd className="font-sans bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded px-1.5 py-0.5 mr-1 shadow-sm">
+                            ↓
+                          </kbd>
+                          Navigate
+                        </span>
+                        <span className="flex items-center">
+                          <kbd className="font-sans bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded px-1.5 py-0.5 mr-1 shadow-sm">
+                            ↵
+                          </kbd>
+                          Select
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Product Table */}
-            <div className="overflow-x-auto rounded-lg border dark:border-gray-800">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-400 uppercase text-xs font-semibold">
+            {/* Product Table - PROFESSIONALLY ADJUSTED */}
+            <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+              <table className="w-full text-sm text-left whitespace-nowrap">
+                <thead className="bg-blue-500 dark:bg-gray-900/80 text-white dark:text-gray-400 uppercase text-[11px] font-semibold tracking-wider">
                   <tr>
-                    <th className="p-4 border-b dark:border-gray-800">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 w-[150px]">
                       Product
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-center w-24">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-center w-[120px]">
                       Qty
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-center w-28">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-right w-[100px]">
                       Price
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-center w-24">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-right w-[80px]">
                       Disc.
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-center w-24">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-right w-[80px]">
                       Tax %
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-right">
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-right w-[100px]">
                       Total
                     </th>
-                    <th className="p-4 border-b dark:border-gray-800 text-center w-16"></th>
+                    <th className="px-3 py-3.5 border-b border-gray-200 dark:border-gray-800 text-center w-12"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-gray-700 dark:text-gray-300">
-                  {rows?.length === 0 ? (
+                  {rows.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={7}
-                        className="p-8 text-center text-gray-500 dark:text-gray-400"
+                        colSpan={8}
+                        className="p-8 text-center text-gray-500 dark:text-gray-400 italic bg-gray-50/30 dark:bg-gray-900/20"
                       >
                         No products added yet. Search above to add items.
                       </td>
                     </tr>
                   ) : (
-                    rows?.map((row) => (
+                    rows.map((row) => (
                       <tr
                         key={row.variant_id}
-                        className="hover:bg-gray-50/50 dark:hover:bg-gray-900/20 transition-colors"
+                        className="hover:bg-blue-50 dark:hover:bg-gray-800/50 transition-colors group"
                       >
-                        <td className="p-4 font-medium">
+                        <td className="px-2 py-2 font-medium truncate max-w-[150px] w-[150px]">
                           {row.ProductName}
-                          <span className="block text-xs text-gray-500 font-normal mt-0.5">
+                          <span className="block text-[11px] text-gray-500 font-normal mt-0.5 truncate">
                             {row.variant_label}
                           </span>
                         </td>
-                        <td className="p-4">
-                          <Input
-                            type="number"
-                            min={1}
-                            value={row.quantity}
-                            onChange={(e) =>
-                              updateRow(
-                                row.variant_id,
-                                "quantity",
-                                Number(e.target.value),
-                              )
-                            }
-                            className="h-8 text-center px-1"
-                          />
+                        {/* <td className="px-2 py-2 w-[140px]">
+                            <div className="w-full">
+                              <WarehouseSearch
+                                warehouses={warehouse}
+                                row={row}
+                                updateRow={updateRow}
+                              />
+                            </div>
+                          </td> */}
+                        <td className="px-2 py-2 w-[120px]">
+                          <div className="flex items-center justify-center">
+                            <div className="flex items-center border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden bg-white dark:bg-neutral-900 shadow-sm">
+                              <button
+                                onClick={() =>
+                                  updateRow(
+                                    row.variant_id,
+                                    "quantity",
+                                    Math.max(1, row.quantity - 1),
+                                  )
+                                }
+                                disabled={row.quantity <= 1}
+                                className="p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent transition active:scale-95"
+                              >
+                                <Minus className="w-3.5 h-3.5" />
+                              </button>
+
+                              <input
+                                type="number"
+                                min={1}
+                                className="w-10 text-center text-sm font-medium border-none focus:ring-0 p-0 bg-transparent [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                value={row.quantity}
+                                onChange={(e) =>
+                                  updateRow(
+                                    row.variant_id,
+                                    "quantity",
+                                    Math.max(1, Number(e.target.value)),
+                                  )
+                                }
+                              />
+
+                              <button
+                                onClick={() =>
+                                  updateRow(
+                                    row.variant_id,
+                                    "quantity",
+                                    row.quantity + 1,
+                                  )
+                                }
+                                className="p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition active:scale-95"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
                         </td>
-                        <td className="p-4">
+                        <td className="px-2 py-2 w-[100px]">
                           <Input
                             type="number"
                             value={row.price}
@@ -652,10 +791,10 @@ export default function EditPurchaseOrder() {
                                 Number(e.target.value),
                               )
                             }
-                            className="h-8 text-right px-2"
+                            className="h-8 w-full text-right px-2 py-1 text-sm bg-gray-50/50 border-transparent hover:border-gray-200 dark:bg-gray-900/50 dark:border-transparent dark:hover:border-gray-700 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary shadow-none transition-all"
                           />
                         </td>
-                        <td className="p-4">
+                        <td className="px-2 py-2 w-[80px]">
                           <Input
                             type="number"
                             value={row.discount}
@@ -666,10 +805,10 @@ export default function EditPurchaseOrder() {
                                 Number(e.target.value),
                               )
                             }
-                            className="h-8 text-center px-1"
+                            className="h-8 w-full text-right px-2 py-1 text-sm bg-gray-50/50 border-transparent hover:border-gray-200 dark:bg-gray-900/50 dark:border-transparent dark:hover:border-gray-700 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary shadow-none transition-all"
                           />
                         </td>
-                        <td className="p-4">
+                        <td className="px-2 py-2 w-[80px]">
                           <Input
                             type="number"
                             value={row.tax}
@@ -680,18 +819,18 @@ export default function EditPurchaseOrder() {
                                 Number(e.target.value),
                               )
                             }
-                            className="h-8 text-center px-1"
+                            className="h-8 w-full text-right px-2 py-1 text-sm bg-gray-50/50 border-transparent hover:border-gray-200 dark:bg-gray-900/50 dark:border-transparent dark:hover:border-gray-700 focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary shadow-none transition-all"
                           />
                         </td>
-                        <td className="p-4 text-right font-bold text-gray-900 dark:text-gray-100">
+                        <td className="px-3 py-2 text-right font-bold text-gray-900 dark:text-gray-100 tabular-nums w-[100px]">
                           ₹{row.total.toFixed(2)}
                         </td>
-                        <td className="p-4 text-center">
+                        <td className="px-3 py-2 text-center w-12">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeRows(row.variant_id)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/50 h-8 w-8 p-0"
+                            className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -708,9 +847,9 @@ export default function EditPurchaseOrder() {
         {/* =========================================
             RIGHT COLUMN: Sidebar (Summary & Extra Fees)
             ========================================= */}
-        <div className="space-y-6">
+        <div className=" gap-6 grid lg:grid-cols-2 col-span-2">
           {/* --- SECTION 3: ADDITIONAL CHARGES --- */}
-          <div className="bg-white dark:bg-gray-950 border dark:border-gray-800 rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-950 border dark:border-gray-800 rounded-xl shadow-sm p-6 w-full">
             <h2 className="text-lg font-semibold mb-5 text-gray-900 dark:text-gray-100">
               Order Adjustments
             </h2>
@@ -764,10 +903,16 @@ export default function EditPurchaseOrder() {
             <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>Items Subtotal:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  ₹{subTotal?.toFixed(2)}
-                </span>
+                {/* <span className="font-medium text-gray-900 dark:text-gray-100">
+                    ₹{subTotal.toFixed(2)}
+                  </span> */}
               </div>
+              <div className="flex justify-between">
+                <span>Order Tax:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  + ₹{orderTax || 0}
+                </span>
+              </div>{" "}
               <div className="flex justify-between text-red-500">
                 <span>Discount:</span>
                 <span>- ₹{formData.discount || 0}</span>
@@ -778,12 +923,6 @@ export default function EditPurchaseOrder() {
                   + ₹{formData.shipping || 0}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>Order Tax:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  + ₹{orderTax || 0}
-                </span>
-              </div>
             </div>
 
             <div className="mt-5 pt-5 border-t dark:border-gray-800">
@@ -791,7 +930,7 @@ export default function EditPurchaseOrder() {
                 <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
                   Grand Total
                 </span>
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-2xl font-bold text-primary tabular-nums">
                   ₹{grandTotal.toFixed(2)}
                 </span>
               </div>
@@ -800,7 +939,7 @@ export default function EditPurchaseOrder() {
             <Button
               className="w-full mt-6"
               size="lg"
-              onClick={handlePurchaseOrder}
+              onClick={handleUpdatePurchaseOrder}
             >
               Confirm Order
             </Button>

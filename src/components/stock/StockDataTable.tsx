@@ -29,6 +29,8 @@ import {
   ArrowUpRight,
   Calendar,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Edit,
   Eye,
   HelpCircle,
@@ -121,8 +123,25 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
-  const [stockhistoryPage, setStockhistoryPage] = React.useState(1);
 
+  const [stockhistoryPage, setStockhistoryPage] = React.useState(1);
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPage: 0,
+    currentPage: 0,
+    totalItems: 0,
+    pageSize: 0,
+    hasnextPage: false,
+    hasPrevPage: false,
+  });
+  const [stockHistorypageMetaData, setStockHistorypageMetaData] =
+    React.useState({
+      totalPage: 0,
+      currentPage: 0,
+      totalItems: 0,
+      pageSize: 0,
+      hasnextPage: false,
+      hasPrevPage: false,
+    });
   // DialogBox State Variable
   const [openStockIn, setOpenStockIn] = React.useState(false);
   const [openStockOut, setOpenStockOut] = React.useState(false);
@@ -155,6 +174,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
       const res = await getAllStockPage(page, 10);
       if (res.status == "OK") {
         setStockVariantData(res.data || []);
+        setPageMetaData(res.pageMetaData);
       }
     } catch (error: any) {
       if (error.response) {
@@ -166,12 +186,13 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
   const getAllStockHistory = async () => {
     try {
       const res = await getAllStockMovement(
-        page,
-        10,
+        stockhistoryPage,
+        5,
         selectedVariant?.stock_id,
       );
       if (res.status == "OK") {
         setStockMovementData(res.data || []);
+        setStockHistorypageMetaData(res.pageMetaData);
       }
     } catch (error: any) {
       if (error.response) {
@@ -182,13 +203,13 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
   };
   React.useEffect(() => {
     getAllStockData();
-  }, [refresh]);
+  }, [refresh, page]);
 
   React.useEffect(() => {
     if (openHistory && selectedVariant) {
       getAllStockHistory();
     }
-  }, [openHistory, selectedVariant]);
+  }, [openHistory, selectedVariant, stockhistoryPage]);
 
   const handleOpenHistory = async (product: StockVariant) => {
     setVariantValue(product);
@@ -746,7 +767,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
       </div>
 
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -755,16 +776,20 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={pageMetaData.hasPrevPage == false}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
+            }
+            disabled={pageMetaData.hasnextPage == false}
           >
             Next
           </Button>
@@ -774,7 +799,6 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
       {/* All Dialog Box of the Table */}
       <Dialog open={openHistory} onOpenChange={setOpenHistory}>
         <DialogContent className="sm:max-w-4xl">
-          {" "}
           {/* Increased width slightly for better breathing room */}
           <DialogHeader className="border-b pb-4">
             <DialogTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
@@ -785,6 +809,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
               </span>
             </DialogTitle>
           </DialogHeader>
+
           {/* Scrollable Table Container */}
           <div className="max-h-[500px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-800">
             <table className="w-full text-sm text-left">
@@ -813,6 +838,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
               </thead>
 
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-black">
+                {/* TIP: Replace stockMovemetData with your paginated array, e.g., stockMovemetData.slice(startIndex, endIndex) */}
                 {stockMovemetData?.length > 0 ? (
                   stockMovemetData.map((data) => {
                     const config = getMovementConfig(data.type);
@@ -893,11 +919,46 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
               </tbody>
             </table>
           </div>
-          <DialogFooter className="mt-4 pt-4 border-t dark:border-gray-800 flex justify-end gap-2">
+
+          {/* =========================================
+              PAGINATION & FOOTER SECTION
+              ========================================= */}
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Pagination Controls */}
+            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-medium">
+                Page {stockHistorypageMetaData.currentPage} of{" "}
+                {stockHistorypageMetaData.totalPage}{" "}
+                {/* Replace with your dynamic state: Page {currentPage} of {totalPages} */}
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  className="h-8 w-8 p-0 border-gray-200 hover:bg-gray-100 hover:text-black dark:border-gray-800 dark:hover:bg-gray-900"
+                  onClick={() => setStockhistoryPage((p) => p - 1)}
+                  disabled={stockHistorypageMetaData.hasPrevPage === false}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-8 w-8 p-0 border-gray-200 hover:bg-gray-100 hover:text-black dark:border-gray-800 dark:hover:bg-gray-900"
+                  onClick={() => setStockhistoryPage((p) => p + 1)}
+                  disabled={stockHistorypageMetaData.hasnextPage === false}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Close Button */}
             <DialogClose asChild>
-              <Button>Close</Button>
+              <Button variant="default" className="w-full sm:w-auto">
+                Close
+              </Button>
             </DialogClose>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
       {/* Dialog for StockIn */}
