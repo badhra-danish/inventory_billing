@@ -113,6 +113,14 @@
 :root {
   --font-sans: "Oswald", sans-serif;
 }
+@font-face {
+  font-family: "Inter";
+  src: url("../src/assets/fonts/Poppins-Regular-400.ttf") format("truetype");
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
 
 @layer base {
   * {

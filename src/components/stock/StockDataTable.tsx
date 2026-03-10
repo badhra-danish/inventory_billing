@@ -772,9 +772,11 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center gap-3">
+          <div className="font-bold font-">
+            page {pageMetaData.currentPage} of {pageMetaData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -783,7 +785,6 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>

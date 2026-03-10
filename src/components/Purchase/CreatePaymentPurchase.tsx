@@ -25,6 +25,7 @@ import type { Purchase } from "./PurchaseDataTable";
 import {
   createPurchase,
   createPurchasePayment,
+  updatePaymentPurchase,
 } from "@/api/PurchaseOrder/PurchaseClient";
 type Props = {
   open: boolean;
@@ -116,7 +117,7 @@ export function CreatePurchasePaymentDialog({
       };
 
       const promise = payment
-        ? updatePayment(payment.payment_id, payload) // UPDATE
+        ? updatePaymentPurchase(payment.payment_id, payload) // UPDATE
         : createPurchasePayment(purchase.purchase_id, payload); // CREATE
 
       toast.promise(promise, {
@@ -191,7 +192,7 @@ export function CreatePurchasePaymentDialog({
                 <Input
                   className="pl-8 border-gray-300 h-11"
                   type="number"
-                  value={purchase?.grand_total}
+                  value={purchase?.due_amount}
                   disabled
                 />
               </div>

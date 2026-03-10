@@ -147,7 +147,7 @@ export default function AppSidebar({
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
-      <Sidebar className="border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 selection:bg-blue-100 dark:selection:bg-blue-900">
+      <Sidebar className="border-r border-slate-800 bg--900 dark:bg-slate-950 selection:bg-slate-700">
         <SidebarHeader className="p-6">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 dark:bg-blue-700 p-2 rounded-lg shadow-sm">
@@ -184,7 +184,7 @@ export default function AppSidebar({
 
           {role === "SHOP_ADMIN" && (
             <div className="space-y-6">
-              <SidebarGroup>
+              <SidebarGroup className="px-0">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Main
                 </SidebarGroupLabel>
@@ -199,7 +199,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup>
+              <SidebarGroup className="px-2">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Inventory
                 </SidebarGroupLabel>
@@ -214,7 +214,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup>
+              <SidebarGroup className="px-2">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Operations
                 </SidebarGroupLabel>
@@ -231,7 +231,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup>
+              <SidebarGroup className="px-2">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mt-1">
                   Directory
                 </SidebarGroupLabel>
@@ -246,7 +246,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup>
+              <SidebarGroup className="px-2">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mt-1">
                   Analytics
                 </SidebarGroupLabel>
@@ -262,7 +262,7 @@ export default function AppSidebar({
           )}
         </SidebarContent>
 
-        <div className="mt-auto p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
+        <div className="mt-auto p-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
           <SidebarMenuButton
             onClick={logout}
             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 rounded-lg transition-colors"

@@ -105,7 +105,7 @@ type OldValue = {
 export default function VariantDataTable({ refresh }: refreshTable) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
 
@@ -115,10 +115,12 @@ export default function VariantDataTable({ refresh }: refreshTable) {
     React.useState<VisibilityState>({});
   const [page, setPage] = React.useState(1);
   const [pageMetaData, setPageMetaData] = React.useState({
-    totalPages: 0,
-    totalElements: 0,
-    elementCountInCurrentPage: 0,
-    currentPageNumber: 0,
+    totalPage: 0,
+    currentPage: 1,
+    totalItems: 0,
+    pageSize: 10,
+    hasnextPage: false,
+    hasPrevPage: false,
   });
 
   const [rowSelection, setRowSelection] = React.useState({});
@@ -163,7 +165,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       // Old DB value → remove & mark delete
       setDeletedValues((prev) => [...prev, String(item.attribute_value_id)]);
       setOldValues((prev) =>
-        prev.filter((v) => v.attribute_value_id !== item.attribute_value_id)
+        prev.filter((v) => v.attribute_value_id !== item.attribute_value_id),
       );
     } else {
       // New value → just remove from newValues
@@ -257,6 +259,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
         return (
           <Button
             variant="ghost"
+            className="text-white"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Variant
@@ -273,7 +276,9 @@ export default function VariantDataTable({ refresh }: refreshTable) {
 
     {
       accessorKey: "attributeValues",
-      header: () => <div className="text-left">Attribute-Values</div>,
+      header: () => (
+        <div className="text-left text-white">Attribute-Values</div>
+      ),
       cell: ({ row }) => {
         const values = row.getValue("attributeValues") as { value: string }[];
         return (
@@ -296,7 +301,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
     // },
     {
       accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
+      header: () => <div className="text-left text-white">Status</div>,
       cell: ({ row }) => {
         const status: string = row.getValue("status");
 
@@ -434,7 +439,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
                     const statusColumn = table.getColumn("status");
                     if (statusColumn) {
                       statusColumn.setFilterValue(
-                        status === "All" ? "" : status
+                        status === "All" ? "" : status,
                       );
                     }
                   }}
@@ -450,7 +455,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       {/*  Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200">
         <Table>
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="bg-blue-500">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.depth}>
                 {headerGroup.headers.map((header) => (
@@ -462,7 +467,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -485,7 +490,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -506,27 +511,30 @@ export default function VariantDataTable({ refresh }: refreshTable) {
       </div>
 
       {/*  Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex gap-2 items-center">
+          <div>
+            Page {pageMetaData.currentPage} of {pageMetaData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page == 1}
+            disabled={pageMetaData.hasPrevPage === false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
-              setPage((p) => Math.min(pageMetaData.totalPages, p + 1))
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
             }
-            disabled={page >= pageMetaData?.totalPages}
+            disabled={pageMetaData.hasnextPage === false}
           >
             Next
           </Button>

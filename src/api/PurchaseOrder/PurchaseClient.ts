@@ -6,6 +6,9 @@ const endPoint = {
   getPurchaseById: "v1/purchase/getpurchasebyid",
   updatePuchase: "v1/purchase/update",
   createPayment: "v1/purchase/createpuchasepayment",
+  getAllPurchasePayment: "v1/purchase/getallpaymentpurchase",
+  updataPaymentPurchase: "v1/purchase/updatepaymentpurchase",
+  deletePurchasePayment: "v1/purchase/deletepurchasepayment",
 };
 
 export const createPurchase = async (payload: object) => {
@@ -52,6 +55,36 @@ export const getPurchaseByID = async (id: string) => {
 export const createPurchasePayment = async (id: string, payload: object) => {
   try {
     const res = await api.post(`${endPoint.createPayment}/${id}`, payload);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAllPaymentDetialsPurchase = async (id: string) => {
+  try {
+    const res = await api.get(`${endPoint.getAllPurchasePayment}/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const updatePaymentPurchase = async (id: string, payload: object) => {
+  try {
+    const res = await api.put(
+      `${endPoint.updataPaymentPurchase}/${id}`,
+      payload,
+    );
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const deletePaymentPurchase = async (id: string) => {
+  try {
+    const res = await api.delete(`${endPoint.deletePurchasePayment}/${id}`);
     return res.data;
   } catch (error) {
     console.error(error);

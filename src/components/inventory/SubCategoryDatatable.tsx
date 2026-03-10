@@ -274,6 +274,7 @@ export default function SubCategoryDatatable({
         return (
           <Button
             variant="ghost"
+            className="text-white"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Sub Category
@@ -290,7 +291,7 @@ export default function SubCategoryDatatable({
 
     {
       accessorKey: "categoryName",
-      header: () => <div className="text-left">Category</div>,
+      header: () => <div className="text-left text-white">Category</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
@@ -301,7 +302,7 @@ export default function SubCategoryDatatable({
     },
     {
       accessorKey: "categoryCode",
-      header: () => <div className="text-left">Category Code</div>,
+      header: () => <div className="text-left text-white">Category Code</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
@@ -312,7 +313,7 @@ export default function SubCategoryDatatable({
     },
     {
       accessorKey: "description",
-      header: () => <div className="text-left"> Description</div>,
+      header: () => <div className="text-left text-white"> Description</div>,
       cell: ({ row }) => {
         return (
           <div className="capitalize text-left ">
@@ -324,7 +325,7 @@ export default function SubCategoryDatatable({
 
     {
       accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
+      header: () => <div className="text-left text-white">Status</div>,
       cell: ({ row }) => {
         const status: string = row.getValue("status");
 
@@ -533,7 +534,7 @@ export default function SubCategoryDatatable({
       {/* Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200 dark:border-slate-800 custom-scrollbar transition-colors">
         <Table>
-          <TableHeader className="bg-gray-100 dark:bg-slate-800">
+          <TableHeader className="bg-blue-500 dark:bg-slate-800">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.depth}
@@ -605,29 +606,30 @@ export default function SubCategoryDatatable({
       </div>
 
       {/* Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex gap-2 items-center">
+          <div>
+            Page {pageMeteData.currentPage} of {pageMeteData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={pageMeteData.hasPrevPage == false}
+            disabled={pageMeteData.hasPrevPage === false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
               setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
-            disabled={pageMeteData.hasnextPage == false}
+            disabled={pageMeteData.hasnextPage === false}
           >
             Next
           </Button>

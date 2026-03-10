@@ -64,7 +64,8 @@ import { PurchaseOrderDetailsDialog } from "./PurchaseOrderDetail";
 import { useNavigate, useNavigation } from "react-router-dom";
 import { getAllPurchase } from "@/api/PurchaseOrder/PurchaseClient";
 import { PurchaseDetailsDialog } from "./PurchaseDetail";
-import { CreatePurchasePaymentDialog } from "./CreatePayment";
+import { CreatePurchasePaymentDialog } from "./CreatePaymentPurchase";
+import { ShowPaymentDetail } from "./ShowPaymentPurchase";
 
 export interface Purchase {
   purchase_id: string;
@@ -77,7 +78,8 @@ export interface Purchase {
   discount: string;
   paid_amount: string;
   due_amount: string;
-  payment_status: "UNPAID" | "PAID" | "PARTIAL";
+  payment_status: "UNPAID" | "PAID" | "PARTIALLY_PAID";
+  warehouse_id: string;
 
   supplier: Supplier;
   purchase_items: PurchaseItem[];
@@ -440,10 +442,10 @@ export default function PurchaseDataTable() {
                   </MenubarItem>
                   <MenubarItem
                     className="gap-2 text-gray-700 cursor-pointer"
-                    // onClick={() => {
-                    //   setSelectedSale(sales);
-                    //   setOpenShowPayment(true);
-                    // }}
+                    onClick={() => {
+                      setSelectedPurchase(purchase);
+                      setOpenShowPurchasePayment(true);
+                    }}
                   >
                     <BadgeIndianRupee className="w-4 h-4 text-green-500" />
                     Show Payment
@@ -660,25 +662,30 @@ export default function PurchaseDataTable() {
       </div>
 
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center gap-3">
+          <div className="font-bold font-">
+            page {pageMetaData.currentPage} of {pageMetaData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={pageMetaData.hasPrevPage == false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
+            }
+            disabled={pageMetaData.hasnextPage == false}
           >
             Next
           </Button>
@@ -694,6 +701,11 @@ export default function PurchaseDataTable() {
         onClose={() => setOpenCreatePurchasePayment(false)}
         purchase={selectedPurchase}
         payment={null}
+      />
+      <ShowPaymentDetail
+        onClose={() => setOpenShowPurchasePayment(false)}
+        open={openShowPurchasePayment}
+        purchase={selectedPurchase}
       />
     </div>
   );

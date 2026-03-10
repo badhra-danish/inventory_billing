@@ -1320,9 +1320,11 @@ export default function Products() {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex gap-2 items-center">
+          <div>
+            Page {pageMeteData.currentPage} of {pageMeteData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -1331,7 +1333,6 @@ export default function Products() {
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>

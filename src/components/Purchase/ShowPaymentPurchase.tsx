@@ -33,58 +33,25 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Edit, Printer, Salad, Trash, X } from "lucide-react";
+import { Edit, Pause, Printer, Salad, Trash, X } from "lucide-react";
 import Sales from "@/pages/Sales/Sales";
-import { CreatePaymentDialog } from "./CreatePayment";
+import { CreatePurchasePaymentDialog } from "./CreatePaymentPurchase";
+import type { PurchaseDetails } from "./EditPurchase";
+import {
+  deletePaymentPurchase,
+  getAllPaymentDetialsPurchase,
+} from "@/api/PurchaseOrder/PurchaseClient";
+import type { Purchase } from "./PurchaseDataTable";
 type Props = {
   open: boolean;
   onClose: () => void;
-  sales: SalesDetail | null;
+  purchase: Purchase | null;
   payment?: PaymentDetails | null;
 };
 
-export type SalesItemDetail = {
-  sales_item_id: string;
-  product_variant_id: string;
-
-  quantity: number;
-  discount: number;
-  tax: number;
-  tax_amount: number;
-  total: number;
-
-  variant: {
-    skuCode: string | null;
-    variant_label: string | null;
-    price: number | null;
-    productName: string | null;
-  };
-};
-
-export type SalesDetail = {
-  sale_id: string;
-  invoice_no: string;
-  sale_date: string;
-
-  status: "INPROGRESS" | "COMPLETED" | "CANCELLED";
-
-  grand_total: number;
-  paid_amount: number;
-  due_amount: number;
-
-  payment_status: "UNPAID" | "PAID" | "PARTIALLY_PAID" | "OVERDUE";
-
-  customer: {
-    firstName: string;
-    lastName: string;
-    phone?: string;
-  } | null;
-
-  sales_items: SalesItemDetail[];
-};
 export type PaymentDetails = {
   payment_id: string;
-  sale_id: string;
+  purchase_id: string;
   amount: number;
   payment_method: "CASH" | "UPI";
   payment_date: string;
@@ -92,18 +59,23 @@ export type PaymentDetails = {
   note?: string | null;
 };
 
-export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
+export const ShowPaymentDetail = ({ open, onClose, purchase }: Props) => {
   const [selectedPayment, setSelectedPayment] = useState<PaymentDetails | null>(
     null,
   );
+
+  const [salesSummary, setSalesSummary] = useState(purchase);
+  useEffect(() => {
+    setSalesSummary(purchase);
+  }, [purchase]);
 
   const [openupdatePayment, setOpenUpdatePayment] = useState(false);
   const [paymentData, setPaymentData] = React.useState<PaymentDetails[]>([]);
   const getAllPaymentDetail = async () => {
     try {
-      const sale_id = sales?.sale_id;
-      if (!sale_id) return;
-      const res = await getAllPaymentDetials(sale_id);
+      const purchase_id = purchase?.purchase_id;
+      if (!purchase_id) return;
+      const res = await getAllPaymentDetialsPurchase(purchase_id);
       if (res.status === "OK") {
         setPaymentData(res.data || []);
       }
@@ -122,7 +94,7 @@ export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
       const payment = paymentData.find((p) => p.payment_id === payment_id);
       if (!payment) return;
 
-      const deletePromise = deletePayment(payment_id);
+      const deletePromise = deletePaymentPurchase(payment_id);
 
       toast.promise(deletePromise, {
         loading: "Deleting payment...",
@@ -138,8 +110,8 @@ export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
 
             return {
               ...prev,
-              paid_amount: newPaid,
-              due_amount: newDue,
+              paid_amount: String(newPaid),
+              due_amount: String(newDue),
               payment_status:
                 newPaid === 0
                   ? "UNPAID"
@@ -159,11 +131,6 @@ export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
     }
   };
 
-  const [salesSummary, setSalesSummary] = useState(sales);
-  useEffect(() => {
-    setSalesSummary(sales);
-  }, [sales]);
-
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
@@ -177,7 +144,7 @@ export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
               Payment Details of Customer{" "}
               <span className="text-blue-600 font-bold">
                 {" "}
-                ( {sales?.customer?.firstName}-{sales?.customer?.lastName})
+                ( {purchase?.supplier.firstName}-{purchase?.supplier?.lastName})
               </span>
             </DialogDescription>
           </DialogHeader>
@@ -287,10 +254,10 @@ export const ShowPaymentDetail = ({ open, onClose, sales }: Props) => {
           </div>
         </DialogContent>
       </Dialog>
-      <CreatePaymentDialog
+      <CreatePurchasePaymentDialog
         open={openupdatePayment}
         onClose={() => setOpenUpdatePayment(false)}
-        sales={sales}
+        purchase={purchase}
         payment={selectedPayment}
       />
     </>

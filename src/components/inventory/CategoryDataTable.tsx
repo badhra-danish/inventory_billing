@@ -285,6 +285,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="text-white"
           >
             Category
             <ArrowUpDown />
@@ -298,14 +299,14 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
 
     {
       accessorKey: "slug",
-      header: () => <div className="text-left">Category Slug</div>,
+      header: () => <div className="text-left text-white">Category Slug</div>,
       cell: ({ row }) => {
         return <div className=" text-left ">{row.getValue("slug")}</div>;
       },
     },
     {
       accessorKey: "createdAt",
-      header: () => <div className="text-left">Created At</div>,
+      header: () => <div className="text-left text-white">Created At</div>,
 
       cell: ({ row }) => {
         const date = new Date(row.getValue("createdAt"));
@@ -316,7 +317,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
+      header: () => <div className="text-left text-white">Status</div>,
       cell: ({ row }) => {
         const status: string = row.getValue("status");
 
@@ -525,7 +526,7 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       {/* 📊 Data Table */}
       <div className="overflow-hidden rounded-md border border-gray-200 dark:border-slate-800 transition-colors">
         <Table>
-          <TableHeader className="bg-gray-100 dark:bg-slate-800">
+          <TableHeader className="bg-blue-500 dark:bg-slate-800">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="dark:border-slate-800">
                 {headerGroup.headers.map((header) => (
@@ -712,29 +713,30 @@ export default function CategoryDataTable({ refresh }: CategoryDataTableProps) {
       </Dialog>
 
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex gap-2 items-center">
+          <div>
+            Page {pageMeteData.currentPage} of {pageMeteData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={pageMeteData.hasPrevPage == false}
+            disabled={pageMeteData.hasPrevPage === false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
             className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             onClick={() =>
               setPage((p) => Math.min(pageMeteData.totalPage, p + 1))
             }
-            disabled={pageMeteData.hasnextPage == false}
+            disabled={pageMeteData.hasnextPage === false}
           >
             Next
           </Button>
