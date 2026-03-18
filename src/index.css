@@ -114,12 +114,12 @@
   --font-sans: "Oswald", sans-serif;
 }
 @font-face {
-  font-family: "Inter";
+  font-family: "poppins";
   src: url("../src/assets/fonts/Poppins-Regular-400.ttf") format("truetype");
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 @layer base {

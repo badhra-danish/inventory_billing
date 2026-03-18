@@ -138,6 +138,7 @@ export default function EditSales() {
   useEffect(() => {
     getSales();
   }, []);
+
   console.log(sales);
   const getallWareHouse = async () => {
     try {

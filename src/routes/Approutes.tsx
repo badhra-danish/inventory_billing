@@ -175,6 +175,9 @@ const Sales = lazy(() => import("@/pages/Sales/Sales"));
 const AddSales = lazy(() => import("@/pages/Sales/AddSales"));
 const AddSalesReturn = lazy(() => import("@/pages/Sales/AddSalesReturn"));
 const SalesReturn = lazy(() => import("@/pages/Sales/SalesReturn"));
+const EditSalesReturn = lazy(
+  () => import("@/components/Sales/EditSalesReturn"),
+);
 const Invoives = lazy(() => import("@/pages/Sales/Invoives"));
 const EditSales = lazy(() => import("@/components/Sales/EditSale"));
 const Invoice = lazy(() => import("@/components/Sales/Invoice"));
@@ -295,6 +298,10 @@ function Approutes() {
                 <Route
                   path="/shop/add-sales-return"
                   element={<AddSalesReturn />}
+                />
+                <Route
+                  path="/shop/salereturn/update/:sale_return_id"
+                  element={<EditSalesReturn />}
                 />
                 <Route path="/shop/invoices" element={<Invoives />} />
                 <Route

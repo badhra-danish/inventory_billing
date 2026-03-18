@@ -14,7 +14,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  CirclePlus,
+  Edit,
+  EllipsisVertical,
+  Eye,
+  Trash,
+} from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -39,252 +47,150 @@ import {
 //import trashImg from "../../assets/images/trash.jpg";
 import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
-const data: SalesReturnDetail[] = [
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "JHones",
-    refrence: "SL0021",
-    date: "12-MAR-2024",
-    status: "Completed",
-    grandTotal: "12,000",
-    paid: "2000",
-    due: "10,000",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Mohan Kumar",
-    refrence: "SL0022",
-    date: "15-MAR-2024",
-    status: "Pending",
-    grandTotal: "8,500",
-    paid: "5,000",
-    due: "3,500",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Aisha Patel",
-    refrence: "SL0023",
-    date: "20-MAR-2024",
-    status: "Completed",
-    grandTotal: "15,000",
-    paid: "15,000",
-    due: "0",
-    paymentStatus: "Paid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Rahul Sharma",
-    refrence: "SL0024",
-    date: "25-MAR-2024",
-    status: "Cancelled",
-    grandTotal: "6,200",
-    paid: "0",
-    due: "6,200",
-    paymentStatus: "Unpaid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Sneha Verma",
-    refrence: "SL0025",
-    date: "28-MAR-2024",
-    status: "Completed",
-    grandTotal: "22,000",
-    paid: "20,000",
-    due: "2,000",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "David Wilson",
-    refrence: "SL0026",
-    date: "02-APR-2024",
-    status: "Pending",
-    grandTotal: "9,200",
-    paid: "4,000",
-    due: "5,200",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Anil Mehta",
-    refrence: "SL0027",
-    date: "05-APR-2024",
-    status: "Completed",
-    grandTotal: "18,500",
-    paid: "18,500",
-    due: "0",
-    paymentStatus: "Paid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Emma Watson",
-    refrence: "SL0028",
-    date: "07-APR-2024",
-    status: "Completed",
-    grandTotal: "27,000",
-    paid: "10,000",
-    due: "17,000",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Ramesh Chauhan",
-    refrence: "SL0029",
-    date: "10-APR-2024",
-    status: "Completed",
-    grandTotal: "14,800",
-    paid: "10,000",
-    due: "4,800",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Priya Nair",
-    refrence: "SL0030",
-    date: "12-APR-2024",
-    status: "Pending",
-    grandTotal: "7,400",
-    paid: "3,000",
-    due: "4,400",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Chris Martin",
-    refrence: "SL0031",
-    date: "14-APR-2024",
-    status: "Completed",
-    grandTotal: "32,000",
-    paid: "32,000",
-    due: "0",
-    paymentStatus: "Paid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Vinay Gupta",
-    refrence: "SL0032",
-    date: "16-APR-2024",
-    status: "Completed",
-    grandTotal: "11,500",
-    paid: "2,000",
-    due: "9,500",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Sarah Thompson",
-    refrence: "SL0033",
-    date: "18-APR-2024",
-    status: "Cancelled",
-    grandTotal: "5,900",
-    paid: "0",
-    due: "5,900",
-    paymentStatus: "Unpaid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Kunal Singh",
-    refrence: "SL0034",
-    date: "20-APR-2024",
-    status: "Pending",
-    grandTotal: "19,200",
-    paid: "12,000",
-    due: "7,200",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Olivia Brown",
-    refrence: "SL0035",
-    date: "22-APR-2024",
-    status: "Completed",
-    grandTotal: "24,000",
-    paid: "24,000",
-    due: "0",
-    paymentStatus: "Paid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Rohit Verma",
-    refrence: "SL0036",
-    date: "25-APR-2024",
-    status: "Completed",
-    grandTotal: "17,800",
-    paid: "5,000",
-    due: "12,800",
-    paymentStatus: "OverDue",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Daniel Harris",
-    refrence: "SL0037",
-    date: "26-APR-2024",
-    status: "Pending",
-    grandTotal: "9,900",
-    paid: "0",
-    due: "9,900",
-    paymentStatus: "Unpaid",
-  },
-  {
-    imgUrl: custImg,
-    product: "Handle",
-    customer: "Siddharth Patel",
-    refrence: "SL0038",
-    date: "28-APR-2024",
-    status: "Completed",
-    grandTotal: "29,500",
-    paid: "20,000",
-    due: "9,500",
-    paymentStatus: "OverDue",
-  },
-];
+import { getAllSalesReturnInfo } from "@/api/SalesReturn/SaleReturnClient";
+import { Cell } from "recharts";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from "../ui/menubar";
+import SalesReturnDetials from "./SalesReturnDetials";
+import { useNavigate } from "react-router-dom";
 
-export type SalesReturnDetail = {
-  imgUrl: string;
-  product: string;
-  customer: string;
-  refrence: string;
-  date: string;
-  status: "Completed" | "Pending" | "Cancelled";
-  grandTotal: string;
-  paid: string;
-  due: string;
-  paymentStatus: "Paid" | "Unpaid" | "OverDue";
-};
+export interface SaleReturnResponse {
+  data: SaleReturn[];
+}
+
+export interface SaleReturn {
+  sale_return_id: string;
+  srn_no: string;
+  sale_return_date: string;
+  status: "PENDING" | "RECEIVED";
+  payment_status: "PAID" | "UNPAID" | "PARTIAL";
+  total_amount: number;
+
+  summary: Summary;
+
+  sale: Sale;
+
+  customer: Customer;
+
+  return_items: ReturnItem[];
+}
+
+// ----------------------------
+// Summary
+// ----------------------------
+export interface Summary {
+  total_items_count: number;
+  fully_returned_count: number;
+  total_return_qty: number;
+  total_tax_amount: number;
+  total_discount: number;
+  net_return_amount: number;
+}
+
+// ----------------------------
+// Sale Info
+// ----------------------------
+export interface Sale {
+  sale_id: string;
+  invoice_no: string;
+  sale_date: string;
+  grand_total: number;
+  paid_amount: number;
+  due_amount: number;
+  payment_status: "PAID" | "UNPAID" | "PARTIAL";
+  order_tax: number;
+  shipping: number;
+  discount: number;
+}
+
+// ----------------------------
+// Customer Info
+// ----------------------------
+export interface Customer {
+  customer_id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+// ----------------------------
+// Return Items
+// ----------------------------
+export interface ReturnItem {
+  sale_return_item_id: string;
+  sale_item_id: string;
+  product_variant_id: string;
+  warehouse_id: string;
+
+  product_id: string;
+  product_name: string;
+  sku_code: string;
+  variant_label: string;
+
+  unit_price: number;
+  original_sold_qty: number;
+  return_quantity: number;
+  remaining_qty: number;
+  is_fully_returned: boolean;
+
+  discount: number;
+  tax: number;
+  tax_amount: number;
+
+  sub_total: number;
+}
 
 export default function SalesReturnDataTable() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
   const [selectedBrand, setSelectedBrand] = React.useState<string>("All");
-
+  const [page, setPage] = React.useState(1);
+  const [pageMetaData, setPageMetaData] = React.useState({
+    totalPage: 0,
+    currentPage: 0,
+    totalItems: 0,
+    pageSize: 0,
+    hasnextPage: false,
+    hasPrevPage: false,
+  });
+  const [openSaleReturnDetails, setOpenSaleReturnDetails] =
+    React.useState(false);
+  const [saleReturnData, setSalesReturnData] = React.useState<SaleReturn[]>([]);
+  const [selectedSaleReturn, setSelectedSaleReturn] =
+    React.useState<SaleReturn | null>();
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const columns: ColumnDef<SalesReturnDetail>[] = [
+  const getAllsaleReturnInfo = async () => {
+    try {
+      const res = await getAllSalesReturnInfo(page, 10);
+      if (res.status === "OK") {
+        setSalesReturnData(res.data || []);
+        setPageMetaData(res.pageMetaData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  React.useEffect(() => {
+    getAllsaleReturnInfo();
+  }, []);
+  console.log(saleReturnData);
+
+  const data: SaleReturn[] = saleReturnData;
+  const columns: ColumnDef<SaleReturn>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -308,29 +214,27 @@ export default function SalesReturnDataTable() {
       enableHiding: false,
     },
     {
-      accessorKey: "product",
+      accessorKey: "customer",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Product Name
+            Customer Name
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => {
         const sales = row.original;
+
         return (
           <div className="flex items-center gap-3">
-            <img
-              src={sales.imgUrl}
-              alt={sales.customer}
-              className="w-10 h-10 rounded-full object-cover border"
-            />
-            <span className="capitalize font-bold">
-              {row.getValue("product")}
+            {/* Avatar Placeholder if needed */}
+
+            <span className="capitalize font-semibold text-gray-900 truncate max-w-[150px]">
+              {sales.customer?.full_name}
             </span>
           </div>
         );
@@ -338,8 +242,8 @@ export default function SalesReturnDataTable() {
     },
 
     {
-      accessorKey: "customer",
-      header: () => <div className="text-left"> Customer Name </div>,
+      accessorKey: "srn_no",
+      header: () => <div className="text-left"> SRN NO</div>,
       cell: ({ row }) => {
         // const sales = row.original;
         return (
@@ -348,110 +252,139 @@ export default function SalesReturnDataTable() {
 
             {/* Customer Name */}
             <span className="capitalize font-bold">
-              {row.getValue("customer")}
+              {row.getValue("srn_no")}
             </span>
           </div>
         );
       },
     },
-    // {
-    //   accessorKey: "refrence",
-    //   header: () => <div className="text-left">Refrence</div>,
-    //   cell: ({ row }) => {
-    //     return (
-    //       <div className="capitalize text-left ">
-    //         {row.getValue("refrence")}
-    //       </div>
-    //     );
-    //   },
-    // },
     {
-      accessorKey: "date",
-      header: () => <div className="text-left">Date</div>,
+      accessorKey: "invoice_no",
+      header: () => <div className="text-left">Invoice NO</div>,
       cell: ({ row }) => {
+        const sales = row.original;
         return (
-          <div className=" text-left capitalize">{row.getValue("date")}</div>
+          <div className="capitalize text-left ">{sales.sale.invoice_no}</div>
+        );
+      },
+    },
+    {
+      accessorKey: "sale_return_date",
+      header: () => <div className="text-left">Return Date</div>,
+      cell: ({ row }) => {
+        const date = row.original.sale_return_date;
+        return (
+          <div className=" text-left capitalize">
+            {new Date(date).toLocaleDateString()}
+          </div>
         );
       },
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-left">Status</div>,
+      header: () => (
+        <div className="text-left font-semibold text-gray-600">Status</div>
+      ),
       cell: ({ row }) => {
-        const status = String(row.getValue("status")).toLowerCase();
+        const status = String(row.getValue("status")).toUpperCase();
 
-        let color = "bg-gray-500";
-        let label = status;
+        // Professional semantic colors
+        let color = "bg-gray-100 text-gray-700 border-gray-200";
 
-        if (status === "completed") {
-          color = "bg-green-400";
-        } else if (status === "pending") {
-          color = "bg-blue-400";
-        } else if (status === "cancelled") {
-          color = "bg-red-400 ";
+        if (status === "RECEIVED") {
+          color = "bg-green-400 text-white border-green-200";
+        } else if (status === "PENDING") {
+          color = "bg-blue-500 text-white border-blue-200";
+        } else if (status === "CANCELLED") {
+          color = "bg-red-200 text-white border-red-200";
         }
+
+        const label = status.replace("_", " ");
+
         return (
-          <div className="lowercase text-left">
+          <div className="flex justify-start">
             <Badge
-              className={`${color} px-3 py-1 rounded-md capitalize text-[10px]`}
+              className={`
+                ${color} 
+                flex items-center gap-1.5 
+                pl-3 pr-3.5 py-1.5   
+                rounded-lg 
+                font-bold 
+                text-[10px] 
+                uppercase 
+                tracking-wider
+                border
+                shadow-sm
+                transition-all
+                hover:opacity-90
+              `}
             >
-              {label}
+              {/* Dot Indicator */}
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-current"></span>
+              </span>
+
+              <span className="truncate">{label}</span>
             </Badge>
           </div>
         );
       },
     },
     {
-      accessorKey: "grandTotal",
+      accessorKey: "total_amount",
       header: () => <div className="text-left">Total</div>,
       cell: ({ row }) => {
         return (
           <div className="lowercase text-left">
-            ₹{row.getValue("grandTotal")}
+            ₹{row.getValue("total_amount")}
           </div>
         );
       },
     },
-    {
-      accessorKey: "paid",
-      header: () => <div className="text-left">Paid</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="lowercase text-left">₹{row.getValue("paid")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "due",
-      header: () => <div className="text-left">Due</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="lowercase text-left">₹{row.getValue("due")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "paymentStatus",
-      header: () => <div className="text-left">Payment Status</div>,
-      cell: ({ row }) => {
-        const status = String(row.getValue("paymentStatus")).toLowerCase();
 
-        let color = "bg-gray-500";
-        let label = status;
+    {
+      accessorKey: "payment_status",
+      header: () => (
+        <div className="text-left font-semibold text-gray-600">
+          Payment Status
+        </div>
+      ),
+      cell: ({ row }) => {
+        const status = String(row.getValue("payment_status")).toLowerCase();
+
+        let color = "bg-gray-100 text-gray-600 border-gray-200";
 
         if (status === "paid") {
-          color = "bg-green-100 text-green-400 ";
-        } else if (status === "overdue") {
-          color = "bg-yellow-50 text-yellow-400";
+          color = "bg-emerald-200 text-emerald-700 border-emerald-200";
+        } else if (status === "partially_paid") {
+          color = "bg-amber-50 text-amber-700 border-amber-200";
         } else if (status === "unpaid") {
-          color = "bg-red-50 text-red-400";
+          color = "bg-rose-100 text-rose-700 border-rose-200";
         }
+
+        const label = status.replace("_", " ");
+
         return (
-          <div className="lowercase text-left">
+          <div className="flex justify-start items-center">
             <Badge
-              className={`${color} px-3 py-1 rounded-md capitalize font-semibold flex items-center`}
+              className={`
+                 ${color} 
+                 pl-3 pr-3.5 py-2 
+                 rounded-lg 
+                 capitalize 
+                 font-semibold 
+                 text-[11px] 
+                 tracking-wide
+                 flex items-center 
+                 gap-1.5
+                 border
+                 shadow-sm
+               `}
             >
-              {label}
+              {/* Static Dot for payment status */}
+              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-70" />
+              <span className="leading-none">{label}</span>
             </Badge>
           </div>
         );
@@ -459,18 +392,47 @@ export default function SalesReturnDataTable() {
     },
     {
       id: "actions",
-      // header: () => <div className="text-left">Action</div>,
-      cell: () => {
-        // const product = row.original;
+      cell: ({ row }) => {
+        const salesReturn = row.original;
         return (
-          <div className="flex gap-2">
-            {" "}
-            <Button variant={"outline"} size="sm">
-              <Edit />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Trash />
-            </Button>
+          <div className="flex justify-end">
+            <Menubar className="border-none bg-transparent shadow-none p-0 h-auto">
+              <MenubarMenu>
+                <MenubarTrigger className="focus:bg-gray-100 data-[state=open]:bg-gray-100 p-1.5 rounded-md cursor-pointer transition-colors">
+                  <EllipsisVertical className="w-4 h-4 text-gray-500" />
+                </MenubarTrigger>
+                <MenubarContent align="end" className="min-w-[180px]">
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    onClick={() => {
+                      setSelectedSaleReturn(salesReturn);
+                      setOpenSaleReturnDetails(true);
+                    }}
+                  >
+                    <Eye className="w-4 h-4 text-gray-500" />
+                    Sales Details
+                  </MenubarItem>
+                  <MenubarItem
+                    className="gap-2 text-gray-700 cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/shop/salereturn/update/${salesReturn.sale_return_id}`,
+                      )
+                    }
+                  >
+                    <Edit className="w-4 h-4 text-gray-500" />
+                    Edit Sales Return
+                  </MenubarItem>
+                  <MenubarSeparator />
+
+                  <MenubarSeparator />
+                  <MenubarItem className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                    <Trash className="w-4 h-4" />
+                    Delete Sales
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           </div>
         );
       },
@@ -635,7 +597,7 @@ export default function SalesReturnDataTable() {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -658,7 +620,7 @@ export default function SalesReturnDataTable() {
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -703,6 +665,11 @@ export default function SalesReturnDataTable() {
           </Button>
         </div>
       </div>
+      <SalesReturnDetials
+        open={openSaleReturnDetails}
+        onClose={() => setOpenSaleReturnDetails(false)}
+        saleReturn={selectedSaleReturn}
+      />
     </div>
   );
 }

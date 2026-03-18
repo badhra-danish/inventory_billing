@@ -4,6 +4,7 @@ const endpoint = {
   createSales: "v1/sale/create",
   getAllSalesInfo: "v1/sale/getallsale",
   getAllInvoiceInfo: "v1/sale/getallinvoice",
+  getAllInvoiceNo: "v1/sale/getallinvoiceno",
   createPayment: "v1/sale/createpayment",
   updateSale: "v1/sale/update",
   getAllPayment: "v1/sale/getallpayment",
@@ -52,6 +53,15 @@ export const getAllInvoiceInfo = async (pageNo: number, pageSize: number) => {
         limit: pageSize,
       },
     });
+    return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAllInvoiceNo = async () => {
+  try {
+    const res = await api.get(endpoint.getAllInvoiceNo);
     return res.data;
   } catch (error) {
     console.error(error);

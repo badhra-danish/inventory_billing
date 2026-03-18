@@ -897,9 +897,9 @@ export default function AddSales() {
               <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex justify-between">
                   <span>Items Subtotal:</span>
-                  {/* <span className="font-medium text-gray-900 dark:text-gray-100">
-                    ₹{subTotal.toFixed(2)}
-                  </span> */}
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    ₹{orderSummary.subtotal.toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Order Tax:</span>

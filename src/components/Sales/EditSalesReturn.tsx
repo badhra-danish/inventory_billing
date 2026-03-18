@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getAllCustomer } from "@/api/Coustomer/CustomerClient";
 import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import Loader from "@/components/commen/loader";
@@ -41,59 +41,84 @@ import {
 import toast from "react-hot-toast";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
 import WarehouseSearch from "@/components/utils/WarehouseSerche";
-import { createSaleReturn } from "@/api/SalesReturn/SaleReturnClient";
-export type SalesItemDetail = {
-  sales_item_id: string;
-  product_variant_id: string;
-  warehouse_id: string;
-  quantity: number;
-  discount: number;
-  tax: number;
-  tax_amount: number;
-  total: number;
+import {
+  createSaleReturn,
+  getAllSalesReturnInfo,
+  getSaleReturnById,
+} from "@/api/SalesReturn/SaleReturnClient";
+export interface SaleReturnData {
+  sale_return_id: string;
+  srn_no: string;
+  sale_return_date: string;
+  status: "PENDING" | "COMPLETED" | "CANCELLED";
+  payment_status: "PAID" | "UNPAID" | "PARTIALY_PAID";
+  total_amount: number;
 
-  variant: {
-    skuCode: string | null;
-    variant_label: string | null;
-    price: number | null;
-    productName: string | null;
-  };
-};
-export type CustomerDetail = {
-  customer_id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  location: Location;
-  status: "ACTIVE" | "INACTIVE";
-};
-export type Location = {
-  city: string;
-  state: string;
-  postalCode: string;
-};
+  summary: Summary;
 
-export type SalesDetail = {
+  sale: Sale;
+  customer: Customer;
+
+  return_items: ReturnItem[];
+}
+
+// Summary
+export interface Summary {
+  total_items_count: number;
+  fully_returned_count: number;
+  total_return_qty: number;
+  total_tax_amount: number;
+  total_discount: number;
+  net_return_amount: number;
+}
+
+// Sale Info
+export interface Sale {
   sale_id: string;
   invoice_no: string;
   sale_date: string;
-  order_tax: number;
-  shipping: number;
-  discount: number;
-  status: "INPROGRESS" | "COMPLETED" | "CANCELLED";
-
   grand_total: number;
   paid_amount: number;
   due_amount: number;
+  payment_status: "PAID" | "UNPAID" | "PARTIALY_PAID";
+  order_tax: number;
+  shipping: number;
+  discount: number;
+}
 
-  payment_status: "UNPAID" | "PAID" | "PARTIALLY_PAID" | "OVERDUE";
+// Customer Info
+export interface Customer {
+  customer_id: string;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+}
 
-  customer: CustomerDetail | null;
+// Return Item
+export interface ReturnItem {
+  sale_return_item_id: string;
+  sale_item_id: string;
+  product_variant_id: string;
+  warehouse_id: string;
 
-  sales_items: SalesItemDetail[];
-};
+  product_id: string;
+  product_name: string;
+  sku_code: string;
+  variant_label: string;
+
+  unit_price: number;
+
+  original_sold_qty: number;
+  return_quantity: number;
+  remaining_qty: number;
+  is_fully_returned: boolean;
+
+  discount: number;
+  tax: number;
+  tax_amount: number;
+  sub_total: number;
+}
 type InfovoiceInfo = {
   sale_id: string;
   invoice_no: string;
@@ -133,8 +158,9 @@ type warehouse = {
   warehouse_id: string;
   warehouseName: string;
 };
-export default function AddSales() {
+export default function SaleReturnUpdate() {
   const navigate = useNavigate();
+  const { sale_return_id } = useParams();
   const [query, setQuery] = useState("");
   const [variant, setVariant] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -159,7 +185,8 @@ export default function AddSales() {
     status: "PENDING",
     payment_status: "",
   });
-  const [salesDetail, setSalesDetial] = React.useState<SalesDetail>();
+  const [salesReturnDetail, setSalesReturnDetial] =
+    React.useState<SaleReturnData>();
   const [Invoiceinfo, setInvoiceInfo] = React.useState<InfovoiceInfo[]>([]);
   const getAllInvoiceinfo = async () => {
     try {
@@ -171,50 +198,55 @@ export default function AddSales() {
       console.error(error.message);
     }
   };
-  const getSales = async () => {
+  const getSaleseturnBID = async () => {
     try {
-      const sale_id = formData.sale_id;
-      if (!sale_id) return;
-      const res = await getSaleById(sale_id);
+      if (!sale_return_id) return;
+      const res = await getSaleReturnById(sale_return_id);
       if (res.status == "OK") {
-        setSalesDetial(res.data);
+        setSalesReturnDetial(res.data);
       }
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
-    getSales();
+    getSaleseturnBID();
   }, [formData.sale_id]);
 
   useEffect(() => {
-    if (!salesDetail?.sales_items?.length) return;
+    if (!salesReturnDetail?.return_items?.length) return;
 
-    const formattedRows: ProductRow[] = salesDetail.sales_items.map((item) => ({
-      sale_item_id: item.sales_item_id,
-      variant_id: item.product_variant_id,
-      return_qty: 0,
-      skuCode: item.variant?.skuCode ?? "",
-      ProductName: item.variant?.productName ?? "",
-      variant_label: item.variant?.variant_label ?? "",
-      warehouse_id: item.warehouse_id,
-      quantity: item.quantity,
-      price: item.variant.price ?? 0,
+    const formattedRows: ProductRow[] = salesReturnDetail.return_items.map(
+      (item) => ({
+        sale_item_id: item.sale_item_id,
+        variant_id: item.product_variant_id,
+        return_qty: item.return_quantity,
+        skuCode: item.sku_code ?? "",
+        ProductName: item.product_name ?? "",
+        variant_label: item?.variant_label ?? "",
+        warehouse_id: item.warehouse_id,
+        quantity: item?.original_sold_qty,
+        price: item.unit_price ?? 0,
 
-      discount: Number(item.discount) ?? 0,
-      tax: item.tax ?? 0,
-      tax_amount: item.tax_amount ?? 0,
-      total: item.total ?? 0,
-    }));
+        discount: Number(item.discount) ?? 0,
+        tax: item.tax ?? 0,
+        tax_amount: item.tax_amount ?? 0,
+        total: item.sub_total ?? 0,
+      }),
+    );
     setFormData((prev) => ({
       ...prev,
-      order_tax: Number(salesDetail.order_tax),
-      shipping: Number(salesDetail.shipping),
-      discount: Number(salesDetail.discount),
-      status: salesDetail.status,
+      srn_no: salesReturnDetail.srn_no,
+      sale_return_date: salesReturnDetail.sale_return_date,
+      sale_id: salesReturnDetail.sale.sale_id,
+      payment_status: salesReturnDetail.payment_status,
+      //   order_tax: Number(salesReturnDetail.summary),
+      //   shipping: Number(salesDetail.shipping),
+      //   discount: Number(salesDetail.discount),
+      status: salesReturnDetail.status,
     }));
     setRows(formattedRows);
-  }, [salesDetail]);
+  }, [salesReturnDetail]);
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -404,34 +436,34 @@ export default function AddSales() {
     };
     console.log(payload);
 
-    const saleReturnPromise = createSaleReturn(payload);
+    // const saleReturnPromise = createSaleReturn(payload);
 
-    toast.promise(saleReturnPromise, {
-      loading: "Creating Sale ..",
-      success: (res) => {
-        setRows([]);
-        setQuery("");
-        setFormData({
-          sale_id: "",
-          srn_no: "",
-          sale_return_date: "",
-          order_tax: 0,
-          shipping: 0,
-          discount: 0,
-          status: "",
-          payment_status: "",
-        });
-        navigate("/shop/sales-return");
-        return res.message || "SaleReturn created successfully!";
-      },
-      error: (err) => {
-        return (
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to create saleReturn!"
-        );
-      },
-    });
+    // toast.promise(saleReturnPromise, {
+    //   loading: "Creating Sale ..",
+    //   success: (res) => {
+    //     setRows([]);
+    //     setQuery("");
+    //     setFormData({
+    //       sale_id: "",
+    //       srn_no: "",
+    //       sale_return_date: "",
+    //       order_tax: 0,
+    //       shipping: 0,
+    //       discount: 0,
+    //       status: "",
+    //       payment_status: "",
+    //     });
+    //     navigate("/shop/sales-return");
+    //     return res.message || "SaleReturn created successfully!";
+    //   },
+    //   error: (err) => {
+    //     return (
+    //       err.response?.data?.message ||
+    //       err.message ||
+    //       "Failed to create saleReturn!"
+    //     );
+    //   },
+    // });
   };
 
   return (
@@ -974,51 +1006,6 @@ export default function AddSales() {
             ========================================= */}
           <div className=" gap-6 grid lg:grid-cols-1 col-span-2">
             {/* --- SECTION 3: ADDITIONAL CHARGES --- */}
-            {/* <div className="bg-white dark:bg-gray-950 border dark:border-gray-800 rounded-xl shadow-sm p-6 w-full">
-              <h2 className="text-lg font-semibold mb-5 text-gray-900 dark:text-gray-100">
-                Order Adjustments
-              </h2>
-
-              <div className="grid gap-5">
-                <div className="grid gap-2">
-                  <Label className="text-gray-700 dark:text-gray-300">
-                    Order Tax (₹)
-                  </Label>
-                  <Input
-                    type="number"
-                    name="order_tax"
-                    value={formData.order_tax || 0}
-                    onChange={handleInputChange}
-                    className="bg-gray-50 dark:bg-gray-900"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-gray-700 dark:text-gray-300">
-                    Overall Discount (₹)
-                  </Label>
-                  <Input
-                    type="number"
-                    name="discount"
-                    value={formData.discount || 0}
-                    onChange={handleInputChange}
-                    className="bg-gray-50 dark:bg-gray-900"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label className="text-gray-700 dark:text-gray-300">
-                    Shipping Charges (₹)
-                  </Label>
-                  <Input
-                    type="number"
-                    name="shipping"
-                    value={formData.shipping || 0}
-                    onChange={handleInputChange}
-                    className="bg-gray-50 dark:bg-gray-900"
-                  />
-                </div>
-              </div>
-            </div> */}
-
             {/* --- SECTION 4: FINAL SUMMARY --- */}
             <div className="bg-gray-50 dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm p-6 w-[50%]">
               <h2 className="text-lg font-semibold mb-5 text-gray-900 dark:text-gray-100">

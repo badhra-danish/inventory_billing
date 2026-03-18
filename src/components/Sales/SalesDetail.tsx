@@ -31,6 +31,10 @@ export type SalesItemDetail = {
   sales_item_id: string;
   product_variant_id: string;
   warehouse_id: string;
+  total_returned_qty: number;
+  original_quantity: number;
+  effective_quantity: number;
+  effective_sub_total: number;
   quantity: number;
   discount: number;
   tax: number;
@@ -228,8 +232,11 @@ export const SalesDetailsDialog = ({ open, onClose, sales }: Props) => {
                           Product
                         </TableHead>
                         <TableHead className="text-white font-semibold bg-blue-500">
-                          Quantity(₹)
+                          Quantity
                         </TableHead>
+                        {/* <TableHead className="text-white font-semibold bg-blue-500">
+                          Return Qty
+                        </TableHead> */}
                         <TableHead className="text-white font-semibold bg-blue-500">
                           Price(₹)
                         </TableHead>
@@ -260,7 +267,8 @@ export const SalesDetailsDialog = ({ open, onClose, sales }: Props) => {
                             {item.variant.productName}-(
                             {item.variant.variant_label})
                           </TableCell>
-                          <TableCell>{item.quantity}</TableCell>
+                          <TableCell>{item.original_quantity}</TableCell>
+                          {/* <TableCell>{item.total_returned_qty}</TableCell> */}
                           <TableCell>{item.variant.price}</TableCell>
                           <TableCell>{item.discount}</TableCell>
                           <TableCell>{item.tax} %</TableCell>
@@ -278,72 +286,84 @@ export const SalesDetailsDialog = ({ open, onClose, sales }: Props) => {
 
             {/* Totals Section */}
 
-            <div className="flex items-center justify-end">
-              <div className="w-110 rounded-lg border shadow-sm bg-white dark:bg-neutral-900 overflow-hidden">
-                <table className="w-full text-sm">
-                  <tbody>
-                    {/* <tr className="border-b last:border-none">
-                      <td className="px-4 py-3 font-medium text-neutral-700 dark:text-neutral-200 border  bg-gray-50">
-                        Sub Total
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {" "}
-                        $ {orderSummary.total.toFixed(2)}
-                      </td>
-                    </tr> */}
-                    <tr className="border-b last:border-none">
-                      <td className="px-4 py-3 font-medium text-neutral-700 dark:text-neutral-200 border  bg-gray-50">
-                        Order Tax ({sales?.order_tax}%)
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {sales?.order_tax}
-                      </td>
-                    </tr>
+            {/* Totals Section */}
+            <div className="flex justify-end">
+              <div className="w-full sm:w-[380px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                <div className="p-5 space-y-3">
+                  <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-400">
+                    <span>Order Tax ({sales?.order_tax}%)</span>
+                    <span className="font-medium tabular-nums text-slate-900 dark:text-white">
+                      ₹
+                      {(
+                        (Number(sales?.order_tax ?? 0) *
+                          Number(sales?.grand_total ?? 0)) /
+                          100 +
+                        Number(sales?.shipping ?? 0) -
+                        Number(sales?.discount ?? 0)
+                      ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-400">
+                    <span>Discount</span>
+                    <span className="font-medium tabular-nums text-red-500">
+                      - ₹
+                      {Number(sales?.discount ?? 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-400">
+                    <span>Shipping</span>
+                    <span className="font-medium tabular-nums text-slate-900 dark:text-white">
+                      + ₹
+                      {Number(sales?.shipping ?? 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
 
-                    <tr className="border-b last:border-none">
-                      <td className="px-4 py-3 font-medium text-neutral-700 dark:text-neutral-200 border bg-gray-50">
-                        Discount
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {sales?.discount}
-                      </td>
-                    </tr>
+                <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-5 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-slate-900 dark:text-white text-base">
+                      Grand Total
+                    </span>
+                    <span className="font-black text-xl text-primary tabular-nums">
+                      ₹
+                      {Number(sales?.grand_total ?? 0).toLocaleString(
+                        undefined,
+                        { minimumFractionDigits: 2 },
+                      )}
+                    </span>
+                  </div>
 
-                    <tr className="border-b last:border-none">
-                      <td className="px-4 py-3 font-medium text-neutral-700 dark:text-neutral-200 border bg-gray-50">
-                        Shipping
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {sales?.shipping}
-                      </td>
-                    </tr>
+                  <div className="h-px bg-slate-200 dark:bg-slate-700/50 w-full my-2" />
 
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-neutral-800 dark:text-neutral-100 border bg-gray-50">
-                        Grand Total
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-neutral-900 dark:text-neutral-50 border">
-                        {sales?.grand_total}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-neutral-800 dark:text-neutral-100 border bg-gray-50">
-                        Paid
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-neutral-900 dark:text-neutral-50 border">
-                        {sales?.paid_amount}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-neutral-800 dark:text-neutral-100 border bg-gray-50">
-                        Due
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-neutral-900 dark:text-neutral-50 border">
-                        {sales?.due_amount}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-slate-600 dark:text-slate-400">
+                      Paid Amount
+                    </span>
+                    <span className="font-bold tabular-nums text-green-600 dark:text-green-500">
+                      ₹
+                      {Number(sales?.paid_amount ?? 0).toLocaleString(
+                        undefined,
+                        { minimumFractionDigits: 2 },
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-slate-600 dark:text-slate-400">
+                      Balance Due
+                    </span>
+                    <span className="font-bold tabular-nums text-red-600 dark:text-red-500">
+                      ₹
+                      {Number(sales?.due_amount ?? 0).toLocaleString(
+                        undefined,
+                        { minimumFractionDigits: 2 },
+                      )}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
