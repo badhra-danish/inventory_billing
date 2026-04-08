@@ -247,7 +247,7 @@ export default function InvoiceDataTable() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate(`/sales/invoice/${invoice.sale_id}`)}
+              onClick={() => navigate(`/shop/sales/invoice/${invoice.sale_id}`)}
             >
               <Eye />
             </Button>

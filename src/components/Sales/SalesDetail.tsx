@@ -267,7 +267,7 @@ export const SalesDetailsDialog = ({ open, onClose, sales }: Props) => {
                             {item.variant.productName}-(
                             {item.variant.variant_label})
                           </TableCell>
-                          <TableCell>{item.original_quantity}</TableCell>
+                          <TableCell>{item.quantity}</TableCell>
                           {/* <TableCell>{item.total_returned_qty}</TableCell> */}
                           <TableCell>{item.variant.price}</TableCell>
                           <TableCell>{item.discount}</TableCell>

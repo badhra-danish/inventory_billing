@@ -171,6 +171,8 @@ export default function AddSales() {
       console.error(error.message);
     }
   };
+  console.log(Invoiceinfo);
+
   const getSales = async () => {
     try {
       const sale_id = formData.sale_id;
