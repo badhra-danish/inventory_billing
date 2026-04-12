@@ -46,13 +46,11 @@ import { useAuth } from "@/context/authContext";
 
 // --- Menu Item Definitions ---
 const DashboardItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/shop/dashboard", icon: LayoutDashboard },
 ];
 const InventoryItems = [
   { title: "Product", url: "/shop/products", icon: Box },
   { title: "Create Product", url: "/shop/create-product", icon: PackagePlus },
-  { title: "Expired Product", url: "/shop/expired", icon: OctagonAlert },
-  { title: "Low Stock", url: "/shop/lowscock", icon: TrendingDown },
   { title: "Category", url: "/shop/category", icon: Shapes },
   { title: "Sub Category", url: "/shop/sub-category", icon: ChartBarStacked },
   { title: "Brands", url: "/shop/brand", icon: Cone },
@@ -62,7 +60,7 @@ const InventoryItems = [
 ];
 const StockItems = [
   { title: "Stock", url: "/shop/manage-stock", icon: Layers },
-  { title: "Manage Stock", url: "/shop/create-product", icon: SquareActivity },
+  { title: "Low Stock", url: "/shop/low-stock", icon: TrendingDown },
 ];
 const SalesItems = [
   { title: "Sales", url: "/shop/sales", icon: BadgeIndianRupee },
@@ -72,21 +70,21 @@ const SalesItems = [
 const PurchaseItem = [
   { title: "Purchase", url: "/shop/purchase", icon: Handbag },
   { title: "Purchase Order", url: "/shop/purchase_order", icon: ShoppingBag },
-  { title: "Purchase Return", url: "/shop/sales-return", icon: Undo2 },
+  // { title: "Purchase Return", url: "/shop/sales-return", icon: Undo2 },
 ];
 const PeoplesItem = [
   { title: "Customer", url: "/shop/customer", icon: Users },
   { title: "Supplier", url: "/shop/supplier", icon: UserLock },
   { title: "Warehouse", url: "/shop/warehouse", icon: Warehouse },
-  { title: "Employees", url: "/shop/sales-return", icon: User },
+  // { title: "Employees", url: "/shop/sales-return", icon: User },
 ];
-const ReportsItem = [
-  { title: "Sales Report", url: "purchase", icon: AlignEndHorizontal },
-  { title: "Purchase Report", url: "invoices", icon: FileChartPie },
-  { title: "Inventory Report", url: "sales-return", icon: Cone },
-  { title: "Invoice Report", url: "sales-return", icon: ReceiptIndianRupee },
-  { title: "Product Report", url: "sales-return", icon: PackageSearch },
-];
+// const ReportsItem = [
+//   { title: "Sales Report", url: "purchase", icon: AlignEndHorizontal },
+//   { title: "Purchase Report", url: "invoices", icon: FileChartPie },
+//   { title: "Inventory Report", url: "sales-return", icon: Cone },
+//   { title: "Invoice Report", url: "sales-return", icon: ReceiptIndianRupee },
+//   { title: "Product Report", url: "sales-return", icon: PackageSearch },
+// ];
 const AdminItems = [
   { title: "Dashboard", url: "purchase", icon: AlignEndHorizontal },
   { title: "Shops", url: "invoices", icon: FileChartPie },
@@ -147,8 +145,8 @@ export default function AppSidebar({
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
-      <Sidebar className="border-r border-slate-800 bg--900 dark:bg-slate-950 selection:bg-slate-700">
-        <SidebarHeader className="p-6">
+      <Sidebar variant="floating" collapsible="icon" className="border-blue-600  dark:!bg-slate-950 selection:bg-slate-700">
+        <SidebarHeader className="py-6 px-3 overflow-hidden">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 dark:bg-blue-700 p-2 rounded-lg shadow-sm">
               <Boxes className="text-white w-6 h-6" />
@@ -184,7 +182,7 @@ export default function AppSidebar({
 
           {role === "SHOP_ADMIN" && (
             <div className="space-y-6">
-              <SidebarGroup className="px-0">
+              <SidebarGroup className="px-0" >
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Main
                 </SidebarGroupLabel>
@@ -199,7 +197,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup className="px-2">
+              <SidebarGroup className="px-0">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Inventory
                 </SidebarGroupLabel>
@@ -214,7 +212,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup className="px-2">
+              <SidebarGroup className="px-0">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Operations
                 </SidebarGroupLabel>
@@ -231,7 +229,7 @@ export default function AppSidebar({
 
               <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
 
-              <SidebarGroup className="px-2">
+              <SidebarGroup className="px-0">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mt-1">
                   Directory
                 </SidebarGroupLabel>
@@ -244,9 +242,9 @@ export default function AppSidebar({
                 </SidebarGroupContent>
               </SidebarGroup>
 
-              <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" />
+              {/* <SidebarSeparator className="m-0 opacity-50 dark:opacity-20" /> */}
 
-              <SidebarGroup className="px-2">
+              {/* <SidebarGroup className="px-2">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mt-1">
                   Analytics
                 </SidebarGroupLabel>
@@ -257,12 +255,12 @@ export default function AppSidebar({
                     ))}
                   </SidebarMenu>
                 </SidebarGroupContent>
-              </SidebarGroup>
+              </SidebarGroup> */}
             </div>
           )}
         </SidebarContent>
 
-        <div className="mt-auto p-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
+        <div className="mt-auto p-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 overflow-hidden rounded-b-lg">
           <SidebarMenuButton
             onClick={logout}
             className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 rounded-lg transition-colors"

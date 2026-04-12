@@ -15,7 +15,7 @@ import InvoiceDataTable from "@/components/Sales/InvoiceDataTable";
 function Dashboard() {
   return (
     <>
-      <div className="p-4 space-y-8">
+      <div className="space-y-8">
         {/* Professional Header Section */}
         <div className="bg-white dark:bg-neutral-900 p-5 rounded-xl border-l-4 border-blue-500 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

@@ -123,7 +123,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [page, setPage] = React.useState(1);
-
+  const [pageSize, setPageSize] = React.useState(10);
   const [stockhistoryPage, setStockhistoryPage] = React.useState(1);
   const [pageMetaData, setPageMetaData] = React.useState({
     totalPage: 0,
@@ -169,9 +169,10 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     },
   );
   const [quantityUpdateType, setQuantityUpdateType] = React.useState("");
+
   const getAllStockData = async () => {
     try {
-      const res = await getAllStockPage(page, 10);
+      const res = await getAllStockPage(page, pageSize);
       if (res.status == "OK") {
         setStockVariantData(res.data || []);
         setPageMetaData(res.pageMetaData);
@@ -183,6 +184,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
       console.error(error);
     }
   };
+
   const getAllStockHistory = async () => {
     try {
       const res = await getAllStockMovement(
@@ -203,7 +205,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
   };
   React.useEffect(() => {
     getAllStockData();
-  }, [refresh, page]);
+  }, [refresh, page, pageSize]);
 
   React.useEffect(() => {
     if (openHistory && selectedVariant) {
@@ -554,12 +556,12 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter, // add this
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+
     state: {
       sorting,
       columnFilters,
@@ -570,7 +572,7 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow-md p-4 custom-scrollbar">
+    <div className="w-full bg-white rounded-md shadow-md p-4 custom-scrollbar min-h-screen">
       {/* 🔍 Top Toolbar */}
       <div className="flex items-center justify-between py-4">
         <Input
@@ -772,7 +774,27 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2 flex items-center gap-3">
+        <div className="space-x-2 flex items-center gap-2">
+          <div className="flex gap-2">
+            <p className="w-full ">Page Size</p>
+            <Select
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="font-bold font-">
             page {pageMetaData.currentPage} of {pageMetaData.totalPage}
           </div>
@@ -922,8 +944,8 @@ export default function StockMangeDatatable({ refresh }: stockDatatable) {
           </div>
 
           {/* =========================================
-              PAGINATION & FOOTER SECTION
-              ========================================= */}
+                PAGINATION & FOOTER SECTION
+                ========================================= */}
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Pagination Controls */}
             <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">

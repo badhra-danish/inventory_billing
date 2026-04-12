@@ -29,7 +29,7 @@ export default function ERPNavbar({
   const [profileOpen, setProfileOpen] = useState(false);
   return (
     <>
-      <nav className="sticky top-0 z-40 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md bg-opacity-80">
+      <nav className="sticky top-2 z-40 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md bg-opacity-80 rounded-lg mr-1">
         <div className="px-4 h-16 flex items-center justify-between">
           {/* Left Section: Branding & Toggle */}
           <div className="flex items-center gap-4">

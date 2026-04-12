@@ -169,7 +169,9 @@ const BrandPage = lazy(() => import("@/pages/inventory/Brand"));
 const UnitsPage = lazy(() => import("@/pages/inventory/Units"));
 const VariantPage = lazy(() => import("@/pages/inventory/Variant"));
 const WarrantiesPage = lazy(() => import("@/pages/inventory/Warranties"));
+
 const StockMangepage = lazy(() => import("@/pages/stock/StockMange"));
+const LowStockMangepage = lazy(() => import("@/pages/stock/lowStock"));
 
 const Sales = lazy(() => import("@/pages/Sales/Sales"));
 const AddSales = lazy(() => import("@/pages/Sales/AddSales"));
@@ -291,6 +293,7 @@ function Approutes() {
                 <Route path="/shop/variant" element={<VariantPage />} />
                 <Route path="/shop/warranties" element={<WarrantiesPage />} />
                 <Route path="/shop/manage-stock" element={<StockMangepage />} />
+                <Route path="/shop/low-stock" element={<LowStockMangepage />} />
                 <Route path="/shop/sales" element={<Sales />} />
                 <Route path="/shop/sales-return" element={<SalesReturn />} />
                 <Route path="/shop/warehouse" element={<WareHouse />} />

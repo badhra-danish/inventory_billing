@@ -176,8 +176,8 @@ function StockMangepage() {
     <>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <p className="font-semibold text-xl">Sub Category </p>
-          <p>Manage Your Sub-Categories</p>
+          <p className="font-semibold text-xl">Stock </p>
+          <p>Manage Your Stock</p>
         </div>
         <div className="flex items-center gap-2">
           <Button className="bg-white border-1 border-gray p-2 hover:bg-gray-100">
