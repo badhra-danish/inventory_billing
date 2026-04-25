@@ -10,41 +10,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate, useParams } from "react-router-dom";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Ban,
-  Check,
   FileText,
   Loader2,
   Minus,
   PackageX,
   Plus,
   Save,
-  Search,
   ShoppingCart,
   Tag,
   Trash2,
   X,
 } from "lucide-react";
-import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import React from "react";
 import { getAllSupplier } from "@/api/Supplier/SupplierClient";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
-import {
-  createPurchaseOrder,
-  getAllPurchaseOrderNo,
-  getPurchaseOrderByID,
-} from "@/api/PurchaseOrder/PurchaseOrderClient";
 import toast from "react-hot-toast";
-import type { PurchaseOrderData } from "@/components/Purchase/PurchaseOrderEdit";
 import {
-  createPurchase,
-  getAllPurchase,
   getPurchaseByID,
   updatePurchase,
 } from "@/api/PurchaseOrder/PurchaseClient";
-import WarehouseSearch from "@/components/utils/WarehouseSerche";
 type ProductRow = {
   purchase_item_id: string;
   variant_id: string;
@@ -71,10 +57,6 @@ type Product = {
 type warehouse = {
   warehouse_id: string;
   warehouseName: string;
-};
-type purchaseOrderNo = {
-  purchase_order_id: string;
-  po_number: string;
 };
 
 export interface PurchaseDetails {
@@ -139,7 +121,6 @@ export default function EditPurchase() {
   const { purchase_id } = useParams();
   const [supplier, setSupplier] = React.useState<Supplier[]>([]);
   const [warehouse, setWareHouse] = React.useState<warehouse[]>([]);
-  const [poNumber, setPoNumber] = React.useState<purchaseOrderNo[]>([]);
   const [query, setQuery] = useState("");
   const [variant, setVariant] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -179,19 +160,7 @@ export default function EditPurchase() {
   React.useEffect(() => {
     getallSupplier();
   }, []);
-  const getallPurchaseOrderNo = async () => {
-    try {
-      const res = await getAllPurchaseOrderNo();
-      if (res.status === "OK") {
-        setPoNumber(res.data || []);
-      }
-    } catch (error) {
-      console.error;
-    }
-  };
-  React.useEffect(() => {
-    getallPurchaseOrderNo();
-  }, []);
+
   const getallWareHouse = async () => {
     try {
       const res = await getAllWarehouse();

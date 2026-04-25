@@ -1,4 +1,3 @@
-import { axiosClient } from "..";
 import api from "@/utils/axios";
 const brandEndPoint = {
   getAllbrand: "/v1/brand/getbrandpage",

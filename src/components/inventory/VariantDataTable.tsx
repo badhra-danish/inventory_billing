@@ -288,17 +288,7 @@ export default function VariantDataTable({ refresh }: refreshTable) {
         );
       },
     },
-    // {
-    //   accessorKey: "createdDate",
-    //   header: () => <div className="text-left">Created Date</div>,
-    //   cell: ({ row }) => {
-    //     return (
-    //       <div className="capitalize text-left ">
-    //         {row.getValue("createdDate")}
-    //       </div>
-    //     );
-    //   },
-    // },
+
     {
       accessorKey: "status",
       header: () => <div className="text-left text-white">Status</div>,

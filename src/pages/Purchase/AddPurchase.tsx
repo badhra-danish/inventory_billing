@@ -10,36 +10,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Textarea } from "@/components/ui/textarea";
 import {
-  Ban,
-  Check,
+
   FileText,
   Loader2,
   Minus,
   PackageX,
   Plus,
   Save,
-  Search,
   ShoppingCart,
   Tag,
   Trash2,
   X,
 } from "lucide-react";
-import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import React from "react";
 import { getAllSupplier } from "@/api/Supplier/SupplierClient";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
 import {
-  createPurchaseOrder,
   getAllPurchaseOrderNo,
   getPurchaseOrderByID,
 } from "@/api/PurchaseOrder/PurchaseOrderClient";
 import toast from "react-hot-toast";
 import type { PurchaseOrderData } from "@/components/Purchase/PurchaseOrderEdit";
 import { createPurchase } from "@/api/PurchaseOrder/PurchaseClient";
-import WarehouseSearch from "@/components/utils/WarehouseSerche";
 type ProductRow = {
   variant_id: string;
   skuCode: string;

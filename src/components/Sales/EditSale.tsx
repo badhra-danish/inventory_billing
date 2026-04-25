@@ -1,14 +1,9 @@
 import { Button } from "@/components/ui/button";
 import {
-  AlertCircle,
   Ban,
-  Box,
-  Check,
-  Cog,
   FileText,
   Loader2,
   Minus,
-  Package,
   PackageX,
   Plus,
   Save,
@@ -31,8 +26,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { getAllCustomer } from "@/api/Coustomer/CustomerClient";
 import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
-import Loader from "@/components/commen/loader";
-import { createSales, getSaleById, updateSale } from "@/api/Sales/SalesClient";
+import { getSaleById, updateSale } from "@/api/Sales/SalesClient";
 import toast from "react-hot-toast";
 // type Product = {
 //   code: string;
@@ -40,16 +34,7 @@ import toast from "react-hot-toast";
 //   price: number;
 // };
 import type { SalesDetail } from "./SalesDetail";
-import type { SalesItemDetail } from "./SalesDetail";
-import type { CustomerDetail } from "./SalesDetail";
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import { DialogContent } from "@radix-ui/react-dialog";
+
 import WarehouseSearch from "../utils/WarehouseSerche";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
 type ProductRow = {
@@ -106,13 +91,6 @@ export default function EditSales() {
   const [rows, setRows] = useState<ProductRow[]>([]);
   const [customer, setCustomer] = React.useState<customer[]>([]);
   const [warehouse, setWareHouse] = React.useState<warehouse[]>([]);
-  const [selectedVariant, setSelectedVariant] = React.useState({
-    product_variant_id: "",
-    skuCode: "",
-    price: 0,
-    variant_label: "",
-    productName: "",
-  });
   const [formData, setFormData] = useState<SaleFormData>({
     customer_id: "",
     date: "",
@@ -553,10 +531,6 @@ export default function EditSales() {
                         ) : variant.length > 0 ? (
                           <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
                             {variant.map((item) => {
-                              const isSelected =
-                                selectedVariant?.product_variant_id ===
-                                item.product_variant_id;
-
                               // --- STOCK LOGIC ---
                               const stockCount = item.quantity || 0;
                               const isOutOfStock = stockCount === 0;
@@ -577,12 +551,12 @@ export default function EditSales() {
                           ? "opacity-60 bg-neutral-50 dark:bg-neutral-900 cursor-not-allowed grayscale-[0.8]"
                           : "cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
                       }
-                      ${isSelected ? "bg-blue-50 dark:bg-blue-900/20" : ""}
+                     
                     `}
                                 >
                                   {/* Active Left Border Indicator */}
                                   <div
-                                    className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-200 ${isSelected ? "bg-blue-600" : "bg-transparent group-hover:bg-blue-300"}`}
+                                    className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-200 `}
                                   />
 
                                   <div className="flex items-start justify-between gap-3 pl-2">
@@ -591,7 +565,7 @@ export default function EditSales() {
                                       {/* Row 1: Name & Variant Badge */}
                                       <div className="flex items-center flex-wrap gap-2 mb-1.5">
                                         <h4
-                                          className={`text-sm font-bold leading-tight ${isSelected ? "text-blue-700 dark:text-blue-400" : "text-neutral-900 dark:text-neutral-100"}`}
+                                          className={`text-sm font-bold leading-tight `}
                                         >
                                           {item.productName}
                                         </h4>
@@ -600,11 +574,7 @@ export default function EditSales() {
                                         <span
                                           className={`
                             inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border
-                            ${
-                              isSelected
-                                ? "bg-blue-100 text-blue-700 border-blue-200"
-                                : "bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700"
-                            }
+                            
                           `}
                                         >
                                           <Tag className="w-3 h-3 mr-1 opacity-70" />
@@ -648,11 +618,6 @@ export default function EditSales() {
                                           <span className="flex items-center text-[10px] font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-100 dark:border-red-900">
                                             <Ban className="w-3 h-3 mr-1" /> No
                                             Stock
-                                          </span>
-                                        ) : isSelected ? (
-                                          <span className="flex items-center text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-right-2">
-                                            <Check className="w-3.5 h-3.5 mr-1" />{" "}
-                                            Added
                                           </span>
                                         ) : (
                                           <button

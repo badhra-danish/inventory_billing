@@ -17,7 +17,6 @@ import {
 import {
   ArrowUpDown,
   ChevronDown,
-  CirclePlus,
   Edit,
   EllipsisVertical,
   Eye,
@@ -45,10 +44,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 //import trashImg from "../../assets/images/trash.jpg";
-import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
 import { getAllSalesReturnInfo } from "@/api/SalesReturn/SaleReturnClient";
-import { Cell } from "recharts";
 import {
   Menubar,
   MenubarContent,
@@ -59,93 +56,7 @@ import {
 } from "../ui/menubar";
 import SalesReturnDetials from "./SalesReturnDetials";
 import { useNavigate } from "react-router-dom";
-
-export interface SaleReturnResponse {
-  data: SaleReturn[];
-}
-
-export interface SaleReturn {
-  sale_return_id: string;
-  srn_no: string;
-  sale_return_date: string;
-  status: "PENDING" | "RECEIVED";
-  payment_status: "PAID" | "UNPAID" | "PARTIAL";
-  total_amount: number;
-
-  summary: Summary;
-
-  sale: Sale;
-
-  customer: Customer;
-
-  return_items: ReturnItem[];
-}
-
-// ----------------------------
-// Summary
-// ----------------------------
-export interface Summary {
-  total_items_count: number;
-  fully_returned_count: number;
-  total_return_qty: number;
-  total_tax_amount: number;
-  total_discount: number;
-  net_return_amount: number;
-}
-
-// ----------------------------
-// Sale Info
-// ----------------------------
-export interface Sale {
-  sale_id: string;
-  invoice_no: string;
-  sale_date: string;
-  grand_total: number;
-  paid_amount: number;
-  due_amount: number;
-  payment_status: "PAID" | "UNPAID" | "PARTIAL";
-  order_tax: number;
-  shipping: number;
-  discount: number;
-}
-
-// ----------------------------
-// Customer Info
-// ----------------------------
-export interface Customer {
-  customer_id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-// ----------------------------
-// Return Items
-// ----------------------------
-export interface ReturnItem {
-  sale_return_item_id: string;
-  sale_item_id: string;
-  product_variant_id: string;
-  warehouse_id: string;
-
-  product_id: string;
-  product_name: string;
-  sku_code: string;
-  variant_label: string;
-
-  unit_price: number;
-  original_sold_qty: number;
-  return_quantity: number;
-  remaining_qty: number;
-  is_fully_returned: boolean;
-
-  discount: number;
-  tax: number;
-  tax_amount: number;
-
-  sub_total: number;
-}
+import type { SaleReturn } from "@/types/saleReturn";
 
 export default function SalesReturnDataTable() {
   const navigate = useNavigate();
@@ -169,7 +80,7 @@ export default function SalesReturnDataTable() {
     React.useState(false);
   const [saleReturnData, setSalesReturnData] = React.useState<SaleReturn[]>([]);
   const [selectedSaleReturn, setSelectedSaleReturn] =
-    React.useState<SaleReturn | null>();
+    React.useState<SaleReturn | null>(null);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -641,25 +552,30 @@ export default function SalesReturnDataTable() {
       </div>
 
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex gap-2 items-center">
+          <div>
+            Page {pageMetaData.currentPage} of {pageMetaData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={pageMetaData.hasPrevPage === false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
+            }
+            disabled={pageMetaData.hasnextPage === false}
           >
             Next
           </Button>

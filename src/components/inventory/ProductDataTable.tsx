@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogTrigger,
   DialogHeader,
   DialogDescription,
   DialogFooter,
@@ -31,7 +30,6 @@ import {
   CircleAlert,
   CirclePlus,
   Edit,
-  Eye,
   List,
   PackageSearch,
   Plus,
@@ -39,7 +37,6 @@ import {
   Printer,
   Trash,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -156,7 +153,6 @@ export type Variants = {
   attributes: VariantAttributes[];
 };
 export default function Products() {
-  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],

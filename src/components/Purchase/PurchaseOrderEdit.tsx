@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate, useParams } from "react-router-dom";
-import { Textarea } from "@/components/ui/textarea";
 import {
   FileText,
   Loader2,
@@ -18,7 +17,6 @@ import {
   PackageX,
   Plus,
   Save,
-  Search,
   ShoppingCart,
   Tag,
   Trash2,
@@ -29,7 +27,6 @@ import React from "react";
 import { getAllSupplier } from "@/api/Supplier/SupplierClient";
 import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
 import {
-  createPurchaseOrder,
   getPurchaseOrderByID,
   updatePurchaseOrder,
 } from "@/api/PurchaseOrder/PurchaseOrderClient";

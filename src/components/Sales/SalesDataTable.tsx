@@ -19,17 +19,10 @@ import {
   ChevronDown,
   Edit,
   Eye,
-  MoreHorizontal,
   Trash,
   EllipsisVertical,
-  ReceiptIndianRupee,
-  ReceiptIndianRupeeIcon,
   BadgeIndianRupee,
   CirclePlus,
-  Type,
-  Calendar,
-  FastForward,
-  KanbanSquareDashed,
 } from "lucide-react";
 import {
   Menubar,
@@ -61,32 +54,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 //import trashImg from "../../assets/images/trash.jpg";
-import custImg from "../../assets/images/customer.jpg";
 import { Badge } from "../ui/badge";
 import { getAllSalesInfo } from "@/api/Sales/SalesClient";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogClose,
-  DialogFooter,
-  DialogHeader,
-} from "../ui/dialog";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { useEffect, useState } from "react";
 import { CreatePaymentDialog } from "./CreatePaymentSales";
 import { SalesDetailsDialog } from "./SalesDetail";
 import { ShowPaymentDetail } from "./ShowPaymentSale";
-import EditSales from "./EditSale";
 import { useNavigate } from "react-router-dom";
 //
 export type CustomerDetail = {
@@ -188,7 +162,6 @@ export default function SalesDataTable() {
   const [openCreatePayment, setOpenCreatePayment] = React.useState(false);
   const [openShowPayment, setOpenShowPayment] = React.useState(false);
   const [openSalesDetail, SetOpenSalesDetail] = React.useState(false);
-  const [openEditSale, SetOpenEditSale] = React.useState(false);
   const [selectedSale, setSelectedSale] = useState<SalesDetail | null>(null);
   useEffect(() => {
     if (!openCreatePayment && !openShowPayment) {

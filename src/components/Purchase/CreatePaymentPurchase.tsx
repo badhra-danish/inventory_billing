@@ -18,12 +18,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { createPayment, updatePayment } from "@/api/Sales/SalesClient";
 import toast from "react-hot-toast";
 
 import type { Purchase } from "./PurchaseDataTable";
 import {
-  createPurchase,
   createPurchasePayment,
   updatePaymentPurchase,
 } from "@/api/PurchaseOrder/PurchaseClient";

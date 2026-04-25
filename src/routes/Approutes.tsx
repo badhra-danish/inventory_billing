@@ -200,6 +200,9 @@ const Customer = lazy(() => import("@/pages/People/Customer.tsx"));
 const Suppliers = lazy(() => import("@/pages/People/Supplier"));
 const WareHouse = lazy(() => import("@/pages/People/WareHouse"));
 
+//Super Admin Routes
+const ShopRoutes = lazy(() => import("@/pages/SuperAdmin/Shop"));
+
 function Approutes() {
   return (
     <BrowserRouter>
@@ -219,6 +222,8 @@ function Approutes() {
             <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
               <Route element={<OutletLayout />}>
                 <Route path="/super/dashboard" element={<Dashboard />} />
+                <Route path="/super/shop" element={<ShopRoutes />} />
+
                 <Route
                   path="/super/create-product"
                   element={<CreateProduct />}

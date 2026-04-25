@@ -24,17 +24,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Component,
-  Edit,
-  Eye,
-  Flashlight,
-  MoreHorizontal,
-  Trash,
-  TrendingUpDown,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, Edit, Trash } from "lucide-react";
 import { Switch } from "../ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";

@@ -1,18 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Menu,
   Search,
   Mail,
   Bell,
-  Settings,
   Moon,
   Sun,
   User,
   LogOut,
   ChevronDown,
-  CreditCard,
-  Shield,
 } from "lucide-react";
 import { useTheme } from "@/context/DarkthemProvider";
 import { useAuth } from "@/context/authContext";

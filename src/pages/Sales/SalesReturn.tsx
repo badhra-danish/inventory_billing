@@ -4,13 +4,7 @@ import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { CirclePlus, RefreshCcw } from "lucide-react";
 import SalesReturnDataTable from "@/components/Sales/SalesReturnDatatable";
-// import {
-//   Dialog,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTrigger,
-//   DialogContent,
-// } from "@/components/ui/dialog";
+
 import { useNavigate } from "react-router-dom";
 function Sales() {
   const navigate = useNavigate();

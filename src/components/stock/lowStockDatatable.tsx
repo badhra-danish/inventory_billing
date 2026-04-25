@@ -195,7 +195,7 @@ export default function LowStockDataTable() {
     {
       accessorKey: "status",
       header: () => <div className="text-left">Status</div>,
-      cell: ({ row }) => {
+      cell: () => {
         const status: string = "LOWSTOCK";
 
         const colorClass =

@@ -1,5 +1,4 @@
 import * as React from "react";
-import Img from "../../assets/images/xls.png";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -19,7 +18,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -31,12 +29,10 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Edit,
   Eye,
   HelpCircle,
   Layers,
   Package,
-  RefreshCw,
   Trash,
 } from "lucide-react";
 //import { useNavigate } from "react-router-dom";
@@ -69,8 +65,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Textarea } from "../ui/textarea";
+
 import {
   deleteStock,
   getAllStockMovement,

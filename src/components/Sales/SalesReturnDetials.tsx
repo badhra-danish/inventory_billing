@@ -1,32 +1,7 @@
-import React from "react";
-import {
-  ArrowLeft,
-  Badge,
-  Calendar,
-  Circle,
-  FileText,
-  Printer,
-  Receipt,
-  User,
-} from "lucide-react";
+import { ArrowLeft, Circle, FileText, Printer } from "lucide-react";
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Dialog, DialogClose, DialogContent } from "../ui/dialog";
+
 import {
   Table,
   TableBody,
@@ -35,88 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-export interface SaleReturn {
-  sale_return_id: string;
-  srn_no: string;
-  sale_return_date: string;
-  status: "PENDING" | "RECEIVED";
-  payment_status: "PAID" | "UNPAID" | "PARTIALY_PAID";
-  total_amount: number;
-
-  summary: Summary;
-
-  sale: Sale;
-
-  customer: Customer;
-
-  return_items: ReturnItem[];
-}
-
-// ----------------------------
-// Summary
-// ----------------------------
-export interface Summary {
-  total_items_count: number;
-  fully_returned_count: number;
-  total_return_qty: number;
-  total_tax_amount: number;
-  total_discount: number;
-  net_return_amount: number;
-}
-
-// ----------------------------
-// Sale Info
-// ----------------------------
-export interface Sale {
-  sale_id: string;
-  invoice_no: string;
-  sale_date: string;
-  grand_total: number;
-  paid_amount: number;
-  due_amount: number;
-  payment_status: "PAID" | "UNPAID" | "PARTIALY_PAID";
-  order_tax: number;
-  shipping: number;
-  discount: number;
-}
-
-// ----------------------------
-// Customer Info
-// ----------------------------
-export interface Customer {
-  customer_id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-// ----------------------------
-// Return Items
-// ----------------------------
-export interface ReturnItem {
-  sale_return_item_id: string;
-  sale_item_id: string;
-  product_variant_id: string;
-  warehouse_id: string;
-
-  product_id: string;
-  product_name: string;
-  sku_code: string;
-  variant_label: string;
-
-  unit_price: number;
-  original_sold_qty: number;
-  return_quantity: number;
-  remaining_qty: number;
-  is_fully_returned: boolean;
-
-  discount: number;
-  tax: number;
-  tax_amount: number;
-
-  sub_total: number;
-}
+import type { SaleReturn } from "@/types/saleReturn";
 
 type Props = {
   open: boolean;
@@ -138,7 +32,7 @@ function saleReturnReturnDetials({ open, onClose, saleReturn }: Props) {
     payment: {
       UNPAID: "border-gray-300 text-gray-600",
       PAID: "border-green-400 text-green-700",
-      PARTIALY_PAID: "border-orange-400 text-orange-700",
+      PARTIALLY_PAID: "border-orange-400 text-orange-700",
       OVERDUE: "border-red-400 text-red-700",
       default: "border-gray-300 text-gray-600",
     },

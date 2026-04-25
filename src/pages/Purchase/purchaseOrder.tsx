@@ -8,8 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function PurchaseOrder() {
   const navigate = useNavigate();
-  // const [open, setOpen] = React.useState(false);
-  // const [refresh, setRefresh] = React.useState(false);
+
   return (
     <>
       <div className="flex items-center justify-between mb-5">

@@ -1,4 +1,3 @@
-import { axiosClient } from "..";
 import api from "@/utils/axios";
 const ProductEndPoint = {
   getAllProductPage: "/v1/product/getallproduct",

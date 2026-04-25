@@ -1,7 +1,7 @@
-import React, { use } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { getSaleById } from "@/api/Sales/SalesClient";
-import { Printer, Download, Mail, CheckCircle2 } from "lucide-react"; // Professional Icons
+import { Printer, Mail, CheckCircle2 } from "lucide-react"; // Professional Icons
 import Loader from "../commen/loader";
 import { numberToWordsIndian } from "@/utils/numberToWord";
 export type CustomerDetail = {

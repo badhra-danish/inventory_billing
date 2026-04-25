@@ -1,32 +1,13 @@
 import { Button } from "@/components/ui/button";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
-import {
-  CirclePlus,
-  RefreshCcw,
-  DollarSign,
-  ShoppingCart,
-  TrendingUp,
-  Package,
-  IndianRupee,
-  Receipt,
-} from "lucide-react";
-// import {
-//   Dialog,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTrigger,
-//   DialogContent,
-// } from "@/components/ui/dialog";
+import { CirclePlus, RefreshCcw, IndianRupee, Receipt } from "lucide-react";
 import SalesDataTable from "@/components/Sales/SalesDataTable";
 import { useNavigate } from "react-router-dom";
 
 function Sales() {
   const navigate = useNavigate();
-  // const [open, setOpen] = React.useState(false);
-  // const [refresh, setRefresh] = React.useState(false);
 
-  // Sample KPI Data - You can map this to your actual backend data later
   const kpiData = [
     {
       title: "Total Amount ",
@@ -99,7 +80,9 @@ function Sales() {
                 <p className="text-sm font-medium text-gray-500 mb-2">
                   {kpi.title}
                 </p>
-                <h3 className={`text-2xl font-bold  text-gray-800 ${kpi.color}`}>
+                <h3
+                  className={`text-2xl font-bold  text-gray-800 ${kpi.color}`}
+                >
                   {kpi.value}
                 </h3>
               </div>

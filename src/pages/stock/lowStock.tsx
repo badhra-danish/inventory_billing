@@ -7,26 +7,8 @@ import xslImg from "../../assets/images/xls.png";
 import { RefreshCcw } from "lucide-react";
 
 import LowStockDataTable from "@/components/stock/lowStockDatatable";
-import React from "react";
-type Product = {
-  product_variant_id: string;
-  skuCode: string;
-  price: number;
-  tax_type: string;
-  tax_value: number;
-  discount_type: string;
-  discount_value: number;
-  variant_label: string;
-  product_id: string;
-  productName: string;
-};
-function StockMangepage() {
-  const [query, setQuery] = React.useState("");
-  const [variant, setVariant] = React.useState<Product[]>([]);
-  const [refresh, setRefresh] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-  const [openAddStock, setAddOpenStock] = React.useState(false);
 
+function StockMangepage() {
   return (
     <>
       <div className="flex items-center justify-between mb-5">

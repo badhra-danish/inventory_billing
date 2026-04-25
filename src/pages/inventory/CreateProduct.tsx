@@ -9,14 +9,9 @@ import {
   List,
   PlusCircle,
   Trash,
-  Settings2,
   Layers,
-  Tag,
   Trash2,
   X,
-  Sparkles,
-  AlertCircle,
-  Hash,
   Box,
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -132,7 +127,6 @@ function CreateProduct() {
   });
 
   const [variants, setVariants] = React.useState<Variant[] | null>([]);
-  const [image, setImage] = React.useState<File[]>([]);
   const [isPriceOpen, setIsPriceOpen] = React.useState(true);
   const [isCustomOpen, setIsCustomOpen] = React.useState(true);
   const [openCreateCategory, setOpenCreateCategory] = React.useState(false);

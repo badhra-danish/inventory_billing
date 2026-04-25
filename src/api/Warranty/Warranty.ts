@@ -1,4 +1,3 @@
-import { axiosClient } from "..";
 import api from "@/utils/axios";
 const endPoint = {
   createWarriant: "/v1/warranty/create",

@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import {
   Box,
   PackagePlus,
-  OctagonAlert,
   TrendingDown,
   ChartBarStacked,
   Shapes,
@@ -13,7 +12,6 @@ import {
   ShieldCheck,
   LayoutDashboard,
   Layers,
-  SquareActivity,
   BadgeIndianRupee,
   ReceiptIndianRupee,
   Undo2,
@@ -21,12 +19,9 @@ import {
   ShoppingBag,
   Users,
   UserLock,
-  User,
   AlignEndHorizontal,
   FileChartPie,
-  PackageSearch,
   LogOut,
-  ChevronRight,
   Warehouse,
 } from "lucide-react";
 import {
@@ -70,26 +65,16 @@ const SalesItems = [
 const PurchaseItem = [
   { title: "Purchase", url: "/shop/purchase", icon: Handbag },
   { title: "Purchase Order", url: "/shop/purchase_order", icon: ShoppingBag },
-  // { title: "Purchase Return", url: "/shop/sales-return", icon: Undo2 },
 ];
 const PeoplesItem = [
   { title: "Customer", url: "/shop/customer", icon: Users },
   { title: "Supplier", url: "/shop/supplier", icon: UserLock },
   { title: "Warehouse", url: "/shop/warehouse", icon: Warehouse },
-  // { title: "Employees", url: "/shop/sales-return", icon: User },
 ];
-// const ReportsItem = [
-//   { title: "Sales Report", url: "purchase", icon: AlignEndHorizontal },
-//   { title: "Purchase Report", url: "invoices", icon: FileChartPie },
-//   { title: "Inventory Report", url: "sales-return", icon: Cone },
-//   { title: "Invoice Report", url: "sales-return", icon: ReceiptIndianRupee },
-//   { title: "Product Report", url: "sales-return", icon: PackageSearch },
-// ];
+
 const AdminItems = [
-  { title: "Dashboard", url: "purchase", icon: AlignEndHorizontal },
-  { title: "Shops", url: "invoices", icon: FileChartPie },
-  { title: "Analyst", url: "sales-return", icon: Cone },
-  { title: "Users", url: "sales-return", icon: ReceiptIndianRupee },
+  { title: "Dashboard", url: "/super/dashboard", icon: AlignEndHorizontal },
+  { title: "Shops", url: "/super/shop", icon: FileChartPie },
 ];
 
 const NavItem = ({ item }: { item: any }) => (
@@ -145,7 +130,11 @@ export default function AppSidebar({
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
-      <Sidebar variant="floating" collapsible="icon" className="border-blue-600  dark:!bg-slate-950 selection:bg-slate-700">
+      <Sidebar
+        variant="floating"
+        collapsible="icon"
+        className="border-blue-600  dark:!bg-slate-950 selection:bg-slate-700"
+      >
         <SidebarHeader className="py-6 px-3 overflow-hidden">
           <div className="flex items-center gap-3">
             <div className="bg-blue-600 dark:bg-blue-700 p-2 rounded-lg shadow-sm">
@@ -182,7 +171,7 @@ export default function AppSidebar({
 
           {role === "SHOP_ADMIN" && (
             <div className="space-y-6">
-              <SidebarGroup className="px-0" >
+              <SidebarGroup className="px-0">
                 <SidebarGroupLabel className="px-3 text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">
                   Main
                 </SidebarGroupLabel>

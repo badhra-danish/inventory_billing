@@ -1,14 +1,7 @@
 import type { PurchaseOrder } from "./PurchaseOrderDatable";
 import { ArrowLeft, FileText, Printer } from "lucide-react";
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogClose, DialogContent } from "../ui/dialog";
 
 import {
   Table,
@@ -29,23 +22,6 @@ export const PurchaseOrderDetailsDialog = ({
   onClose,
   purchaseOrder,
 }: Props) => {
-  const statusConfig = {
-    // Order Status Styles (Solid Backgrounds)
-    order: {
-      INPROGRESS: "bg-yellow-100 text-yellow-800",
-      COMPLETED: "bg-green-100 text-green-800",
-      CANCELLED: "bg-red-100 text-red-800",
-      default: "bg-gray-100 text-gray-600",
-    },
-    // Payment Status Styles (Light Backgrounds with Borders)
-    payment: {
-      UNPAID: "border-gray-300 text-gray-600",
-      PAID: "border-green-400 text-green-700",
-      PARTIALLY_PAID: "border-orange-400 text-orange-700",
-      OVERDUE: "border-red-400 text-red-700",
-      default: "border-gray-300 text-gray-600",
-    },
-  };
   return (
     <>
       {/* Increased max-width to 7xl for a wider view */}

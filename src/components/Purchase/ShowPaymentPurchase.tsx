@@ -2,28 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import {
-  createPayment,
-  deletePayment,
-  getAllPaymentDetials,
-} from "@/api/Sales/SalesClient";
+
 import toast from "react-hot-toast";
 import {
   Table,
@@ -33,10 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Edit, Pause, Printer, Salad, Trash, X } from "lucide-react";
-import Sales from "@/pages/Sales/Sales";
+import { Edit, Trash } from "lucide-react";
 import { CreatePurchasePaymentDialog } from "./CreatePaymentPurchase";
-import type { PurchaseDetails } from "./EditPurchase";
 import {
   deletePaymentPurchase,
   getAllPaymentDetialsPurchase,

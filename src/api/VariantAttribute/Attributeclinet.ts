@@ -1,4 +1,3 @@
-import { axiosClient } from "..";
 import api from "@/utils/axios";
 const attributeEndPoint = {
   createAttribute: "/v1/attribute/create",

@@ -19,13 +19,8 @@ import {
   ChevronDown,
   Edit,
   Eye,
-  MoreHorizontal,
   Trash,
   EllipsisVertical,
-  ReceiptIndianRupee,
-  ReceiptIndianRupeeIcon,
-  BadgeIndianRupee,
-  CirclePlus,
   RefreshCcw,
 } from "lucide-react";
 
@@ -61,63 +56,8 @@ import {
   MenubarTrigger,
 } from "../ui/menubar";
 import { PurchaseOrderDetailsDialog } from "./PurchaseOrderDetail";
-import { useNavigate, useNavigation } from "react-router-dom";
-// const data: PurchaseDetails[] = [
-//   {
-//     supplierName: "Travel Mart",
-//     date: "10 Sep 2024",
-//     total: "1700",
-//     paid: "1700",
-//     due: "0.00",
-//     paymentStatus: "paid",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Global Supplies",
-//     date: "15 Sep 2024",
-//     total: "3200",
-//     paid: "1000",
-//     due: "2200",
-//     paymentStatus: "overdue",
-//     status: "ordered",
-//   },
-//   {
-//     supplierName: "Smart Traders",
-//     date: "19 Sep 2024",
-//     total: "2800",
-//     paid: "0.00",
-//     due: "2800",
-//     paymentStatus: "unpaid",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Metro Wholesale",
-//     date: "25 Sep 2024",
-//     total: "5600",
-//     paid: "5600",
-//     due: "0.00",
-//     paymentStatus: "paid",
-//     status: "received",
-//   },
-//   {
-//     supplierName: "Value Connect",
-//     date: "30 Sep 2024",
-//     total: "4100",
-//     paid: "1500",
-//     due: "2600",
-//     paymentStatus: "overdue",
-//     status: "pending",
-//   },
-//   {
-//     supplierName: "Prime Industries",
-//     date: "04 Oct 2024",
-//     total: "2400",
-//     paid: "0.00",
-//     due: "2400",
-//     paymentStatus: "unpaid",
-//     status: "pending",
-//   },
-// ];
+import { useNavigate } from "react-router-dom";
+
 export interface Variant {
   product_variant_id: string;
   skuCode: string;
@@ -634,25 +574,30 @@ export default function PurchaseOrderDataTable() {
       </div>
 
       {/* 📄 Pagination + Footer Info */}
-      <div className="flex items-center justify-between py-4 text-sm text-gray-600">
+      <div className="flex items-center justify-between py-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
         <div>
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 flex items-center gap-3">
+          <div className="font-bold font-">
+            page {pageMetaData.currentPage} of {pageMetaData.totalPage}
+          </div>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={pageMetaData.hasPrevPage == false}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            onClick={() =>
+              setPage((p) => Math.min(pageMetaData.totalPage, p + 1))
+            }
+            disabled={pageMetaData.hasnextPage == false}
           >
             Next
           </Button>

@@ -60,62 +60,6 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
-// const data: Warranty[] = [
-//   {
-//     warranty: "Water Damage Warranty",
-//     description: "Coverage for water-related issues",
-//     duration: "6 Months",
-//     status: "active",
-//   },
-//   {
-//     warranty: "Screen Replacement Warranty",
-//     description: "Free screen replacement within warranty period",
-//     duration: "12 Months",
-//     status: "active",
-//   },
-//   {
-//     warranty: "Battery Warranty",
-//     description: "Covers battery performance issues and replacements",
-//     duration: "9 Months",
-//     status: "inactive",
-//   },
-//   {
-//     warranty: "Manufacturing Defect Warranty",
-//     description: "Covers defects due to manufacturing faults",
-//     duration: "1 Year",
-//     status: "active",
-//   },
-//   {
-//     warranty: "Screen Replacement Warranty",
-//     description: "Free screen replacement within warranty period",
-//     duration: "12 Months",
-//     status: "active",
-//   },
-//   {
-//     warranty: "Battery Warranty",
-//     description: "Covers battery performance issues and replacements",
-//     duration: "9 Months",
-//     status: "inactive",
-//   },
-//   {
-//     warranty: "Manufacturing Defect Warranty",
-//     description: "Covers defects due to manufacturing faults",
-//     duration: "1 Year",
-//     status: "active",
-//   },
-//   {
-//     warranty: "Accidental Damage Warranty",
-//     description: "Protection against accidental physical damage",
-//     duration: "6 Months",
-//     status: "inactive",
-//   },
-//   {
-//     warranty: "Accidental Damage Warranty",
-//     description: "Protection against accidental physical damage",
-//     duration: "6 Months",
-//     status: "inactive",
-//   },
-// ];
 
 export type Warranty = {
   warranty_id: string;

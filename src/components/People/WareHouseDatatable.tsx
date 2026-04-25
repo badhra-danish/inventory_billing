@@ -44,11 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import trashImg from "../../assets/images/trash.jpg";
-import {
-  deleteBrand,
-  getAllBrand,
-  upadateBrand,
-} from "@/api/brand/BrandApiClient";
+
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import toast from "react-hot-toast";

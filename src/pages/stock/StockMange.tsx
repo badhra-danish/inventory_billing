@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 
 // import { Switch } from "@/components/ui/switch";
-import { Check, CirclePlus, Package, X } from "lucide-react";
+import { Check, CirclePlus, Package } from "lucide-react";
 import pdfImg from "../../assets/images/pdf.jpg";
 import xslImg from "../../assets/images/xls.png";
 import { RefreshCcw } from "lucide-react";
@@ -25,16 +25,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import React, { useEffect } from "react";
+import React from "react";
 import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import Loader from "@/components/commen/loader";
 import { createStock } from "@/api/Stock/Stockclinet";
 import toast from "react-hot-toast";
-import {
-  getAllWarehouse,
-  getAllWarehousePage,
-} from "@/api/WareHouse/WareHouse";
+import { getAllWarehouse } from "@/api/WareHouse/WareHouse";
 type Product = {
   product_variant_id: string;
   skuCode: string;

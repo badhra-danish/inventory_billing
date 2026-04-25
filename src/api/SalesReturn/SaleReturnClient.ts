@@ -1,4 +1,3 @@
-import { axiosClient } from "..";
 import api from "@/utils/axios";
 const endPoint = {
   createSaleReturn: "v1/salereturn/create",

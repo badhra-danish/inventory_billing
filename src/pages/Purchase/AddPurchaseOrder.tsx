@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { Textarea } from "@/components/ui/textarea";
 import {
   FileText,
   Loader2,
@@ -18,13 +17,11 @@ import {
   PackageX,
   Plus,
   Save,
-  Search,
   ShoppingCart,
   Tag,
   Trash2,
   X,
 } from "lucide-react";
-import { getAllVariantInstock } from "@/api/Stock/Stockclinet";
 import { getAllVariantBySearch } from "@/api/CreateProduct/ProductClinet";
 import React from "react";
 import { getAllSupplier } from "@/api/Supplier/SupplierClient";
