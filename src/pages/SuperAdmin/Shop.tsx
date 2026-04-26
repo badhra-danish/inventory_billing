@@ -1,4 +1,5 @@
 import { createUserShop } from "@/api/superAdmin/superAdmin";
+import UserDataTable from "@/components/superAdmin/ShopUserDataTable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -248,6 +249,7 @@ export default function Shop() {
             </Dialog>
           </div>
         </div>
+        <UserDataTable />
       </>
     </div>
   );

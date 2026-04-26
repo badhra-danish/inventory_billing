@@ -12,7 +12,34 @@ import {
 } from "lucide-react";
 import SalesPurchaseChart from "@/components/utils/SalesPurchaseChart";
 import InvoiceDataTable from "@/components/Sales/InvoiceDataTable";
+import React, { use } from "react";
+import { getShopAdminStats } from "@/api/superAdmin/superAdmin";
 function Dashboard() {
+  const [stats, setStats] = React.useState({
+    totalSales: 0,
+    totalPurchase: 0,
+    totalSalesDue: 0,
+    totalPurchaseDue: 0,
+    totalCustomers: 0,
+    totalSuppliers: 0,
+    totalSalesInvoices: 0,
+    totalPurchaseInvoices: 0,
+  });
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  console.log(user);
+
+  React.useEffect(() => {
+    const fetchStats = async () => {
+      if (!user?.shop_id) return;
+      const res = await getShopAdminStats(user?.shop_id);
+
+      if (res.status === "OK") {
+        setStats(res.data);
+      }
+    };
+
+    fetchStats();
+  }, []);
   return (
     <>
       <div className="space-y-8">
@@ -38,28 +65,28 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
           <StatCard
             icon={<ShoppingBag />}
-            amount="$307,144"
+            amount={stats.totalPurchaseDue.toString()}
             label="Total Purchase Due"
             bg="bg-orange-100"
             bgText="text-orange-600"
           />
           <StatCard
             icon={<BadgeIndianRupee />}
-            amount="$307,144"
+            amount={stats.totalSalesDue.toString()}
             label="Total Sales Due"
             bg="bg-green-100"
             bgText="text-green-600"
           />
           <StatCard
             icon={<ArrowDownFromLine />}
-            amount="$307,144"
+            amount={stats.totalPurchase.toString()}
             label="Total Purchase"
             bg="bg-blue-100"
             bgText="text-blue-600"
           />
           <StatCard
             icon={<ArrowUpFromLine />}
-            amount="$307,144"
+            amount={stats.totalSales.toString()}
             label="Total Sales"
             bg="bg-red-100"
             bgText="text-red-600"
@@ -70,25 +97,25 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <SummaryCard
             icon={<User className="w-12 h-12" />}
-            value="100"
+            value={stats.totalSuppliers.toString()}
             label="Suppliers"
             bg="bg-orange-300"
           />
           <SummaryCard
             icon={<UserCheck className="w-12 h-12" />}
-            value="110"
+            value={stats.totalCustomers.toString()}
             label="Customers"
             bg="bg-blue-400"
           />
           <SummaryCard
             icon={<ScrollText className="w-12 h-12" />}
-            value="150"
+            value={stats.totalPurchaseInvoices.toString()}
             label="Purchase Invoice"
             bg="bg-blue-900"
           />
           <SummaryCard
             icon={<ReceiptText className="w-12 h-12" />}
-            value="170"
+            value={stats.totalSalesInvoices.toString()}
             label="Sales Invoice"
             bg="bg-green-500"
           />

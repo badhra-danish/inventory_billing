@@ -158,6 +158,10 @@ import Loader from "@/components/commen/loader.tsx";
 
 // 🔥 Lazy Imports
 const Dashboard = lazy(() => import("@/pages/Dashbord/Dashboard"));
+const SuperAdminDashboard = lazy(
+  () => import("@/pages/Dashbord/SuperAdminDashbord"),
+);
+
 const CreateProduct = lazy(() => import("@/pages/inventory/CreateProduct"));
 const ProductDataTablepage = lazy(() => import("@/pages/inventory/Product"));
 const ProductDetails = lazy(
@@ -221,7 +225,10 @@ function Approutes() {
             {/* SUPER ADMIN */}
             <Route element={<ProtectedLayout roles={["SUPER_ADMIN"]} />}>
               <Route element={<OutletLayout />}>
-                <Route path="/super/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/super/dashboard"
+                  element={<SuperAdminDashboard />}
+                />
                 <Route path="/super/shop" element={<ShopRoutes />} />
 
                 <Route

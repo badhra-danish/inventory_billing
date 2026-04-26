@@ -92,7 +92,7 @@ export default function LowStockDataTable() {
   };
   React.useEffect(() => {
     getAlllowStockData();
-  }, []);
+  }, [page]);
   const data: StockVariant[] = lowStockVariantData;
   const columns: ColumnDef<StockVariant>[] = [
     {
