@@ -15,36 +15,36 @@ import { useNavigate } from "react-router-dom";
 export default function Purchase() {
   const navigate = useNavigate();
 
-  const kpiData = [
-    {
-      title: "Total Amount ",
-      value: "$45,231",
-      icon: IndianRupee,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
-    {
-      title: "Total Collected",
-      value: "356",
-      icon: IndianRupee,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-    },
-    {
-      title: "Total Due",
-      value: "$127.05",
-      icon: IndianRupee,
-      color: "text-red-600",
-      bgColor: "bg-red-100",
-    },
-    {
-      title: "Total Purchase",
-      value: "12",
-      icon: Receipt,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-    },
-  ];
+  // const kpiData = [
+  //   {
+  //     title: "Total Amount ",
+  //     value: "$45,231",
+  //     icon: IndianRupee,
+  //     color: "text-blue-600",
+  //     bgColor: "bg-blue-50",
+  //   },
+  //   {
+  //     title: "Total Collected",
+  //     value: "356",
+  //     icon: IndianRupee,
+  //     color: "text-green-600",
+  //     bgColor: "bg-green-50",
+  //   },
+  //   {
+  //     title: "Total Due",
+  //     value: "$127.05",
+  //     icon: IndianRupee,
+  //     color: "text-red-600",
+  //     bgColor: "bg-red-100",
+  //   },
+  //   {
+  //     title: "Total Purchase",
+  //     value: "12",
+  //     icon: Receipt,
+  //     color: "text-orange-600",
+  //     bgColor: "bg-orange-50",
+  //   },
+  // ];
 
   return (
     <>
@@ -70,7 +70,7 @@ export default function Purchase() {
         </div>
       </div>
       {/* Added KPI Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {kpiData.map((kpi, index) => {
           const Icon = kpi.icon;
           return (
@@ -94,7 +94,7 @@ export default function Purchase() {
             </div>
           );
         })}
-      </div>
+      </div> */}
       <PurchaseDataTable />
     </>
   );
